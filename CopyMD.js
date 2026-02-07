@@ -3,7 +3,7 @@
 // @name:zh-TW   複製為 Markdown + LaTeX
 // @name:zh-CN   复制为 Markdown + LaTeX
 // @namespace    mdltx.copy.self
-// @version      3.2.0
+// @version      3.2.3
 // @description  Copy selection/article/page as Markdown, preserving LaTeX from KaTeX/MathJax/MathML. Enhanced code block language detection for AI chat platforms. Self-contained with modern UI.
 // @description:zh-TW  將選取範圍／文章／整頁複製為 Markdown，完整保留 KaTeX/MathJax/MathML 數學公式。增強 AI 聊天平台的程式碼區塊語言偵測。獨立運作，相容 Trusted Types。
 // @description:zh-CN  将选取范围／文章／整页复制为 Markdown，完整保留 KaTeX/MathJax/MathML 数学公式。增强 AI 聊天平台的代码区块语言检测。独立运作，相容 Trusted Types。
@@ -285,6 +285,23 @@
       hiddenUntilFoundVisible: '將 hidden="until-found" 視為可見',
       unknownEmptyTagStrategy: '未知空標籤策略',
 
+      exportSettings: '匯出設定',
+      importSettings: '匯入設定',
+      exportSuccess: '設定已匯出到剪貼簿',
+      importSuccess: '設定已成功匯入',
+      importFailed: '匯入失敗：格式不正確',
+      importConfirm: '確定要匯入這些設定嗎？目前的設定會被覆蓋。',
+
+      detailsDefaultSummary: '詳細內容',
+      defaultDocumentName: '文件',
+      unsavedChangesWarning: '你有尚未儲存的編輯，確定要關閉嗎？',
+      discardChanges: '捨棄變更',
+      continueEditing: '繼續編輯',
+      renderEngineLabel: '預覽渲染引擎',
+      renderEngineBuiltin: '內建（輕巧）',
+      renderEngineEnhanced: '增強（更精準）',
+      renderEngineEnhancedHint: '支援更完整的 Markdown 語法',
+      cursorPosition: '行 {line}, 欄 {col}',
     },
     'zh-CN': {
       copyMd: '复制 MD', copySelection: '复制选中内容', copyArticle: '智能提取文章', copyPage: '复制整个页面', downloadMd: '下载为 .md 文件', settings: '设置',
@@ -395,6 +412,23 @@
       hiddenUntilFoundVisible: '将 hidden="until-found" 视为可见',
       unknownEmptyTagStrategy: '未知空标签策略',
 
+      exportSettings: '导出设置',
+      importSettings: '导入设置',
+      exportSuccess: '设置已导出到剪贴板',
+      importSuccess: '设置已成功导入',
+      importFailed: '导入失败：格式不正确',
+      importConfirm: '确定要导入这些设置吗？当前的设置会被覆盖。',
+
+      detailsDefaultSummary: '详细内容',
+      defaultDocumentName: '文档',
+      unsavedChangesWarning: '你有尚未保存的编辑，确定要关闭吗？',
+      discardChanges: '放弃更改',
+      continueEditing: '继续编辑',
+      renderEngineLabel: '预览渲染引擎',
+      renderEngineBuiltin: '内建（轻巧）',
+      renderEngineEnhanced: '增强（更精准）',
+      renderEngineEnhancedHint: '支持更完整的 Markdown 语法',
+      cursorPosition: '行 {line}, 列 {col}',
     },
     'en': {
       copyMd: 'Copy MD', copySelection: 'Copy Selection', copyArticle: 'Smart Article', copyPage: 'Copy Entire Page', downloadMd: 'Download as .md', settings: 'Settings',
@@ -505,6 +539,23 @@
       hiddenUntilFoundVisible: 'Treat hidden="until-found" as visible',
       unknownEmptyTagStrategy: 'Unknown empty tag strategy',
 
+      exportSettings: 'Export Settings',
+      importSettings: 'Import Settings',
+      exportSuccess: 'Settings exported to clipboard',
+      importSuccess: 'Settings imported successfully',
+      importFailed: 'Import failed: invalid format',
+      importConfirm: 'Import these settings? Current settings will be overwritten.',
+
+      detailsDefaultSummary: 'Details',
+      defaultDocumentName: 'document',
+      unsavedChangesWarning: 'You have unsaved edits. Close anyway?',
+      discardChanges: 'Discard',
+      continueEditing: 'Keep Editing',
+      renderEngineLabel: 'Preview Render Engine',
+      renderEngineBuiltin: 'Built-in (Lightweight)',
+      renderEngineEnhanced: 'Enhanced (More Accurate)',
+      renderEngineEnhancedHint: 'Supports more complete Markdown syntax',
+      cursorPosition: 'Ln {line}, Col {col}',
     }
   };
 
@@ -597,6 +648,8 @@
     quote: 'M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21zm12 0c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3z',
     minus: 'M5 12h14',
     xCircle: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6',
+    upload: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12',
+    clipboard: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 2h6a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z',
   };
 
   function createIcon(type, size) {
@@ -655,9 +708,9 @@
 .mdltx-root[data-theme="light"]{--mdltx-bg:#fff;--mdltx-bg-secondary:#f3f4f6;--mdltx-bg-tertiary:#e5e7eb;--mdltx-text:#1f2937;--mdltx-text-secondary:#6b7280;--mdltx-border:#d1d5db;--mdltx-shadow:rgba(0,0,0,0.1);--mdltx-shadow-lg:rgba(0,0,0,0.15);--mdltx-overlay:rgba(0,0,0,0.5)}
 .mdltx-root[data-theme="dark"]{--mdltx-bg:#1f2937;--mdltx-bg-secondary:#374151;--mdltx-bg-tertiary:#4b5563;--mdltx-text:#f9fafb;--mdltx-text-secondary:#9ca3af;--mdltx-border:#4b5563;--mdltx-shadow:rgba(0,0,0,0.3);--mdltx-shadow-lg:rgba(0,0,0,0.4);--mdltx-overlay:rgba(0,0,0,0.7)}
 .mdltx-root{color:var(--mdltx-text)}.mdltx-root *{box-sizing:border-box;margin:0;padding:0}
-@media(prefers-reduced-motion:reduce){.mdltx-root *,.mdltx-root *::before,.mdltx-root *::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}
+@media(prefers-reduced-motion:reduce){.mdltx-root *,.mdltx-root *::before,.mdltx-root *::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}.mdltx-btn:hover:not(.dragging):not(.processing){transform:none!important}.mdltx-toast.show{transform:translateX(-50%) translateY(0)!important}.mdltx-menu.open{transform:scale(1) translateY(0)!important}.mdltx-modal-overlay.open .mdltx-modal,.mdltx-modal-overlay.open .mdltx-preview-modal{transform:scale(1)!important}}
 .mdltx-root button:focus-visible,.mdltx-root .mdltx-menu-item:focus-visible,.mdltx-root .mdltx-select:focus-visible,.mdltx-root .mdltx-input:focus-visible,.mdltx-root .mdltx-checkbox:focus-visible,.mdltx-root .mdltx-range:focus-visible{outline:2px solid var(--mdltx-primary);outline-offset:2px}
-.mdltx-btn{position:fixed;z-index:2147483647;display:flex;align-items:center;justify-content:center;width:var(--mdltx-btn-size,42px);height:var(--mdltx-btn-size,42px);padding:0;border-radius:50%;border:1px solid var(--mdltx-border);background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 4px 12px var(--mdltx-shadow);cursor:pointer;user-select:none;touch-action:none;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease,color 0.2s ease,opacity 0.3s ease;font-family:inherit;opacity:var(--mdltx-btn-opacity,0.85)}
+.mdltx-btn{position:fixed;z-index:2147483647;display:flex;align-items:center;justify-content:center;width:var(--mdltx-btn-size,42px);height:var(--mdltx-btn-size,42px);padding:0;border-radius:50%;border:1px solid var(--mdltx-border);background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 4px 12px var(--mdltx-shadow);cursor:pointer;user-select:none;touch-action:none;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease,color 0.2s ease,opacity 0.3s ease;font-family:inherit;opacity:var(--mdltx-btn-opacity,0.85);will-change:transform,opacity}
 .mdltx-btn:hover:not(.dragging):not(.processing){transform:translateY(-2px) scale(1.05);box-shadow:0 8px 24px var(--mdltx-shadow-lg);opacity:var(--mdltx-btn-hover-opacity,1)!important}
 .mdltx-btn:focus-visible{outline:3px solid var(--mdltx-primary);outline-offset:2px}
 .mdltx-btn:active:not(.dragging){transform:translateY(0) scale(0.98)}
@@ -674,12 +727,13 @@
 .mdltx-tooltip{position:fixed;z-index:2147483648;background:var(--mdltx-bg);color:var(--mdltx-text);border:1px solid var(--mdltx-border);padding:10px 14px;border-radius:10px;font-size:12px;line-height:1.5;box-shadow:0 4px 16px var(--mdltx-shadow-lg);max-width:260px;opacity:0;visibility:hidden;transition:opacity 0.15s ease,visibility 0.15s ease;pointer-events:none;white-space:pre-line}
 .mdltx-tooltip.show{opacity:1;visibility:visible}
 .mdltx-tooltip-hotkey{display:block;margin-top:6px;padding-top:6px;border-top:1px solid var(--mdltx-border);color:var(--mdltx-text-secondary);font-size:11px}
-.mdltx-menu{position:fixed;z-index:2147483647;min-width:220px;padding:6px;background:var(--mdltx-bg);border:1px solid var(--mdltx-border);border-radius:12px;box-shadow:0 8px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transform:scale(0.95) translateY(-10px);transform-origin:top;transition:all 0.15s ease}
+.mdltx-menu{position:fixed;z-index:2147483647;min-width:220px;padding:6px;background:var(--mdltx-bg);border:1px solid var(--mdltx-border);border-radius:12px;box-shadow:0 8px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transform:scale(0.95) translateY(-10px);transform-origin:top;transition:opacity 0.2s cubic-bezier(0,0,0.2,1),visibility 0.2s cubic-bezier(0,0,0.2,1),transform 0.2s cubic-bezier(0,0,0.2,1)}
 .mdltx-menu.open{opacity:1;visibility:visible;transform:scale(1) translateY(0)}
 .mdltx-menu.from-bottom{transform-origin:bottom;transform:scale(0.95) translateY(10px)}
 .mdltx-menu.from-bottom.open{transform:scale(1) translateY(0)}
 .mdltx-menu-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s ease,transform 0.15s ease;color:var(--mdltx-text);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-size:14px}
 .mdltx-menu-item:hover:not(:disabled){background:var(--mdltx-bg-secondary);transform:translateX(2px)}
+.mdltx-menu-item:hover:not(:disabled) .mdltx-menu-item-icon{color:var(--mdltx-primary)}
 .mdltx-menu-item:focus-visible{background:var(--mdltx-bg-secondary);outline:none}
 .mdltx-menu-item:active:not(:disabled){background:var(--mdltx-bg-tertiary)}
 .mdltx-menu-item:disabled{opacity:0.5;cursor:not-allowed}
@@ -691,7 +745,7 @@
 .mdltx-menu-divider{height:1px;background:var(--mdltx-border);margin:6px 0}
 .mdltx-menu-hint{padding:6px 12px;font-size:11px;color:var(--mdltx-text-secondary)}
 .mdltx-toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(100px);z-index:2147483647;display:flex;align-items:flex-start;gap:12px;padding:14px 18px;min-width:280px;max-width:min(500px,90vw);border-radius:12px;background:var(--mdltx-bg);border:1px solid var(--mdltx-border);box-shadow:0 8px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
-.mdltx-toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.mdltx-toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1)}
 .mdltx-toast.success{border-left:4px solid var(--mdltx-success)}
 .mdltx-toast.error{border-left:4px solid var(--mdltx-error)}
 .mdltx-toast.info{border-left:4px solid var(--mdltx-primary)}
@@ -706,7 +760,7 @@
 .mdltx-toast-close{width:24px;height:24px;padding:4px;border:none;background:none;cursor:pointer;border-radius:6px;color:var(--mdltx-text-secondary);transition:all 0.15s ease;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .mdltx-toast-close svg{width:16px;height:16px}
 .mdltx-toast-close:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
-.mdltx-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:var(--mdltx-overlay);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all 0.2s ease}
+.mdltx-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:var(--mdltx-overlay);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all 0.2s ease;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .mdltx-modal-overlay.open{opacity:1;visibility:visible}
 .mdltx-modal{width:100%;max-width:640px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:16px;box-shadow:0 24px 48px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease}
 .mdltx-modal-overlay.open .mdltx-modal{transform:scale(1)}
@@ -715,19 +769,20 @@
 .mdltx-modal-close{width:32px;height:32px;padding:6px;border:none;background:none;cursor:pointer;border-radius:8px;color:var(--mdltx-text-secondary);transition:all 0.15s ease;display:flex;align-items:center;justify-content:center}
 .mdltx-modal-close svg{width:20px;height:20px}
 .mdltx-modal-close:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
-.mdltx-modal-body{flex:1;overflow-y:auto;padding:20px 24px}
+.mdltx-modal-body{flex:1;overflow-y:auto;padding:20px 24px;background:linear-gradient(var(--mdltx-bg) 33%,transparent) center top,linear-gradient(transparent,var(--mdltx-bg) 66%) center bottom,radial-gradient(farthest-side at 50% 0,rgba(0,0,0,0.08),transparent) center top,radial-gradient(farthest-side at 50% 100%,rgba(0,0,0,0.08),transparent) center bottom;background-repeat:no-repeat;background-size:100% 40px,100% 40px,100% 10px,100% 10px;background-attachment:local,local,scroll,scroll}
 .mdltx-modal-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 24px;border-top:1px solid var(--mdltx-border);flex-shrink:0}
 .mdltx-modal-footer-hint{font-size:12px;color:var(--mdltx-text-secondary)}
 .mdltx-modal-footer-left,.mdltx-modal-footer-right{display:flex;gap:8px}
 .mdltx-mode-toggle{display:flex;background:var(--mdltx-bg-secondary);border-radius:8px;padding:4px;margin-bottom:20px}
 .mdltx-mode-toggle-btn{flex:1;padding:8px 16px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all 0.2s ease}
 .mdltx-mode-toggle-btn:hover{color:var(--mdltx-text)}
-.mdltx-mode-toggle-btn.active{background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 1px 3px var(--mdltx-shadow)}
+.mdltx-mode-toggle-btn.active{background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 1px 3px var(--mdltx-shadow);transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
 .mdltx-mode-toggle-btn:focus-visible{outline:2px solid var(--mdltx-primary);outline-offset:-2px}
 .mdltx-section{margin-bottom:24px}
 .mdltx-section:last-child{margin-bottom:0}
 .mdltx-section.hidden{display:none}
-.mdltx-section-title{font-size:13px;font-weight:600;color:var(--mdltx-text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px}
+.mdltx-section-title{font-size:13px;font-weight:600;color:var(--mdltx-text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--mdltx-border);display:flex;align-items:center;gap:8px}
+.mdltx-section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--mdltx-primary);border-radius:2px;flex-shrink:0}
 .mdltx-field{margin-bottom:16px}
 .mdltx-field:last-child{margin-bottom:0}
 .mdltx-field.hidden{display:none}
@@ -767,7 +822,7 @@
 /* ═══ 元素選取模式 ═══ */
 .mdltx-picker-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483645;pointer-events:none}
 .mdltx-picker-highlight{position:fixed;pointer-events:none;border:2px solid var(--mdltx-primary);background:rgba(37,99,235,0.1);border-radius:4px;transition:all 0.1s ease;z-index:2147483644}
-.mdltx-picker-label{position:fixed;z-index:2147483646;background:var(--mdltx-primary);color:#fff;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.mdltx-picker-label{position:fixed;z-index:2147483646;background:var(--mdltx-primary);color:#fff;font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 12px rgba(0,0,0,0.25);max-width:400px;line-height:1.4;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
 .mdltx-picker-toolbar{position:fixed;z-index:2147483647;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--mdltx-bg);border:1px solid var(--mdltx-border);border-radius:12px;box-shadow:0 8px 32px var(--mdltx-shadow-lg)}
 .mdltx-picker-toolbar-text{font-size:14px;color:var(--mdltx-text)}
 .mdltx-picker-toolbar-hint{font-size:12px;color:var(--mdltx-text-secondary)}
@@ -785,7 +840,8 @@
 .mdltx-preview-tab.active{background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 1px 3px var(--mdltx-shadow)}
 .mdltx-preview-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .mdltx-preview-content{flex:1;overflow:auto;padding:0}
-.mdltx-preview-editor{width:100%;height:100%;border:none;resize:none;padding:16px 20px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6;color:var(--mdltx-text);background:var(--mdltx-bg);outline:none}
+.mdltx-preview-editor{width:100%;height:100%;border:none;resize:none;padding:16px 20px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6;color:var(--mdltx-text);background:var(--mdltx-bg);outline:none;transition:box-shadow 0.15s ease}
+.mdltx-preview-editor:focus{box-shadow:inset 0 0 0 2px rgba(37,99,235,0.15)}
 .mdltx-preview-rendered{padding:16px 20px;font-size:14px;line-height:1.7;color:var(--mdltx-text)}
 .mdltx-preview-rendered pre{background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);border-radius:8px;padding:12px 16px;overflow-x:auto;margin:12px 0}
 .mdltx-preview-rendered code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}
@@ -797,6 +853,22 @@
 .mdltx-preview-rendered th,.mdltx-preview-rendered td{border:1px solid var(--mdltx-border);padding:8px 12px;text-align:left}
 .mdltx-preview-rendered th{background:var(--mdltx-bg-secondary);font-weight:600}
 .mdltx-preview-rendered hr{border:none;border-top:1px solid var(--mdltx-border);margin:16px 0}
+.mdltx-preview-rendered table tr:nth-child(even) td{background:rgba(0,0,0,0.02)}
+.mdltx-root[data-theme="dark"] .mdltx-preview-rendered table tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
+.mdltx-preview-rendered li.task{list-style:none;margin-left:-20px}
+.mdltx-preview-rendered li.task input[type="checkbox"]{margin-right:6px;accent-color:var(--mdltx-primary);width:15px;height:15px;vertical-align:middle}
+.mdltx-preview-rendered li.task.done{color:var(--mdltx-text-secondary);text-decoration:line-through;text-decoration-color:var(--mdltx-border)}
+.mdltx-preview-rendered img{border-radius:8px;border:1px solid var(--mdltx-border);max-width:100%}
+.mdltx-preview-rendered del{color:var(--mdltx-text-secondary);text-decoration-color:var(--mdltx-error)}
+.mdltx-preview-rendered mark{background:rgba(250,204,21,0.3);padding:1px 4px;border-radius:2px}
+.mdltx-preview-rendered sup,.mdltx-preview-rendered sub{font-size:0.8em;line-height:0}
+.mdltx-preview-rendered h1{font-size:1.6em;border-bottom:1px solid var(--mdltx-border);padding-bottom:8px}
+.mdltx-preview-rendered h2{font-size:1.35em;border-bottom:1px solid var(--mdltx-border);padding-bottom:6px}
+.mdltx-preview-rendered h3{font-size:1.15em}
+.math-block{position:relative}
+.math-block-copy{position:absolute;top:6px;right:8px;padding:2px 8px;border:1px solid var(--mdltx-border);border-radius:4px;background:var(--mdltx-bg);color:var(--mdltx-text-secondary);font-size:10px;cursor:pointer;opacity:0;transition:opacity 0.15s ease;font-family:system-ui,sans-serif}
+.math-block:hover .math-block-copy{opacity:1}
+.math-block-copy:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
 .mdltx-preview-rendered a{color:var(--mdltx-primary);text-decoration:none}
 .mdltx-preview-rendered a:hover{text-decoration:underline}
 .mdltx-preview-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--mdltx-border);flex-shrink:0}
@@ -832,6 +904,23 @@
 .mdltx-picker-exit-btn{padding:8px 16px;border:1px solid var(--mdltx-error);border-radius:8px;background:transparent;color:var(--mdltx-error);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s ease;display:flex;align-items:center;gap:6px}
 .mdltx-picker-exit-btn:hover{background:var(--mdltx-error);color:#fff}
 .mdltx-picker-exit-btn svg{width:16px;height:16px}
+
+/* ═══ 匯出匯入對話框 ═══ */
+.mdltx-import-dialog{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--mdltx-overlay);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10;border-radius:16px}
+.mdltx-import-dialog-inner{background:var(--mdltx-bg);border:1px solid var(--mdltx-border);border-radius:12px;padding:20px;width:100%;max-width:480px;box-shadow:0 8px 32px var(--mdltx-shadow-lg)}
+.mdltx-import-dialog-title{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--mdltx-text)}
+.mdltx-import-dialog-textarea{width:100%;min-height:160px;padding:12px;border:1px solid var(--mdltx-border);border-radius:8px;background:var(--mdltx-bg);color:var(--mdltx-text);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.5;resize:vertical;outline:none;transition:border-color 0.15s ease}
+.mdltx-import-dialog-textarea:focus{border-color:var(--mdltx-primary);box-shadow:var(--mdltx-focus-ring)}
+.mdltx-import-dialog-hint{font-size:12px;color:var(--mdltx-text-secondary);margin-top:8px;margin-bottom:16px}
+.mdltx-import-dialog-buttons{display:flex;justify-content:flex-end;gap:8px}
+.mdltx-btn-icon-sm{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--mdltx-border);border-radius:8px;background:var(--mdltx-bg);color:var(--mdltx-text);font-family:inherit;font-size:13px;cursor:pointer;transition:all 0.15s ease}
+.mdltx-btn-icon-sm:hover{background:var(--mdltx-bg-secondary)}
+.mdltx-btn-icon-sm svg{width:14px;height:14px}
+
+/* ═══ 工具列按鈕 hover tooltip ═══ */
+.mdltx-toolbar-btn{position:relative}
+.mdltx-toolbar-btn[title]::after{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:3px 8px;border-radius:4px;background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);color:var(--mdltx-text);font-size:11px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.15s ease 0.3s;z-index:1}
+.mdltx-toolbar-btn[title]:hover::after{opacity:1}
 `;
 
   // ─────────────────────────────────────────────────────────────
@@ -843,6 +932,7 @@
     for (const [key, value] of Object.entries(attrs)) {
       if (key === 'className') el.className = value;
       else if (key === 'textContent') el.textContent = value;
+      else if (key === 'value') el.value = value;
       else if (key.startsWith('on') && typeof value === 'function') el.addEventListener(key.slice(2).toLowerCase(), value);
       else if (key === 'style' && typeof value === 'object') Object.assign(el.style, value);
       else if (key === 'dataset' && typeof value === 'object') Object.assign(el.dataset, value);
@@ -856,12 +946,20 @@
   }
 
   function sanitizeFilename(name) {
-    return String(name || 'document').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 100) || 'document';
+    const fallback = t('defaultDocumentName') || 'document';
+    return String(name || fallback).replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 100) || fallback;
   }
 
   function generateFilename() {
-    const title = sanitizeFilename(document.title || 'untitled'), date = new Date().toISOString().slice(0, 10);
-    return S.get('downloadFilenameTemplate').replace('{title}', title).replace('{date}', date).replace('{timestamp}', Date.now().toString()) + '.md';
+    const title = sanitizeFilename(document.title || 'untitled');
+    const date = new Date().toISOString().slice(0, 10);
+    const timestamp = Date.now().toString();
+    const template = S.get('downloadFilenameTemplate') || '{title}_{date}';
+    const filename = template
+      .split('{title}').join(title)
+      .split('{date}').join(date)
+      .split('{timestamp}').join(timestamp);
+    return filename + '.md';
   }
 
   function downloadAsFile(content, filename) {
@@ -872,6 +970,58 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     return filename;
+  }
+
+  /**
+   * 安全地設定元素的 HTML 內容（Trusted Types 相容）
+   * 第二階段將擴展此函數以支援 Trusted Type policy
+   */
+  function safeSetInnerHTML(el, html) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    el.appendChild(template.content.cloneNode(true));
+  }
+
+  /**
+   * 將設定匯出為 JSON 字串
+   */
+  function exportSettings() {
+    const settings = S.getAll();
+    return JSON.stringify(settings, null, 2);
+  }
+
+  /**
+   * 從 JSON 字串匯入設定
+   * @returns {boolean} 是否匯入成功
+   */
+  function importSettings(jsonString) {
+    try {
+      const parsed = JSON.parse(jsonString);
+      if (typeof parsed !== 'object' || parsed === null) return false;
+      let importedCount = 0;
+      for (const [k, v] of Object.entries(parsed)) {
+        if (k in DEFAULTS && k in SETTING_TYPES) {
+          const type = SETTING_TYPES[k];
+          if (type === 'boolean' && typeof v === 'boolean') { S.set(k, v); importedCount++; }
+          else if (type === 'number' && typeof v === 'number' && !isNaN(v)) { S.set(k, v); importedCount++; }
+          else if (type === 'string' && typeof v === 'string') { S.set(k, v); importedCount++; }
+        }
+      }
+      return importedCount > 0;
+    } catch (e) {
+      console.warn('[mdltx] importSettings error:', e);
+      return false;
+    }
+  }
+
+  /**
+   * 偵測是否支援 Trusted Types（為第二階段 safeSetInnerHTML 擴展準備）
+   */
+  function supportsTrustedTypes() {
+    try {
+      return typeof window.trustedTypes !== 'undefined' && typeof window.trustedTypes.createPolicy === 'function';
+    } catch { return false; }
   }
 
   /**
@@ -941,7 +1091,10 @@
       this.prev = null;
     }
     _focusable() {
-      return Array.from(this.container.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),a[href]')).filter(el => el.offsetParent !== null || el.getAttribute('tabindex') === '0');
+      return Array.from(this.container.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),a[href]')).filter(el => {
+        if (el.getAttribute('tabindex') === '0') return true;
+        try { const cs = getComputedStyle(el); return cs.display !== 'none' && cs.visibility !== 'hidden'; } catch { return el.offsetParent !== null; }
+      });
     }
     _onKey(e) {
       if (e.key !== 'Tab') return;
@@ -967,6 +1120,7 @@
       this.onComplete = null;
       this._onMouseMove = this._onMouseMove.bind(this);
       this._onMouseDown = this._onMouseDown.bind(this);
+      this._onClick = this._onClick.bind(this);
       this._onKeyDown = this._onKeyDown.bind(this);
       this._onScroll = this._onScroll.bind(this);
     }
@@ -1013,7 +1167,10 @@
       this.toolbar = createElement('div', { className: 'mdltx-picker-toolbar' }, [
         createElement('span', { className: 'mdltx-picker-toolbar-text', textContent: t('pickerModeActive') }),
         createElement('span', { className: 'mdltx-picker-toolbar-hint' }, [
-          document.createTextNode(t('pickerExitHint') + ' '),
+          createElement('kbd', { textContent: '↑↓←→' }),
+          document.createTextNode(' '),
+          createElement('kbd', { textContent: 'Enter' }),
+          document.createTextNode(' '),
           createElement('kbd', { textContent: 'ESC' }),
         ]),
         exitBtn,
@@ -1032,13 +1189,16 @@
     _bindEvents() {
       document.addEventListener('mousemove', this._onMouseMove, true);
       document.addEventListener('mousedown', this._onMouseDown, true);
+      document.addEventListener('click', this._onClick, true);
       document.addEventListener('keydown', this._onKeyDown, true);
       window.addEventListener('scroll', this._onScroll, true);
+      this.modal.addEventListener('keydown', e => this._handleEditorHotkeys(e), true);
     }
 
     _unbindEvents() {
       document.removeEventListener('mousemove', this._onMouseMove, true);
       document.removeEventListener('mousedown', this._onMouseDown, true);
+      document.removeEventListener('click', this._onClick, true);
       document.removeEventListener('keydown', this._onKeyDown, true);
       window.removeEventListener('scroll', this._onScroll, true);
     }
@@ -1066,11 +1226,21 @@
       let labelText = el.tagName.toLowerCase();
       if (el.id) labelText += `#${el.id}`;
       else if (el.className && typeof el.className === 'string') {
-        const firstClass = el.className.split(' ')[0];
-        if (firstClass) labelText += `.${firstClass}`;
+        const classes = el.className.trim().split(/\s+/).slice(0, 2);
+        if (classes.length) labelText += '.' + classes.join('.');
       }
       const textLen = (el.textContent || '').trim().length;
-      labelText += ` (${Math.round(rect.width)}×${Math.round(rect.height)}, ${textLen} chars)`;
+      const childCount = el.children?.length || 0;
+      labelText += ` (${Math.round(rect.width)}×${Math.round(rect.height)}`;
+      if (childCount > 0) labelText += `, ${childCount} children`;
+      labelText += `, ${textLen} chars)`;
+
+      // 文字預覽（截斷）
+      const preview = (el.textContent || '').trim().slice(0, 60);
+      if (preview && preview.length > 0) {
+        const truncated = preview.length >= 60 ? preview + '…' : preview;
+        labelText += `\n"${truncated}"`;
+      }
 
       this.label.textContent = labelText;
       l.display = 'block';
@@ -1094,12 +1264,126 @@
       if (this.onComplete) this.onComplete(el);
     }
 
+    _onClick(e) {
+      if (!this.active) return;
+      if (isOurUI(e.target)) return;
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     _onKeyDown(e) {
       if (!this.active) return;
-      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); this.stop(); }
+
+      if (e.key === 'Escape') {
+        e.preventDefault(); e.stopPropagation();
+        this.stop();
+        return;
+      }
+
+      // ═══ 方向鍵導覽 ═══
+      if (!this.currentElement) return;
+
+      let target = null;
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault(); e.stopPropagation();
+          target = this._getNavigableParent(this.currentElement);
+          break;
+        case 'ArrowDown':
+          e.preventDefault(); e.stopPropagation();
+          target = this._getFirstNavigableChild(this.currentElement);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault(); e.stopPropagation();
+          target = this._getPrevNavigableSibling(this.currentElement);
+          break;
+        case 'ArrowRight':
+          e.preventDefault(); e.stopPropagation();
+          target = this._getNextNavigableSibling(this.currentElement);
+          break;
+        case 'Enter':
+        case ' ':
+          // Enter / Space = 確認選取（同滑鼠點擊）
+          e.preventDefault(); e.stopPropagation();
+          const el = this.currentElement;
+          this.stop();
+          if (this.onComplete) this.onComplete(el);
+          return;
+      }
+
+      if (target) this._navigateTo(target);
     }
 
     _onScroll() { if (this.currentElement) this._updateHighlight(this.currentElement); }
+
+    /** 判斷元素是否適合做為導覽目標 */
+    _isNavigable(el) {
+      if (!el || el.nodeType !== 1) return false;
+      if (/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|MJX-ASSISTIVE-MML|BR|HR)$/i.test(el.tagName)) return false;
+      if (isOurUI(el)) return false;
+      try {
+        const rect = el.getBoundingClientRect();
+        // 跳過完全沒有尺寸的元素（但保留 0 寬或 0 高的行內元素）
+        if (rect.width === 0 && rect.height === 0) return false;
+      } catch { return false; }
+      return true;
+    }
+
+    /** 取得父元素（可導覽的） */
+    _getNavigableParent(el) {
+      if (!el) return null;
+      let parent = el.parentElement;
+      while (parent) {
+        if (parent.tagName === 'HTML' || parent.tagName === 'BODY') return parent;
+        if (this._isNavigable(parent)) return parent;
+        parent = parent.parentElement;
+      }
+      return null;
+    }
+
+    /** 取得第一個可導覽的子元素 */
+    _getFirstNavigableChild(el) {
+      if (!el) return null;
+      for (const child of el.children) {
+        if (this._isNavigable(child)) return child;
+      }
+      return null;
+    }
+
+    /** 取得前一個可導覽的兄弟元素 */
+    _getPrevNavigableSibling(el) {
+      if (!el) return null;
+      let sibling = el.previousElementSibling;
+      while (sibling) {
+        if (this._isNavigable(sibling)) return sibling;
+        sibling = sibling.previousElementSibling;
+      }
+      return null;
+    }
+
+    /** 取得後一個可導覽的兄弟元素 */
+    _getNextNavigableSibling(el) {
+      if (!el) return null;
+      let sibling = el.nextElementSibling;
+      while (sibling) {
+        if (this._isNavigable(sibling)) return sibling;
+        sibling = sibling.nextElementSibling;
+      }
+      return null;
+    }
+
+    /** 導覽到指定元素 */
+    _navigateTo(el) {
+      if (!el || !this.active) return;
+      this.currentElement = el;
+      this._updateHighlight(el);
+      // 確保元素可見
+      try {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      } catch {
+        try { el.scrollIntoView(false); } catch {}
+      }
+    }
   }
 
   /**
@@ -1117,6 +1401,7 @@
     }
 
     async show(markdown, options = {}) {
+      this._originalContent = markdown;
       this.content = markdown;
       this.options = options;
       this.mode = S.get('previewSplitView') ? 'split' : (S.get('previewDefaultMode') || 'preview');
@@ -1196,10 +1481,17 @@
       this._focusTrap.activate();
     }
 
-    close() {
+    close(force = false) {
       if (!this.modal) return;
+
+      // 檢查是否有未儲存的編輯
+      if (!force && this._originalContent !== undefined && this.content !== this._originalContent) {
+        if (!confirm(t('unsavedChangesWarning'))) return;
+      }
+
       if (this._focusTrap) { this._focusTrap.deactivate(); this._focusTrap = null; }
       this.modal.classList.remove('open');
+      this._originalContent = undefined;
       setTimeout(() => { this.modal?.remove(); this.modal = null; }, 200);
     }
 
@@ -1290,6 +1582,9 @@
       this.modal.addEventListener('click', e => { if (e.target === this.modal) this.close(); });
       this.modal.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); this.close(); } });
 
+      // 編輯器快捷鍵（Ctrl/Cmd + B/I/K/`）
+      this.modal.addEventListener('keydown', e => this._handleEditorHotkeys(e), true);
+
       // 視圖切換
       this.modal.querySelectorAll('.mdltx-preview-view-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1330,7 +1625,7 @@
         modalEl.classList.toggle('fullscreen', this.isFullscreen);
       }
       if (btn) {
-        btn.innerHTML = '';
+        while (btn.firstChild) btn.removeChild(btn.firstChild);
         btn.appendChild(createIcon(this.isFullscreen ? 'minimize' : 'maximize', 18));
         btn.title = this.isFullscreen ? t('previewExitFullscreen') : t('previewFullscreen');
       }
@@ -1339,7 +1634,9 @@
     _updateView() {
       const container = this.modal?.querySelector('#mdltx-preview-content');
       if (!container) return;
-      container.innerHTML = '';
+      while (container.firstChild) container.removeChild(container.firstChild);
+      container.style.maxHeight = '';
+      container.style.overflow = '';
       this._updateViewState();
 
       const maxH = `${S.get('previewMaxHeight')}vh`;
@@ -1353,6 +1650,14 @@
         textarea.addEventListener('input', () => { this.content = textarea.value; this._updateStats(); });
         container.appendChild(textarea);
         this._editorRef = textarea;
+
+        const updateCursor = () => this._updateCursorPosition();
+        textarea.addEventListener('keyup', updateCursor);
+        textarea.addEventListener('click', updateCursor);
+        textarea.addEventListener('input', updateCursor);
+        // 初始更新
+        requestAnimationFrame(updateCursor);
+
         textarea.focus();
       } else if (this.mode === 'split') {
         // 並列模式
@@ -1370,6 +1675,12 @@
         editPane.appendChild(textarea);
         this._editorRef = textarea;
 
+        const updateCursor2 = () => this._updateCursorPosition();
+        textarea.addEventListener('keyup', updateCursor2);
+        textarea.addEventListener('click', updateCursor2);
+        textarea.addEventListener('input', updateCursor2);
+        requestAnimationFrame(updateCursor2);
+
         const previewPane = createElement('div', { className: 'mdltx-preview-pane' }, [
           createElement('div', { className: 'mdltx-preview-pane-header', textContent: t('previewModePreview') }),
           createElement('div', { className: 'mdltx-preview-rendered', id: 'mdltx-preview-rendered' }),
@@ -1378,10 +1689,36 @@
 
         container.style.maxHeight = maxH;
         container.append(editPane, previewPane);
+
+        // ═══ 滾動同步 ═══
+        this._isSyncing = false;
+        const renderedEl = previewPane.querySelector('.mdltx-preview-rendered');
+
+        const syncScroll = (source, target) => {
+          if (this._isSyncing || !source || !target) return;
+          this._isSyncing = true;
+          requestAnimationFrame(() => {
+            const sourceMax = source.scrollHeight - source.clientHeight;
+            if (sourceMax > 0) {
+              const ratio = source.scrollTop / sourceMax;
+              const targetMax = target.scrollHeight - target.clientHeight;
+              target.scrollTop = ratio * targetMax;
+            }
+            // 使用 setTimeout 而非立即解除，避免對方的 scroll 事件回彈
+            setTimeout(() => { this._isSyncing = false; }, 50);
+          });
+        };
+
+        textarea.addEventListener('scroll', () => syncScroll(textarea, renderedEl));
+        if (renderedEl) {
+          renderedEl.addEventListener('scroll', () => syncScroll(renderedEl, textarea));
+        }
       } else {
         // 純預覽
         const rendered = createElement('div', { className: 'mdltx-preview-rendered', id: 'mdltx-preview-rendered' });
         rendered.innerHTML = this._renderMarkdown(this.content);
+        this._bindMathCopyHandlers(rendered);
+
         rendered.style.maxHeight = maxH;
         container.appendChild(rendered);
         this._editorRef = null;
@@ -1392,7 +1729,59 @@
       const rendered = this.modal?.querySelector('#mdltx-preview-rendered');
       if (rendered) {
         rendered.innerHTML = this._renderMarkdown(this.content);
+        this._bindMathCopyHandlers(rendered);
       }
+    }
+
+    _handleEditorHotkeys(e) {
+      const editor = this._editorRef;
+      if (!editor) return;
+      const activeEl = (this.modal?.querySelector('.mdltx-preview-modal')?.getRootNode?.()?.activeElement) || document.activeElement;
+      if (activeEl !== editor) return;
+
+      const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform || '') ||
+                    (navigator.userAgentData?.platform || '').toLowerCase().includes('mac');
+      const modKey = isMac ? e.metaKey : e.ctrlKey;
+      if (!modKey || e.altKey) return;
+
+      const key = (e.key || '').toLowerCase();
+      const code = (e.code || '');
+
+      if (key === 'b' && !e.shiftKey) {
+        e.preventDefault(); e.stopPropagation();
+        this._insertFormat('**', '**');
+      } else if (key === 'i' && !e.shiftKey) {
+        e.preventDefault(); e.stopPropagation();
+        this._insertFormat('*', '*');
+      } else if (key === 'k' && !e.shiftKey) {
+        e.preventDefault(); e.stopPropagation();
+        this._insertFormat('[', '](url)');
+      } else if ((key === '`' || code === 'Backquote') && !e.shiftKey) {
+        e.preventDefault(); e.stopPropagation();
+        this._insertFormat('`', '`');
+      }
+    }
+
+    _bindMathCopyHandlers(container) {
+      if (!container || container.dataset?.mdltxMathCopyBound === '1') return;
+      container.dataset.mdltxMathCopyBound = '1';
+
+      container.addEventListener('click', async (e) => {
+        const btn = e.target?.closest?.('.math-block-copy');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const latex = (btn.dataset?.latex || '').trim();
+        if (!latex) return;
+
+        try {
+          await setClipboardText('$$\n' + latex + '\n$$');
+          const old = btn.textContent;
+          btn.textContent = '✓';
+          setTimeout(() => { btn.textContent = old || 'Copy'; }, 1200);
+        } catch {}
+      }, true);
     }
 
     // 編輯工具方法
@@ -1531,21 +1920,53 @@
 
     _renderMarkdown(md) {
       const escapeHtml = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const escapeHtmlAttr = s => String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
 
       let html = md;
 
+      // ═══ 佔位符策略：保護程式碼區塊和行內程式碼不被後續正則破壞 ═══
+      const protectedBlocks = [];
+      const protectBlock = (content) => {
+        const idx = protectedBlocks.length;
+        protectedBlocks.push(content);
+        return `\x00PBLOCK${idx}\x00`;
+      };
+
       // 程式碼區塊（先處理）
       html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
-        `<pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`);
+        protectBlock(`<pre><code class="language-${escapeHtml(lang)}">${escapeHtml(code.trim())}</code></pre>`));
 
-      // 行內程式碼
-      html = html.replace(/(`+)([^`]+)\1/g, '<code>$2</code>');
+      // 行內程式碼（需逸出 HTML 以防止注入）
+      html = html.replace(/(`+)([^`]+)\1/g, (_, ticks, code) =>
+        protectBlock(`<code>${escapeHtml(code)}</code>`));
 
-      // 數學公式（區塊）
-      html = html.replace(/\$\$\n?([\s\S]*?)\n?\$\$/g, '<div class="math-block" style="text-align:center;padding:1em;background:var(--mdltx-bg-secondary);border-radius:4px;margin:1em 0;font-family:serif;">$$$1$$</div>');
+      // 數學公式（區塊）——以數學字型顯示原始 LaTeX，附加類型標籤
+      html = html.replace(/\$\$\n?([\s\S]*?)\n?\$\$/g, (_, content) => {
+        const escaped = escapeHtml(content.trim());
+        const rawForCopy = escapeHtmlAttr(content.trim());
+        return protectBlock('<div class="math-block" style="text-align:center;padding:12px 16px;' +
+          'background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);' +
+          'border-radius:8px;margin:12px 0;font-family:\'Cambria Math\',\'Latin Modern Math\',' +
+          'serif;font-size:15px;line-height:1.8;white-space:pre-wrap;color:var(--mdltx-text);">' +
+          '<span style="display:block;font-size:10px;opacity:0.4;margin-bottom:4px;' +
+          'font-family:system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.5px;">LaTeX</span>' +
+          '<button class="math-block-copy" ' +
+          'data-latex="' + rawForCopy + '">Copy</button>' +
+          escaped + '</div>');
+      });
 
-      // 數學公式（行內）
-      html = html.replace(/\$([^\$\n]+)\$/g, '<span class="math-inline" style="font-family:serif;">$$$1$$</span>');
+      // 數學公式（行內）——以數學字型顯示，背景色區隔
+      html = html.replace(/\$([^\$\n]+)\$/g, (_, content) => {
+        const escaped = escapeHtml(content);
+        return protectBlock('<span class="math-inline" style="font-family:\'Cambria Math\',\'Latin Modern Math\',' +
+          'serif;background:var(--mdltx-bg-secondary);padding:1px 5px;border-radius:3px;' +
+          'font-size:0.95em;">' + escaped + '</span>');
+      });
 
       // 標題
       html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
@@ -1640,6 +2061,11 @@
       html = html.replace(/(<\/(?:h[1-6]|pre|table|ul|ol|blockquote|div)>)<\/p>/g, '$1');
       html = html.replace(/<p>(<hr \/>)<\/p>/g, '$1');
 
+      // ═══ 還原所有被保護的區塊 ═══
+      for (let i = 0; i < protectedBlocks.length; i++) {
+        html = html.split(`\x00PBLOCK${i}\x00`).join(protectedBlocks[i]);
+      }
+
       return html;
     }
 
@@ -1690,19 +2116,48 @@
       const chars = this.content.length;
       const lines = this.content.split('\n').length;
       const words = this.content.trim().split(/\s+/).filter(Boolean).length;
-      stats.innerHTML = '';
-      stats.append(
+      while (stats.firstChild) stats.removeChild(stats.firstChild);
+
+      const statItems = [
         createElement('span', { className: 'mdltx-preview-stat', textContent: `${t('previewCharCount')}: ${chars.toLocaleString()}` }),
         createElement('span', { className: 'mdltx-preview-stat', textContent: `${t('previewLineCount')}: ${lines.toLocaleString()}` }),
         createElement('span', { className: 'mdltx-preview-stat', textContent: `${t('previewWordCount')}: ${words.toLocaleString()}` }),
-      );
+      ];
+
+      // 游標位置（僅在編輯模式中顯示）
+      if (this._editorRef && (this.mode === 'edit' || this.mode === 'split')) {
+        const cursorSpan = createElement('span', {
+          className: 'mdltx-preview-stat',
+          id: 'mdltx-cursor-pos',
+          textContent: t('cursorPosition', { line: '1', col: '1' }),
+          style: { marginLeft: 'auto', fontFamily: 'ui-monospace, monospace', fontSize: '11px' }
+        });
+        statItems.push(cursorSpan);
+      }
+
+      stats.append(...statItems);
+    }
+
+    /** 更新游標位置顯示 */
+    _updateCursorPosition() {
+      const editor = this._editorRef;
+      const posEl = this.modal?.querySelector('#mdltx-cursor-pos');
+      if (!editor || !posEl) return;
+
+      const pos = editor.selectionStart;
+      const textBefore = this.content.substring(0, pos);
+      const line = textBefore.split('\n').length;
+      const lastNewline = textBefore.lastIndexOf('\n');
+      const col = pos - lastNewline;
+
+      posEl.textContent = t('cursorPosition', { line: String(line), col: String(col) });
     }
 
     async _handleCopy() {
       try {
         await setClipboardText(this.content);
         this.ui.showToast('success', t('previewCopySuccess'), `${this.content.length.toLocaleString()} ${t('previewCharCount')}`);
-        this.close();
+        this.close(true);
       } catch (e) { this.ui.showToast('error', t('toastError'), e.message); }
     }
 
@@ -1720,7 +2175,7 @@
         const filename = generateFilename();
         downloadAsFile(content, filename);
         this.ui.showToast('success', t('previewDownloadSuccess'), filename);
-        this.close();
+        this.close(true);
       } catch (e) { this.ui.showToast('error', t('toastError'), e.message); }
     }
 
@@ -1974,7 +2429,7 @@
     _updateMenuContent() {
       if (!this.menu) return;
       const hasSel = hasSelection(), noSelMode = S.get('noSelectionMode');
-      this.menu.innerHTML = '';
+      while (this.menu.firstChild) this.menu.removeChild(this.menu.firstChild);
       const mkItem = (action, icon, text, disabled = false) => {
         const item = createElement('button', { className: 'mdltx-menu-item', role: 'menuitem', type: 'button', tabindex: disabled ? '-1' : '0', dataset: { action } }, [
           createElement('span', { className: 'mdltx-menu-item-icon' }, [createIcon(icon)]),
@@ -2066,7 +2521,8 @@
       if (this.toastTimeoutId !== null) { this._tm.clear(this.toastTimeoutId); this.toastTimeoutId = null; }
       this.toast.classList.remove('show');
       requestAnimationFrame(() => {
-        this.toast.innerHTML = ''; this.toast.className = `mdltx-toast ${type}`;
+        while (this.toast.firstChild) this.toast.removeChild(this.toast.firstChild);
+        this.toast.className = `mdltx-toast ${type}`;
         const icons = { success: 'check', error: 'alertCircle', info: 'info' };
         const closeBtn = createElement('button', { className: 'mdltx-toast-close', type: 'button', 'aria-label': t('close'), tabindex: '0' }, [createIcon('x')]);
         closeBtn.addEventListener('click', () => this.hideToast());
@@ -2088,13 +2544,13 @@
       if (!this.toast) return;
       this.toast.classList.remove('show');
       if (this.toastTimeoutId !== null) { this._tm.clear(this.toastTimeoutId); this.toastTimeoutId = null; }
-      this._tm.set(() => { if (this.toast && !this.toast.classList.contains('show')) this.toast.innerHTML = ''; }, 300);
+      this._tm.set(() => { if (this.toast && !this.toast.classList.contains('show')) { while (this.toast.firstChild) this.toast.removeChild(this.toast.firstChild); } }, 300);
     }
 
     setButtonState(state) {
       if (!this.button) return;
       const iconEl = this.button.querySelector('.mdltx-btn-icon'); if (!iconEl) return;
-      this.button.classList.remove('processing', 'success', 'error'); iconEl.innerHTML = '';
+      this.button.classList.remove('processing', 'success', 'error'); while (iconEl.firstChild) iconEl.removeChild(iconEl.firstChild);
       const states = {
         processing: { cls: 'processing', icon: () => createElement('div', { className: 'mdltx-btn-spinner' }), reset: false },
         success: { cls: 'success', icon: () => createIcon('check'), reset: 1500 },
@@ -2238,10 +2694,13 @@
           mkSelect('setting-strongEmBlockStrategy', t('strongEmBlockStrategy'), [{ value: 'split', label: t('strategySplit') }, { value: 'html', label: t('strategyHtml') }, { value: 'strip', label: t('strategyStrip') }], settings.strongEmBlockStrategy),
           mkSelect('setting-complexTableStrategy', t('complexTableStrategy'), [{ value: 'list', label: t('strategyList') }, { value: 'html', label: t('strategyTableHtml') }], settings.complexTableStrategy),
           mkSelect('setting-detailsStrategy', t('detailsStrategy'), [{ value: 'preserve', label: t('detailsPreserve') }, { value: 'strict-visual', label: t('detailsStrictVisual') }], settings.detailsStrategy),
+          mkSelect('setting-unknownEmptyTagStrategy', t('unknownEmptyTagStrategy'), [{ value: 'literal', label: 'Literal (<tag>)' }, { value: 'drop', label: 'Drop' }], settings.unknownEmptyTagStrategy),
           mkCheck('setting-mergeAdjacentCodeSpans', t('mergeAdjacentCodeSpans'), settings.mergeAdjacentCodeSpans)
         ),
         mkSection(t('visibilitySettings'), true,
           mkSelect('setting-visibilityMode', t('visibilityMode'), [{ value: 'loose', label: t('visibilityLoose') }, { value: 'strict', label: t('visibilityStrict') }, { value: 'dom', label: t('visibilityDom') }], settings.visibilityMode),
+          mkNum('setting-hiddenScanMaxElements', t('hiddenScanMaxElements'), settings.hiddenScanMaxElements, 100, 50000, 100),
+          mkCheck('setting-hiddenUntilFoundVisible', t('hiddenUntilFoundVisible'), settings.hiddenUntilFoundVisible),
           mkCheck('setting-strictOffscreen', t('strictOffscreen'), settings.strictOffscreen),
           offscreenCond
         ),
@@ -2269,7 +2728,8 @@
                 createElement('textarea', {
                   className: 'mdltx-input', id: 'setting-frontmatterCustom',
                   rows: '3', style: { width: '100%', minHeight: '60px', fontFamily: 'monospace' },
-                  placeholder: t('frontmatterCustomHint')
+                  placeholder: t('frontmatterCustomHint'),
+                  value: settings.frontmatterCustom || ''
                 })
               ])
             );
@@ -2280,7 +2740,7 @@
               createElement('span', { className: 'mdltx-label-text', textContent: t('downloadFilenameTemplate') || 'Filename Template' }),
               createElement('input', {
                 type: 'text', className: 'mdltx-input', id: 'setting-downloadFilenameTemplate',
-                value: settings.downloadFilenameTemplate, style: { width: '200px' },
+                value: settings.downloadFilenameTemplate, style: { width: '100%', maxWidth: '280px' },
                 placeholder: '{title}_{date}'
               })
             ])
@@ -2356,7 +2816,8 @@
                 createElement('textarea', {
                   className: 'mdltx-input', id: 'setting-customExcludeSelectors',
                   rows: '2', style: { width: '100%', minHeight: '40px', fontFamily: 'monospace' },
-                  placeholder: t('customExcludeSelectorsHint')
+                  placeholder: t('customExcludeSelectorsHint'),
+                  value: settings.customExcludeSelectors || ''
                 })
               ]),
               createElement('div', { className: 'mdltx-field' }, [
@@ -2366,26 +2827,26 @@
                 createElement('textarea', {
                   className: 'mdltx-input', id: 'setting-customIgnoreHiddenSelectors',
                   rows: '2', style: { width: '100%', minHeight: '40px', fontFamily: 'monospace' },
-                  placeholder: t('customIgnoreHiddenSelectorsHint')
+                  placeholder: t('customIgnoreHiddenSelectorsHint'),
+                  value: settings.customIgnoreHiddenSelectors || ''
                 })
               ])
             );
             return thirdPartyCond;
           })()
         ),
-
-        // ═══ 進階可見性設定（補充遺漏的） ═══
-        // 在現有的 visibilitySettings 區塊中加入：
-        mkNum('setting-hiddenScanMaxElements', t('hiddenScanMaxElements') || 'Max elements to scan', settings.hiddenScanMaxElements, 100, 50000, 100, true),
-        mkCheck('setting-hiddenUntilFoundVisible', t('hiddenUntilFoundVisible') || 'Treat hidden="until-found" as visible', settings.hiddenUntilFoundVisible, true),
-        mkSelect('setting-unknownEmptyTagStrategy', t('unknownEmptyTagStrategy') || 'Unknown empty tag strategy', [
-          { value: 'literal', label: 'Literal (<tag>)' },
-          { value: 'drop', label: 'Drop' }
-        ], settings.unknownEmptyTagStrategy, true),
       ]);
 
       const footer = createElement('div', { className: 'mdltx-modal-footer' }, [
-        createElement('div', { className: 'mdltx-modal-footer-left' }, [createElement('button', { className: 'mdltx-btn-danger', type: 'button', id: 'settings-reset', tabindex: '0', textContent: t('resetSettings') })]),
+        createElement('div', { className: 'mdltx-modal-footer-left' }, [
+          createElement('button', { className: 'mdltx-btn-danger', type: 'button', id: 'settings-reset', tabindex: '0', textContent: t('resetSettings') }),
+          createElement('button', { className: 'mdltx-btn-icon-sm', type: 'button', id: 'settings-export', tabindex: '0' }, [
+            createIcon('clipboard', 14), document.createTextNode(' ' + t('exportSettings'))
+          ]),
+          createElement('button', { className: 'mdltx-btn-icon-sm', type: 'button', id: 'settings-import', tabindex: '0' }, [
+            createIcon('upload', 14), document.createTextNode(' ' + t('importSettings'))
+          ]),
+        ]),
         createElement('span', { className: 'mdltx-modal-footer-hint', textContent: t('settingsHint') }),
         createElement('div', { className: 'mdltx-modal-footer-right' }, [
           createElement('button', { className: 'mdltx-btn-secondary', type: 'button', id: 'settings-cancel', tabindex: '0', textContent: t('cancel') }),
@@ -2440,6 +2901,38 @@
 
       const saveSettings = () => {
         stopRec();
+
+        // ═══ 快捷鍵衝突檢測 ═══
+        const mainKey = tempHotkey.key.toLowerCase();
+        const pickerKey = (gv('setting-elementPickerHotkey')?.value || 'e').toLowerCase().slice(0, 1);
+        const previewKey = (gv('setting-previewHotkey')?.value || 'p').toLowerCase().slice(0, 1);
+        const hotkeyIsEnabled = gv('setting-hotkeyEnabled')?.checked;
+        const pickerIsEnabled = gv('setting-elementPickerEnabled')?.checked;
+        const previewIsEnabled = gv('setting-previewEnabled')?.checked;
+
+        const activeKeys = [];
+        if (hotkeyIsEnabled) activeKeys.push({ key: mainKey, name: t('hotkeyCombo') });
+        if (pickerIsEnabled) activeKeys.push({ key: pickerKey, name: t('elementPickerHotkey') });
+        if (previewIsEnabled) activeKeys.push({ key: previewKey, name: t('previewHotkey') });
+
+        const seen = new Map();
+        const conflicts = [];
+        for (const entry of activeKeys) {
+          if (seen.has(entry.key)) {
+            conflicts.push(`${seen.get(entry.key)} / ${entry.name}`);
+          } else {
+            seen.set(entry.key, entry.name);
+          }
+        }
+
+        if (conflicts.length > 0) {
+          const conflictMsg = detectLanguage().startsWith('zh')
+            ? `以下快捷鍵設定衝突，請修改：\n${conflicts.join('\n')}`
+            : `Hotkey conflict detected:\n${conflicts.join('\n')}`;
+          alert(conflictMsg);
+          return;
+        }
+
         const valNum = (v, min, max, def) => { const n = parseFloat(v); return isNaN(n) ? def : Math.max(min, Math.min(max, n)); };
         const vals = {
           showButton: gv('setting-showButton')?.checked,
@@ -2491,15 +2984,8 @@
 
           // 元素選取
           elementPickerEnabled: gv('setting-elementPickerEnabled')?.checked,
-          elementPickerHotkey: gv('setting-elementPickerHotkey')?.value || 'e',
+          elementPickerHotkey: (gv('setting-elementPickerHotkey')?.value || 'e').toLowerCase().slice(0, 1),
           buttonDoubleClickAction: gv('setting-buttonDoubleClickAction')?.value,
-
-          // 預覽
-          previewEnabled: gv('setting-previewEnabled')?.checked,
-          previewHotkey: gv('setting-previewHotkey')?.value || 'p',
-          previewDefaultMode: gv('setting-previewDefaultMode')?.value,
-          previewMaxHeight: valNum(gv('setting-previewMaxHeight')?.value, 30, 90, 70),
-          previewFontSize: valNum(gv('setting-previewFontSize')?.value, 10, 24, 14),
 
           // 第三方兼容
           thirdPartyCompatibility: gv('setting-thirdPartyCompatibility')?.checked,
@@ -2516,7 +3002,7 @@
           previewEnabled: gv('setting-previewEnabled')?.checked,
           previewAlwaysShow: gv('setting-previewAlwaysShow')?.checked,
           previewSplitView: gv('setting-previewSplitView')?.checked,
-          previewHotkey: gv('setting-previewHotkey')?.value || 'p',
+          previewHotkey: (gv('setting-previewHotkey')?.value || 'p').toLowerCase().slice(0, 1),
           previewDefaultMode: gv('setting-previewDefaultMode')?.value,
           previewMaxHeight: valNum(gv('setting-previewMaxHeight')?.value, 30, 90, 70),
           previewFontSize: valNum(gv('setting-previewFontSize')?.value, 10, 24, 14),
@@ -2555,6 +3041,7 @@
       bindRangePreview('setting-buttonHoverOpacity', v => `${Math.round(v * 100)}%`);
       bindRangePreview('setting-buttonHiddenOpacity', v => `${Math.round(v * 100)}%`);
       bindRangePreview('setting-buttonSize', v => `${v}px`, v => { if (this.button) this.button.style.setProperty('--mdltx-btn-size', `${v}px`); });
+      bindRangePreview('setting-previewMaxHeight', v => `${v}vh`);
 
       const themeSelect = gv('setting-theme');
       if (themeSelect) themeSelect.addEventListener('change', () => { this.root.setAttribute('data-theme', themeSelect.value === 'auto' ? getEffectiveTheme() : themeSelect.value); });
@@ -2573,9 +3060,22 @@
       const autoHideCb = gv('setting-buttonAutoHide'), autoHideCond = gv('autohide-conditional');
       if (autoHideCb && autoHideCond) autoHideCb.addEventListener('change', () => autoHideCond.classList.toggle('hidden', !autoHideCb.checked));
 
+      // ═══ 條件區塊 toggle 綁定 ═══
+      const conditionalBindings = [
+        ['setting-downloadFrontmatter',      'frontmatter-conditional'],
+        ['setting-elementPickerEnabled',     'picker-conditional'],
+        ['setting-previewEnabled',           'preview-conditional'],
+        ['setting-thirdPartyCompatibility',  'thirdparty-conditional'],
+      ];
+      for (const [cbId, condId] of conditionalBindings) {
+        const cb = gv(cbId), cond = gv(condId);
+        if (cb && cond) cb.addEventListener('change', () => cond.classList.toggle('hidden', !cb.checked));
+      }
+
       const hotkeyDisplay = gv('hotkey-display');
       const updateHotkeyDisp = () => {
-        if (!hotkeyDisplay) return; hotkeyDisplay.innerHTML = '';
+        if (!hotkeyDisplay) return;
+        while (hotkeyDisplay.firstChild) hotkeyDisplay.removeChild(hotkeyDisplay.firstChild);
         if (tempHotkey.ctrl) hotkeyDisplay.appendChild(createElement('span', { className: 'mdltx-kbd', textContent: 'Ctrl' }));
         if (tempHotkey.alt) hotkeyDisplay.appendChild(createElement('span', { className: 'mdltx-kbd', textContent: 'Alt' }));
         if (tempHotkey.shift) hotkeyDisplay.appendChild(createElement('span', { className: 'mdltx-kbd', textContent: 'Shift' }));
@@ -2603,6 +3103,84 @@
 
       gv('settings-reset')?.addEventListener('click', () => { if (confirm(t('confirmReset'))) { S.resetAll(); close(false); this.refresh(); this.showToast('success', t('toastSettingsReset'), t('settingsResetDone')); } });
       gv('settings-save')?.addEventListener('click', saveSettings);
+
+      // ═══ 匯出設定 ═══
+      gv('settings-export')?.addEventListener('click', async () => {
+        try {
+          const json = exportSettings();
+          await setClipboardText(json);
+          this.showToast('success', t('exportSuccess'));
+        } catch (e) {
+          this.showToast('error', t('toastError'), e.message);
+        }
+      });
+
+      // ═══ 匯入設定 ═══
+      gv('settings-import')?.addEventListener('click', () => {
+        // 在 modal 內顯示匯入對話框
+        const modalEl = overlay.querySelector('.mdltx-modal');
+        if (!modalEl) return;
+
+        // 移除已有的匯入對話框（防止重複）
+        modalEl.querySelector('.mdltx-import-dialog')?.remove();
+
+        const importDialog = createElement('div', { className: 'mdltx-import-dialog' });
+        const dialogInner = createElement('div', { className: 'mdltx-import-dialog-inner' }, [
+          createElement('div', { className: 'mdltx-import-dialog-title', textContent: t('importSettings') }),
+          createElement('textarea', {
+            className: 'mdltx-import-dialog-textarea',
+            id: 'import-textarea',
+            placeholder: '{ "showButton": true, ... }',
+            spellcheck: 'false',
+          }),
+          createElement('div', { className: 'mdltx-import-dialog-hint', textContent: t('exportSettings') + ' → ' + t('importSettings') }),
+          createElement('div', { className: 'mdltx-import-dialog-buttons' }, [
+            createElement('button', { className: 'mdltx-btn-secondary', type: 'button', id: 'import-cancel', textContent: t('cancel') }),
+            createElement('button', { className: 'mdltx-btn-primary', type: 'button', id: 'import-confirm', textContent: t('importSettings') }),
+          ]),
+        ]);
+        importDialog.appendChild(dialogInner);
+
+        // 點擊背景關閉
+        importDialog.addEventListener('click', (e) => {
+          if (e.target === importDialog) importDialog.remove();
+        });
+
+        // 取消按鈕
+        dialogInner.querySelector('#import-cancel')?.addEventListener('click', () => importDialog.remove());
+
+        // 確認匯入
+        dialogInner.querySelector('#import-confirm')?.addEventListener('click', () => {
+          const textarea = dialogInner.querySelector('#import-textarea');
+          const json = textarea?.value?.trim();
+          if (!json) { importDialog.remove(); return; }
+
+          if (!confirm(t('importConfirm'))) return;
+
+          const success = importSettings(json);
+          importDialog.remove();
+          if (success) {
+            close(false);
+            this.refresh();
+            this.showToast('success', t('importSuccess'));
+          } else {
+            this.showToast('error', t('importFailed'));
+          }
+        });
+
+        // ESC 關閉
+        importDialog.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); importDialog.remove(); }
+        });
+
+        modalEl.style.position = 'relative';
+        modalEl.appendChild(importDialog);
+
+        // 聚焦 textarea
+        requestAnimationFrame(() => {
+          dialogInner.querySelector('#import-textarea')?.focus();
+        });
+      });
     }
 
     _bindButton() {
@@ -2922,7 +3500,7 @@
       this._cancelAutoHideTimer();
       // 清理新模組
       this.elementPicker?.stop();
-      this.previewModal?.close();
+      this.previewModal?.close(true);
       this.elementPicker = null;
       this.previewModal = null;
       if (this._handlers.docClick) { document.removeEventListener('click', this._handlers.docClick); this._handlers.docClick = null; }
@@ -3718,7 +4296,7 @@
       }
 
       // 方法 2：從 code-block 容器的 header 查找
-      const container = codeEl.closest('.code-block_container__lbMX4') ||
+      const container = codeEl.closest('[class*="code-block_container"]') ||
                         codeEl.closest('[class*="code-block"]') ||
                         codeEl.closest('[class*="not-prose"]') ||
                         preParent?.parentElement;
@@ -3806,7 +4384,7 @@
     try {
       // 擴展選擇器以包含 Arena 的程式碼區塊結構
       const codeBlocks = (scope || document.body).querySelectorAll(
-        'pre code, pre[class*="shiki"], pre[class*="hljs"], .code-block_container__lbMX4 pre, [class*="code-block"] pre'
+        'pre code, pre[class*="shiki"], pre[class*="hljs"], [class*="code-block_container"] pre, [class*="code-block"] pre'
       );
 
       for (const codeEl of codeBlocks) {
@@ -3865,7 +4443,7 @@
   function smartConcat(out, part) {
     if (!out) return part; if (!part) return out;
     for (const [len, mk] of [[3, '***'], [2, '**'], [2, '~~'], [1, '*']]) if (out.slice(-len) === mk && part.slice(0, len) === mk) return out.slice(0, -len) + part.slice(len);
-    if (S.get('mergeAdjacentCodeSpans')) { const outM = out.match(/(`+)([^`]+)\1$/), partM = part.match(/^(`+)([^`]+)\1/); if (outM && partM) return out.slice(0, -outM[0].length) + wrapInlineCode(outM[2] + partM[2]) + part.slice(partM[0].length); }
+    if (S.get('mergeAdjacentCodeSpans')) { const outM = out.match(/(`+)([^`]+)\1$/), partM = part.match(/^(`+)([^`]+)\1/); if (outM && partM) return out.slice(0, -outM[0].length) + wrapInlineCode(outM[2] + ' ' + partM[2]) + part.slice(partM[0].length); }
     return out + part;
   }
 
@@ -4084,7 +4662,13 @@
       if (T === 'BR') return '<br>';
       if (T === 'INPUT') { const type = (node.getAttribute('type') || '').toLowerCase(); if (type === 'checkbox') return (node.checked || node.defaultChecked || node.getAttribute('checked') !== null) ? '[x] ' : '[ ] '; return ''; }
       if (/^(STRONG|B|EM|I|DEL|S)$/.test(T)) return processInlineFormat(node, T, ctx);
-      if (T === 'Q') { const inner = processChildrenInline(node, ctx).trim(); return inner ? `「${inner}」` : ''; }
+      if (T === 'Q') {
+        const inner = processChildrenInline(node, ctx).trim();
+        if (!inner) return '';
+        const lang = detectLanguage();
+        const [open, close] = lang.startsWith('zh') ? ['「', '」'] : ['"', '"'];
+        return `${open}${inner}${close}`;
+      }
       if (T === 'CODE') { const txt = node.textContent || ''; return txt.trim() ? wrapInlineCode(txt) : ''; }
       if (T === 'A') { const textContent = processChildrenInline(node, { ...ctx, escapeText: false }).trim(), text = textContent || (node.getAttribute('href') || ''), href = hrefForA(node, ctx.baseUri); return href ? mdLink(text, href, ctx.inTable) : escapeLinkLabel(text, ctx); }
       if (T === 'IMG') { const wtex = wikipediaImgToTex(node); if (wtex) return wtex; const alt = escapeBracketText((node.getAttribute('alt') || '').trim()), u = absUrl(pickImgSrc(node), ctx.baseUri); return u ? `![${alt}](${escapeLinkDest(u, ctx.inTable)})` : (alt || ''); }
@@ -4123,7 +4707,7 @@
       if (T === 'FIGURE') return figureToMd(node, ctx);
       if (T === 'DL') return dlToMd(node, ctx);
       if (T === 'DIV' && node.hasAttribute('data-code-block')) { const header = node.querySelector(':scope > div:first-child'), lang = (header?.textContent || '').trim().toLowerCase(), codeEl = node.querySelector('pre code') || node.querySelector('pre'), content = (codeEl?.textContent || '').replace(/\n+$/g, ''), fence = chooseFence(content); return `\n\n${fence}${lang}\n${content}\n${fence}\n\n`; }
-      if (T === 'DETAILS') { const isOpen = node.hasAttribute('open'), summary = node.querySelector(':scope > summary'), summaryText = summary ? mdInline(summary, ctx).trim() : 'Details';
+      if (T === 'DETAILS') { const isOpen = node.hasAttribute('open'), summary = node.querySelector(':scope > summary'), summaryText = summary ? mdInline(summary, ctx).trim() : t('detailsDefaultSummary');
         if (S.get('detailsStrategy') === 'strict-visual' && !isOpen) return `\n\n<details>\n<summary>${summaryText}</summary>\n\n</details>\n\n`;
         let inner = ''; for (const ch of Array.from(node.childNodes)) if (!(ch.nodeType === 1 && ch.tagName === 'SUMMARY')) inner += md(ch, ctx);
         return `\n\n<details${isOpen ? ' open' : ''}>\n<summary>${summaryText}</summary>\n\n${trimNewlinesOnly(inner)}\n\n</details>\n\n`; }
@@ -4139,7 +4723,13 @@
       if (T === 'A') { const textContent = processChildren(node, { ...ctx, escapeText: false }).trim(), text = textContent || (node.getAttribute('href') || ''), href = hrefForA(node, ctx.baseUri); return href ? mdLink(text, href, ctx.inTable) : escapeLinkLabel(text, ctx); }
       if (T === 'IMG') { const wtex = wikipediaImgToTex(node); if (wtex) return wtex; const alt = escapeBracketText((node.getAttribute('alt') || '').trim()), u = absUrl(pickImgSrc(node), ctx.baseUri); return u ? `![${alt}](${escapeLinkDest(u, ctx.inTable)})` : (alt || ''); }
       if (/^(STRONG|B|EM|I|DEL|S)$/.test(T)) return processInlineFormat(node, T, ctx);
-      if (T === 'Q') { const inner = processChildren(node, ctx).trim(); return inner ? `「${inner}」` : ''; }
+      if (T === 'Q') {
+        const inner = processChildren(node, ctx).trim();
+        if (!inner) return '';
+        const lang = detectLanguage();
+        const [open, close] = lang.startsWith('zh') ? ['「', '」'] : ['"', '"'];
+        return `${open}${inner}${close}`;
+      }
       if (T === 'SUB') return `<sub>${processChildren(node, ctx).trim()}</sub>`;
       if (T === 'SUP') return `<sup>${processChildren(node, ctx).trim()}</sup>`;
       if (T === 'KBD') return `<kbd>${processChildren(node, ctx).trim()}</kbd>`;
@@ -4172,7 +4762,7 @@
         // 例如 Arena 使用 <ol class="flex flex-col-reverse"> 包裹 <div> 訊息
         if (liChildren.length === 0 && nonLiChildren.length > 0) {
           // 檢測 flex-col-reverse（Arena 特徵）並反轉順序
-          const isReversed = (node.className || '').includes('flex-col-reverse');
+          const isReversed = node.classList?.contains('flex-col-reverse') ?? false;
           const childrenToProcess = isReversed ? [...nonLiChildren].reverse() : nonLiChildren;
 
           let result = '';
@@ -4186,7 +4776,9 @@
         }
 
         // 情況 3：混合內容（同時有 LI 和非 LI 子元素）
-        for (const child of children) {
+        const isReversedMixed = node.classList?.contains('flex-col-reverse') ?? false;
+        const mixedChildren = isReversedMixed ? [...children].reverse() : children;
+        for (const child of mixedChildren) {
           if (child.tagName === 'LI') {
             out += renderLi(child, ctx.depth || 0, ordered ? idx++ : 0, ctx);
           } else if (child.nodeType === 1) {
@@ -4205,9 +4797,11 @@
   }
 
   function renderLi(li, depth, olIndex, ctx) {
-    ctx = normalizeCtx(ctx); const indent = ' '.repeat(depth * 4), marker = getListMarker(), prefix = olIndex ? `${olIndex}. ` : `${marker} `;
+    const maxDepth = 10;
+    const effectiveDepth = Math.min(depth, maxDepth);
+    ctx = normalizeCtx(ctx); const indent = ' '.repeat(effectiveDepth * 4), marker = getListMarker(), prefix = olIndex ? `${olIndex}. ` : `${marker} `;
     let contentParts = '', nestedParts = '';
-    try { for (const ch of Array.from(li.childNodes)) { if (ch.nodeType === 1 && (ch.tagName === 'UL' || ch.tagName === 'OL')) nestedParts += md(ch, { ...ctx, depth: depth + 1 }); else contentParts += md(ch, ctx); }
+    try { for (const ch of Array.from(li.childNodes)) { if (ch.nodeType === 1 && (ch.tagName === 'UL' || ch.tagName === 'OL')) nestedParts += md(ch, { ...ctx, depth: Math.min(depth + 1, maxDepth) }); else contentParts += md(ch, ctx); }
       const content = String(contentParts).replace(/\n{3,}/g, '\n\n').trim(), nested = nestedParts?.trim() ? trimNewlinesOnly(nestedParts) : '';
       if (!content && !nested) return '';
       const lines = content ? content.split('\n') : ['']; let out = `${indent}${prefix}${lines[0] || ''}\n`;
@@ -4351,8 +4945,23 @@
         return len + paragraphs * 120 + preCodes * 60 + messages * 100 + olDivs * 80 - links * 30;
       };
 
+      // ═══ 兩階段篩選：先用快速指標過濾，再對候選做精確計算 ═══
+      // 第一階段：快速估算，取 top-30
+      const quickScored = candidates
+        .map(el => {
+          if (!el || el.nodeType !== 1 || isBad(el)) return null;
+          // 用 textContent.length 快速估算（可能包含 script/style 內容，但做為粗篩足夠）
+          const quickLen = (el.textContent || '').length;
+          if (quickLen < 100) return null;
+          return { el, quickLen };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.quickLen - a.quickLen)
+        .slice(0, 30);
+
+      // 第二階段：精確計算，僅對 top-30 使用完整的 score 函數
       let best = null, bestScore = -1e9;
-      for (const el of candidates) {
+      for (const { el } of quickScored) {
         const sc = score(el);
         if (sc > bestScore) { bestScore = sc; best = el; }
       }
@@ -4440,10 +5049,14 @@
     try { const waitMs = S.get('waitBeforeCaptureMs'); if (waitMs > 0) await new Promise(r => setTimeout(r, waitMs));
       const idleMs = S.get('waitDomIdleMs'); if (idleMs > 0) await waitForDomIdle(idleMs);
       if (mode === 'selection' && !hasSelection()) mode = decideModeNoSelection();
-      const { root, actualMode } = await makeRoot(mode);
+      let { root, actualMode } = await makeRoot(mode);
       const mathMap = replaceMathWithPlaceholders(root);
       const ctx = { depth: 0, escapeText: S.get('escapeMarkdownChars'), inTable: false, baseUri: document.baseURI };
       let out = md(root, ctx);
+
+      // 及時釋放 DOM 克隆以減輕記憶體壓力
+      root = null;
+
       for (const k of Object.keys(mathMap)) out = out.split(k).join(mathMap[k]);
       out = normalizeOutput(out);
       return { markdown: out, actualMode, length: out.length };
@@ -4492,7 +5105,7 @@
         // 預覽快捷鍵
         if (S.get('previewEnabled') && isModifierMatch && key === S.get('previewHotkey').toLowerCase()) {
           e.preventDefault(); e.stopPropagation();
-          if (ui) await ui.handlePreviewCopy();
+          if (ui) await ui.handlePreview();
           return;
         }
       } catch (err) { console.error('[mdltx] Hotkey error:', err); }
@@ -4514,7 +5127,7 @@
 
       // 新增：預覽模式
       if (S.get('previewEnabled')) {
-        GM_registerMenuCommand('👁️ ' + t('previewCopy'), async () => { try { if (ui) await ui.handlePreviewCopy(); } catch (e) { console.error('[mdltx] Menu command error:', e); } });
+        GM_registerMenuCommand('👁️ ' + t('previewCopy'), async () => { try { if (ui) await ui.handlePreview(); } catch (e) { console.error('[mdltx] Menu command error:', e); } });
       }
     } catch (e) { console.warn('[mdltx] Failed to register menu commands:', e); }
   }
@@ -4532,7 +5145,7 @@
       ui.init();
       installHotkey();
       installMenu();
-      console.log('[mdltx] Copy MD + LaTeX v3.2.0 initialized.');
+      console.log('[mdltx] Copy MD + LaTeX v3.2.3 initialized.');
     } catch (e) { console.error('[mdltx] Initialization failed:', e); }
   }
 
