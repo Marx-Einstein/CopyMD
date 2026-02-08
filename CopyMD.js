@@ -3,7 +3,7 @@
 // @name:zh-TW   複製為 Markdown + LaTeX
 // @name:zh-CN   复制为 Markdown + LaTeX
 // @namespace    mdltx.copy.self
-// @version      3.2.4
+// @version      3.2.7
 // @description  Copy selection/article/page as Markdown, preserving LaTeX from KaTeX/MathJax/MathML. Enhanced code block language detection for AI chat platforms. Self-contained with modern UI.
 // @description:zh-TW  將選取範圍／文章／整頁複製為 Markdown，完整保留 KaTeX/MathJax/MathML 數學公式。增強 AI 聊天平台的程式碼區塊語言偵測。獨立運作，相容 Trusted Types。
 // @description:zh-CN  将选取范围／文章／整页复制为 Markdown，完整保留 KaTeX/MathJax/MathML 数学公式。增强 AI 聊天平台的代码区块语言检测。独立运作，相容 Trusted Types。
@@ -44,6 +44,7 @@
     theme: 'auto', toastDuration: 2500, language: 'auto',
     settingsMode: 'simple',
     downloadFilenameTemplate: '{title}_{date}',
+    diagnosticLogging: false,
 
     // ═══ Frontmatter 設定 ═══
     downloadFrontmatter: false,
@@ -75,7 +76,7 @@
     customExcludeSelectors: '',
     customIgnoreHiddenSelectors: '',
 
-    settingsVersion: 6,
+    settingsVersion: 7,
   };
 
   const SETTING_TYPES = {
@@ -95,6 +96,7 @@
     theme: 'string', toastDuration: 'number', language: 'string',
     settingsMode: 'string',
     downloadFilenameTemplate: 'string',
+    diagnosticLogging: 'boolean',
 
     // Frontmatter
     downloadFrontmatter: 'boolean',
@@ -153,6 +155,7 @@
         [4, ['buttonHoverOpacity', 'buttonSize', 'buttonAutoHide', 'buttonAutoHideDelay', 'buttonClickAction', 'listMarker', 'emphasisMarker', 'strongMarker', 'horizontalRule', 'settingsMode', 'buttonHiddenOpacity']],
         [5, ['enableContentBasedLangDetection', 'lmArenaEnhancedDetection', 'aiChatPlatformDetection']],
         [6, ['downloadFrontmatter', 'frontmatterTitle', 'frontmatterDate', 'frontmatterUrl', 'frontmatterDescription', 'frontmatterAuthor', 'frontmatterTags', 'frontmatterCustom', 'elementPickerEnabled', 'elementPickerHotkey', 'buttonDoubleClickAction', 'previewEnabled', 'previewHotkey', 'previewDefaultMode', 'previewMaxHeight', 'previewFontSize', 'thirdPartyCompatibility', 'ignoreCollapsedCodeBlocks', 'customExcludeSelectors', 'customIgnoreHiddenSelectors']],
+        [7, ['diagnosticLogging']],
       ];
       for (const [ver, keys] of migrations) {
         if (cur < ver) for (const k of keys) if (GM_getValue(k) === undefined) GM_setValue(k, DEFAULTS[k]);
@@ -190,6 +193,8 @@
       aiChatPlatformDetection: 'AI 聊天平台增強偵測',
       aiChatPlatformDetectionTooltip: '針對 Claude、Grok、ChatGPT 等平台的程式碼區塊進行特殊處理',
       advancedSettings: '進階設定', articleMinChars: '文章最少字元數', articleMinRatio: '文章最小比例', toastDuration: 'Toast 顯示時間 (ms)',
+      diagnosticLogging: '啟用診斷紀錄',
+      diagnosticLoggingHint: '僅在需要偵錯時開啟，可能增加主控台輸出',
       resetSettings: '重設為預設值', saveSettings: '儲存設定', cancel: '取消', close: '關閉',
       toastSettingsSaved: '✅ 設定已儲存',
       toastSettingsReset: '✅ 設定已重設',
@@ -290,6 +295,8 @@
       importSettings: '匯入設定',
       exportSuccess: '設定已匯出到剪貼簿',
       importSuccess: '設定已成功匯入',
+      importSuccessDetail: '已套用 {count} 項設定',
+      importIgnoredDetail: '已忽略 {count} 項不支援的設定',
       importFailed: '匯入失敗：格式不正確',
       importConfirm: '確定要匯入這些設定嗎？目前的設定會被覆蓋。',
 
@@ -328,6 +335,8 @@
       aiChatPlatformDetection: 'AI 聊天平台增强检测',
       aiChatPlatformDetectionTooltip: '针对 Claude、Grok、ChatGPT 等平台的代码区块进行特殊处理',
       advancedSettings: '高级设置', articleMinChars: '文章最少字符数', articleMinRatio: '文章最小比例', toastDuration: 'Toast 显示时间 (ms)',
+      diagnosticLogging: '启用诊断记录',
+      diagnosticLoggingHint: '仅在需要调试时开启，可能增加控制台输出',
       resetSettings: '重置为默认值', saveSettings: '保存设置', cancel: '取消', close: '关闭',
       toastSettingsSaved: '✅ 设置已保存',
       toastSettingsReset: '✅ 设置已重置',
@@ -418,6 +427,8 @@
       importSettings: '导入设置',
       exportSuccess: '设置已导出到剪贴板',
       importSuccess: '设置已成功导入',
+      importSuccessDetail: '已应用 {count} 项设置',
+      importIgnoredDetail: '已忽略 {count} 项不支持的设置',
       importFailed: '导入失败：格式不正确',
       importConfirm: '确定要导入这些设置吗？当前的设置会被覆盖。',
 
@@ -456,6 +467,8 @@
       aiChatPlatformDetection: 'AI chat platform detection',
       aiChatPlatformDetectionTooltip: 'Special handling for Claude, Grok, ChatGPT and other AI chat platforms',
       advancedSettings: 'Advanced Settings', articleMinChars: 'Article Minimum Characters', articleMinRatio: 'Article Minimum Ratio', toastDuration: 'Toast Duration (ms)',
+      diagnosticLogging: 'Enable Diagnostic Logging',
+      diagnosticLoggingHint: 'Enable only for debugging; may increase console output',
       resetSettings: 'Reset to Defaults', saveSettings: 'Save Settings', cancel: 'Cancel', close: 'Close',
       toastSettingsSaved: '✅ Settings Saved',
       toastSettingsReset: '✅ Settings Reset',
@@ -546,6 +559,8 @@
       importSettings: 'Import Settings',
       exportSuccess: 'Settings exported to clipboard',
       importSuccess: 'Settings imported successfully',
+      importSuccessDetail: '{count} settings applied',
+      importIgnoredDetail: '{count} unsupported settings ignored',
       importFailed: 'Import failed: invalid format',
       importConfirm: 'Import these settings? Current settings will be overwritten.',
 
@@ -589,6 +604,11 @@
     if (S.get('hotkeyShift')) parts.push('Shift');
     parts.push(S.get('hotkeyKey').toUpperCase());
     return parts.join('+');
+  }
+
+  function diagLog(...args) {
+    if (!S.get('diagnosticLogging')) return;
+    try { console.debug('[mdltx]', ...args); } catch {}
   }
 
   function getClickActionLabel(short = false) {
@@ -707,15 +727,16 @@
 
   const STYLES = `
 :host{all:initial;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.5}
-.mdltx-root{--mdltx-primary:#2563eb;--mdltx-primary-hover:#1d4ed8;--mdltx-success:#16a34a;--mdltx-error:#dc2626;--mdltx-warning:#d97706;--mdltx-focus-ring:0 0 0 3px rgba(37,99,235,0.4)}
-.mdltx-root[data-theme="light"]{--mdltx-bg:#fff;--mdltx-bg-secondary:#f3f4f6;--mdltx-bg-tertiary:#e5e7eb;--mdltx-text:#1f2937;--mdltx-text-secondary:#6b7280;--mdltx-border:#d1d5db;--mdltx-shadow:rgba(0,0,0,0.1);--mdltx-shadow-lg:rgba(0,0,0,0.15);--mdltx-overlay:rgba(0,0,0,0.5)}
-.mdltx-root[data-theme="dark"]{--mdltx-bg:#1f2937;--mdltx-bg-secondary:#374151;--mdltx-bg-tertiary:#4b5563;--mdltx-text:#f9fafb;--mdltx-text-secondary:#9ca3af;--mdltx-border:#4b5563;--mdltx-shadow:rgba(0,0,0,0.3);--mdltx-shadow-lg:rgba(0,0,0,0.4);--mdltx-overlay:rgba(0,0,0,0.7)}
+.mdltx-root{--mdltx-primary:#2563eb;--mdltx-primary-hover:#1d4ed8;--mdltx-success:#16a34a;--mdltx-error:#dc2626;--mdltx-warning:#d97706;--mdltx-focus-ring:0 0 0 3px rgba(37,99,235,0.4);--mdltx-radius-sm:8px;--mdltx-radius-md:12px;--mdltx-radius-lg:16px;--mdltx-surface:rgba(255,255,255,0.7);--mdltx-border-subtle:rgba(0,0,0,0.06);--mdltx-overlay-blur:6px}
+.mdltx-root[data-theme="light"]{--mdltx-bg:#fff;--mdltx-bg-secondary:#f3f4f6;--mdltx-bg-tertiary:#e5e7eb;--mdltx-bg-elevated:#fefefe;--mdltx-text:#1f2937;--mdltx-text-secondary:#6b7280;--mdltx-border:#d1d5db;--mdltx-border-subtle:rgba(0,0,0,0.08);--mdltx-shadow:rgba(15,23,42,0.12);--mdltx-shadow-lg:rgba(15,23,42,0.2);--mdltx-overlay:rgba(15,23,42,0.48)}
+.mdltx-root[data-theme="dark"]{--mdltx-bg:#1f2937;--mdltx-bg-secondary:#374151;--mdltx-bg-tertiary:#4b5563;--mdltx-bg-elevated:#273244;--mdltx-text:#f9fafb;--mdltx-text-secondary:#9ca3af;--mdltx-border:#4b5563;--mdltx-border-subtle:rgba(255,255,255,0.08);--mdltx-shadow:rgba(0,0,0,0.35);--mdltx-shadow-lg:rgba(0,0,0,0.5);--mdltx-overlay:rgba(0,0,0,0.7)}
 .mdltx-root{color:var(--mdltx-text)}.mdltx-root *{box-sizing:border-box;margin:0;padding:0}
 @media(prefers-reduced-motion:reduce){.mdltx-root *,.mdltx-root *::before,.mdltx-root *::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}.mdltx-btn:hover:not(.dragging):not(.processing){transform:none!important}.mdltx-toast.show{transform:translateX(-50%) translateY(0)!important}.mdltx-menu.open{transform:scale(1) translateY(0)!important}.mdltx-modal-overlay.open .mdltx-modal,.mdltx-modal-overlay.open .mdltx-preview-modal{transform:scale(1)!important}}
 .mdltx-root button:focus-visible,.mdltx-root .mdltx-menu-item:focus-visible,.mdltx-root .mdltx-select:focus-visible,.mdltx-root .mdltx-input:focus-visible,.mdltx-root .mdltx-checkbox:focus-visible,.mdltx-root .mdltx-range:focus-visible{outline:2px solid var(--mdltx-primary);outline-offset:2px}
-.mdltx-btn{position:fixed;z-index:2147483647;display:flex;align-items:center;justify-content:center;width:var(--mdltx-btn-size,42px);height:var(--mdltx-btn-size,42px);padding:0;border-radius:50%;border:1px solid var(--mdltx-border);background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 4px 12px var(--mdltx-shadow);cursor:pointer;user-select:none;touch-action:none;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease,color 0.2s ease,opacity 0.3s ease;font-family:inherit;opacity:var(--mdltx-btn-opacity,0.85);will-change:transform,opacity}
-.mdltx-btn:hover:not(.dragging):not(.processing){transform:translateY(-2px) scale(1.05);box-shadow:0 8px 24px var(--mdltx-shadow-lg);opacity:var(--mdltx-btn-hover-opacity,1)!important}
-.mdltx-btn:focus-visible{outline:3px solid var(--mdltx-primary);outline-offset:2px}
+.mdltx-btn{position:fixed;z-index:2147483647;display:flex;align-items:center;justify-content:center;width:var(--mdltx-btn-size,42px);height:var(--mdltx-btn-size,42px);padding:0;border-radius:50%;border:1px solid var(--mdltx-border);background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.75));color:var(--mdltx-text);box-shadow:0 6px 16px var(--mdltx-shadow);cursor:pointer;user-select:none;touch-action:none;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease,color 0.2s ease,opacity 0.3s ease;font-family:inherit;opacity:var(--mdltx-btn-opacity,0.85);will-change:transform,opacity}
+.mdltx-root[data-theme="dark"] .mdltx-btn{background:linear-gradient(180deg,rgba(55,65,81,0.95),rgba(31,41,55,0.9))}
+.mdltx-btn:hover:not(.dragging):not(.processing){transform:translateY(-2px) scale(1.05);box-shadow:0 10px 24px var(--mdltx-shadow-lg);opacity:var(--mdltx-btn-hover-opacity,1)!important}
+.mdltx-btn:focus-visible{outline:3px solid var(--mdltx-primary);outline-offset:2px;box-shadow:0 0 0 4px rgba(37,99,235,0.18)}
 .mdltx-btn:active:not(.dragging){transform:translateY(0) scale(0.98)}
 .mdltx-btn.dragging{cursor:grabbing;opacity:0.9!important;transition:opacity 0.1s ease}
 .mdltx-btn.processing{pointer-events:none}
@@ -727,10 +748,10 @@
 .mdltx-btn-spinner{width:50%;height:50%;border:2px solid var(--mdltx-border);border-top-color:var(--mdltx-primary);border-radius:50%;animation:mdltx-spin 0.8s linear infinite}
 @keyframes mdltx-spin{to{transform:rotate(360deg)}}
 .mdltx-sensor{position:fixed;z-index:2147483646;background:transparent;pointer-events:auto;border-radius:50%}
-.mdltx-tooltip{position:fixed;z-index:2147483648;background:var(--mdltx-bg);color:var(--mdltx-text);border:1px solid var(--mdltx-border);padding:10px 14px;border-radius:10px;font-size:12px;line-height:1.5;box-shadow:0 4px 16px var(--mdltx-shadow-lg);max-width:260px;opacity:0;visibility:hidden;transition:opacity 0.15s ease,visibility 0.15s ease;pointer-events:none;white-space:pre-line}
+.mdltx-tooltip{position:fixed;z-index:2147483648;background:var(--mdltx-bg-elevated);color:var(--mdltx-text);border:1px solid var(--mdltx-border-subtle);padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.5;box-shadow:0 8px 20px var(--mdltx-shadow-lg);max-width:260px;opacity:0;visibility:hidden;transition:opacity 0.15s ease,visibility 0.15s ease;pointer-events:none;white-space:pre-line}
 .mdltx-tooltip.show{opacity:1;visibility:visible}
 .mdltx-tooltip-hotkey{display:block;margin-top:6px;padding-top:6px;border-top:1px solid var(--mdltx-border);color:var(--mdltx-text-secondary);font-size:11px}
-.mdltx-menu{position:fixed;z-index:2147483647;min-width:220px;padding:6px;background:var(--mdltx-bg);border:1px solid var(--mdltx-border);border-radius:12px;box-shadow:0 8px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transform:scale(0.95) translateY(-10px);transform-origin:top;transition:opacity 0.2s cubic-bezier(0,0,0.2,1),visibility 0.2s cubic-bezier(0,0,0.2,1),transform 0.2s cubic-bezier(0,0,0.2,1)}
+.mdltx-menu{position:fixed;z-index:2147483647;min-width:220px;padding:6px;background:var(--mdltx-bg-elevated);border:1px solid var(--mdltx-border-subtle);border-radius:14px;box-shadow:0 14px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transform:scale(0.95) translateY(-10px);transform-origin:top;transition:opacity 0.2s cubic-bezier(0,0,0.2,1),visibility 0.2s cubic-bezier(0,0,0.2,1),transform 0.2s cubic-bezier(0,0,0.2,1)}
 .mdltx-menu.open{opacity:1;visibility:visible;transform:scale(1) translateY(0)}
 .mdltx-menu.from-bottom{transform-origin:bottom;transform:scale(0.95) translateY(10px)}
 .mdltx-menu.from-bottom.open{transform:scale(1) translateY(0)}
@@ -747,7 +768,7 @@
 .mdltx-menu-item-hint{font-size:12px;color:var(--mdltx-text-secondary);margin-left:auto}
 .mdltx-menu-divider{height:1px;background:var(--mdltx-border);margin:6px 0}
 .mdltx-menu-hint{padding:6px 12px;font-size:11px;color:var(--mdltx-text-secondary)}
-.mdltx-toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(100px);z-index:2147483647;display:flex;align-items:flex-start;gap:12px;padding:14px 18px;min-width:280px;max-width:min(500px,90vw);border-radius:12px;background:var(--mdltx-bg);border:1px solid var(--mdltx-border);box-shadow:0 8px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+.mdltx-toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(100px);z-index:2147483647;display:flex;align-items:flex-start;gap:12px;padding:14px 18px;min-width:280px;max-width:min(520px,90vw);border-radius:14px;background:var(--mdltx-bg-elevated);border:1px solid var(--mdltx-border-subtle);box-shadow:0 12px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
 .mdltx-toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1)}
 .mdltx-toast.success{border-left:4px solid var(--mdltx-success)}
 .mdltx-toast.error{border-left:4px solid var(--mdltx-error)}
@@ -763,28 +784,30 @@
 .mdltx-toast-close{width:24px;height:24px;padding:4px;border:none;background:none;cursor:pointer;border-radius:6px;color:var(--mdltx-text-secondary);transition:all 0.15s ease;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .mdltx-toast-close svg{width:16px;height:16px}
 .mdltx-toast-close:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
-.mdltx-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:var(--mdltx-overlay);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all 0.2s ease;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.mdltx-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:var(--mdltx-overlay);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all 0.2s ease;-webkit-backdrop-filter:blur(var(--mdltx-overlay-blur));backdrop-filter:blur(var(--mdltx-overlay-blur))}
 .mdltx-modal-overlay.open{opacity:1;visibility:visible}
-.mdltx-modal{width:100%;max-width:640px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:16px;box-shadow:0 24px 48px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease}
+.mdltx-modal{width:100%;max-width:660px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:var(--mdltx-radius-lg);box-shadow:0 24px 52px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-modal-overlay.open .mdltx-modal{transform:scale(1)}
-.mdltx-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--mdltx-border);flex-shrink:0}
+.mdltx-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--mdltx-border-subtle);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
+.mdltx-root[data-theme="dark"] .mdltx-modal-header{background:linear-gradient(180deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
 .mdltx-modal-title{font-size:18px;font-weight:600;color:var(--mdltx-text)}
-.mdltx-modal-close{width:32px;height:32px;padding:6px;border:none;background:none;cursor:pointer;border-radius:8px;color:var(--mdltx-text-secondary);transition:all 0.15s ease;display:flex;align-items:center;justify-content:center}
+.mdltx-modal-close{width:32px;height:32px;padding:6px;border:none;background:none;cursor:pointer;border-radius:10px;color:var(--mdltx-text-secondary);transition:all 0.15s ease;display:flex;align-items:center;justify-content:center}
 .mdltx-modal-close svg{width:20px;height:20px}
 .mdltx-modal-close:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
 .mdltx-modal-body{flex:1;overflow-y:auto;padding:20px 24px;background:linear-gradient(var(--mdltx-bg) 33%,transparent) center top,linear-gradient(transparent,var(--mdltx-bg) 66%) center bottom,radial-gradient(farthest-side at 50% 0,rgba(0,0,0,0.08),transparent) center top,radial-gradient(farthest-side at 50% 100%,rgba(0,0,0,0.08),transparent) center bottom;background-repeat:no-repeat;background-size:100% 40px,100% 40px,100% 10px,100% 10px;background-attachment:local,local,scroll,scroll}
-.mdltx-modal-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 24px;border-top:1px solid var(--mdltx-border);flex-shrink:0}
+.mdltx-modal-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 24px;border-top:1px solid var(--mdltx-border-subtle);flex-shrink:0;background:linear-gradient(0deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
+.mdltx-root[data-theme="dark"] .mdltx-modal-footer{background:linear-gradient(0deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
 .mdltx-modal-footer-hint{font-size:12px;color:var(--mdltx-text-secondary)}
 .mdltx-modal-footer-left,.mdltx-modal-footer-right{display:flex;gap:8px}
-.mdltx-mode-toggle{display:flex;background:var(--mdltx-bg-secondary);border-radius:8px;padding:4px;margin-bottom:20px}
-.mdltx-mode-toggle-btn{flex:1;padding:8px 16px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all 0.2s ease}
+.mdltx-mode-toggle{display:flex;background:var(--mdltx-bg-secondary);border-radius:var(--mdltx-radius-md);padding:4px;margin-bottom:20px;border:1px solid var(--mdltx-border-subtle)}
+.mdltx-mode-toggle-btn{flex:1;padding:8px 16px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:600;cursor:pointer;border-radius:10px;transition:all 0.2s ease}
 .mdltx-mode-toggle-btn:hover{color:var(--mdltx-text)}
-.mdltx-mode-toggle-btn.active{background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 1px 3px var(--mdltx-shadow);transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
+.mdltx-mode-toggle-btn.active{background:var(--mdltx-bg-elevated);color:var(--mdltx-text);box-shadow:0 1px 3px var(--mdltx-shadow);transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
 .mdltx-mode-toggle-btn:focus-visible{outline:2px solid var(--mdltx-primary);outline-offset:-2px}
 .mdltx-section{margin-bottom:24px}
 .mdltx-section:last-child{margin-bottom:0}
 .mdltx-section.hidden{display:none}
-.mdltx-section-title{font-size:13px;font-weight:600;color:var(--mdltx-text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--mdltx-border);display:flex;align-items:center;gap:8px}
+.mdltx-section-title{font-size:12px;font-weight:700;color:var(--mdltx-text-secondary);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--mdltx-border-subtle);display:flex;align-items:center;gap:8px}
 .mdltx-section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--mdltx-primary);border-radius:2px;flex-shrink:0}
 .mdltx-field{margin-bottom:16px}
 .mdltx-field:last-child{margin-bottom:0}
@@ -794,9 +817,10 @@
 .mdltx-label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mdltx-text);cursor:pointer}
 .mdltx-label-text{flex:1}
 .mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cursor:pointer}
-.mdltx-select{padding:8px 12px;border:1px solid var(--mdltx-border);border-radius:8px;background:var(--mdltx-bg);color:var(--mdltx-text);font-family:inherit;font-size:14px;cursor:pointer;min-width:180px}
+.mdltx-select{padding:8px 12px;border:1px solid var(--mdltx-border);border-radius:var(--mdltx-radius-sm);background:var(--mdltx-bg-elevated);color:var(--mdltx-text);font-family:inherit;font-size:14px;cursor:pointer;min-width:180px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.25)}
+.mdltx-select:hover{border-color:var(--mdltx-border-subtle)}
 .mdltx-select:focus{outline:none;border-color:var(--mdltx-primary);box-shadow:var(--mdltx-focus-ring)}
-.mdltx-input{padding:8px 12px;border:1px solid var(--mdltx-border);border-radius:8px;background:var(--mdltx-bg);color:var(--mdltx-text);font-family:inherit;font-size:14px;width:100px;transition:border-color 0.15s ease,box-shadow 0.15s ease}
+.mdltx-input{padding:8px 12px;border:1px solid var(--mdltx-border);border-radius:var(--mdltx-radius-sm);background:var(--mdltx-bg-elevated);color:var(--mdltx-text);font-family:inherit;font-size:14px;width:100px;transition:border-color 0.15s ease,box-shadow 0.15s ease}
 .mdltx-input:focus{outline:none;border-color:var(--mdltx-primary);box-shadow:var(--mdltx-focus-ring)}
 .mdltx-input.invalid{border-color:var(--mdltx-error);background:rgba(220,38,38,0.05)}
 .mdltx-input.valid{border-color:var(--mdltx-success)}
@@ -810,13 +834,14 @@
 .mdltx-hotkey-record-btn{padding:6px 12px;border:1px solid var(--mdltx-border);border-radius:8px;background:var(--mdltx-bg-secondary);color:var(--mdltx-text);font-family:inherit;font-size:13px;cursor:pointer;transition:all 0.15s ease}
 .mdltx-hotkey-record-btn:hover{background:var(--mdltx-bg-tertiary)}
 .mdltx-hotkey-record-btn.recording{background:var(--mdltx-primary);color:#fff;border-color:var(--mdltx-primary)}
-.mdltx-btn-primary{padding:10px 20px;border:none;border-radius:8px;background:var(--mdltx-primary);color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s ease}
-.mdltx-btn-primary:hover{background:var(--mdltx-primary-hover)}
+.mdltx-btn-primary{padding:10px 20px;border:none;border-radius:var(--mdltx-radius-sm);background:linear-gradient(180deg,var(--mdltx-primary),var(--mdltx-primary-hover));color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s ease;box-shadow:0 6px 14px rgba(37,99,235,0.25)}
+.mdltx-btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 18px rgba(37,99,235,0.28)}
+.mdltx-btn-primary:active{transform:translateY(0)}
 .mdltx-btn-primary:focus-visible{outline:2px solid var(--mdltx-primary);outline-offset:2px}
-.mdltx-btn-secondary{padding:10px 20px;border:1px solid var(--mdltx-border);border-radius:8px;background:var(--mdltx-bg);color:var(--mdltx-text);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s ease}
-.mdltx-btn-secondary:hover{background:var(--mdltx-bg-secondary)}
+.mdltx-btn-secondary{padding:10px 20px;border:1px solid var(--mdltx-border);border-radius:var(--mdltx-radius-sm);background:var(--mdltx-bg-elevated);color:var(--mdltx-text);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s ease}
+.mdltx-btn-secondary:hover{background:var(--mdltx-bg-secondary);border-color:var(--mdltx-border-subtle)}
 .mdltx-btn-secondary:focus-visible{outline:2px solid var(--mdltx-primary);outline-offset:2px}
-.mdltx-btn-danger{padding:10px 20px;border:1px solid var(--mdltx-error);border-radius:8px;background:transparent;color:var(--mdltx-error);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s ease}
+.mdltx-btn-danger{padding:10px 20px;border:1px solid rgba(220,38,38,0.6);border-radius:var(--mdltx-radius-sm);background:transparent;color:var(--mdltx-error);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s ease}
 .mdltx-btn-danger:hover{background:var(--mdltx-error);color:#fff}
 .mdltx-btn-danger:focus-visible{outline:2px solid var(--mdltx-error);outline-offset:2px}
 .icon{display:inline-block;vertical-align:middle}
@@ -992,8 +1017,39 @@
    * 安全地設定元素的 HTML 內容（Trusted Types 相容）
    * 第二階段將擴展此函數以支援 Trusted Type policy
    */
+  let trustedHtmlPolicy = null;
+  function getTrustedHtmlPolicy() {
+    if (trustedHtmlPolicy) return trustedHtmlPolicy;
+    if (!supportsTrustedTypes()) return null;
+    try {
+      trustedHtmlPolicy = window.trustedTypes.createPolicy('mdltx#safe', { createHTML: input => input });
+      return trustedHtmlPolicy;
+    } catch (e) {
+      console.warn('[mdltx] Failed to create Trusted Types policy:', e);
+      return null;
+    }
+  }
+
   function safeSetInnerHTML(el, html) {
     while (el.firstChild) el.removeChild(el.firstChild);
+    const policy = getTrustedHtmlPolicy();
+    if (policy) {
+      const template = document.createElement('template');
+      template.innerHTML = policy.createHTML(html);
+      el.appendChild(template.content.cloneNode(true));
+      return;
+    }
+    if (supportsTrustedTypes()) {
+      try {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => fragment.appendChild(node));
+        el.appendChild(fragment);
+        return;
+      } catch (e) {
+        console.warn('[mdltx] DOMParser fallback failed:', e);
+      }
+    }
     const template = document.createElement('template');
     template.innerHTML = html;
     el.appendChild(template.content.cloneNode(true));
@@ -1009,25 +1065,31 @@
 
   /**
    * 從 JSON 字串匯入設定
-   * @returns {boolean} 是否匯入成功
+   * @returns {{ success: boolean, importedCount: number, ignoredCount: number }} 匯入結果
    */
   function importSettings(jsonString) {
     try {
       const parsed = JSON.parse(jsonString);
-      if (typeof parsed !== 'object' || parsed === null) return false;
-      let importedCount = 0;
+      if (typeof parsed !== 'object' || parsed === null) return { success: false, importedCount: 0, ignoredCount: 0 };
+      let importedCount = 0, ignoredCount = 0;
       for (const [k, v] of Object.entries(parsed)) {
         if (k in DEFAULTS && k in SETTING_TYPES) {
           const type = SETTING_TYPES[k];
           if (type === 'boolean' && typeof v === 'boolean') { S.set(k, v); importedCount++; }
           else if (type === 'number' && typeof v === 'number' && !isNaN(v)) { S.set(k, v); importedCount++; }
           else if (type === 'string' && typeof v === 'string') { S.set(k, v); importedCount++; }
+          else ignoredCount++;
+        } else {
+          ignoredCount++;
         }
       }
-      return importedCount > 0;
+      if (importedCount > 0) migrateSettings();
+      const result = { success: importedCount > 0, importedCount, ignoredCount };
+      if (result.success) diagLog('Settings imported', result);
+      return result;
     } catch (e) {
       console.warn('[mdltx] importSettings error:', e);
-      return false;
+      return { success: false, importedCount: 0, ignoredCount: 0 };
     }
   }
 
@@ -2751,7 +2813,8 @@
         mkSection(t('advancedSettings'), true,
           mkNum('setting-articleMinChars', t('articleMinChars'), settings.articleMinChars, 100, 10000, 50),
           mkNum('setting-articleMinRatio', t('articleMinRatio'), settings.articleMinRatio, 0.1, 1, 0.05),
-          mkNum('setting-toastDuration', t('toastDuration'), settings.toastDuration, 500, 10000, 100)
+          mkNum('setting-toastDuration', t('toastDuration'), settings.toastDuration, 500, 10000, 100),
+          (() => { const f = mkCheck('setting-diagnosticLogging', t('diagnosticLogging'), settings.diagnosticLogging, true); f.querySelector('label')?.setAttribute('title', t('diagnosticLoggingHint')); return f; })()
         ),
         // ═══ 下載設定 ═══
         mkSection(t('downloadSettings') || 'Download Settings', true,
@@ -3007,6 +3070,7 @@
           articleMinChars: valNum(gv('setting-articleMinChars')?.value, 100, 10000, 600),
           articleMinRatio: valNum(gv('setting-articleMinRatio')?.value, 0.1, 1, 0.55),
           toastDuration: valNum(gv('setting-toastDuration')?.value, 500, 10000, 2500),
+          diagnosticLogging: gv('setting-diagnosticLogging')?.checked,
           strongEmBlockStrategy: gv('setting-strongEmBlockStrategy')?.value,
           complexTableStrategy: gv('setting-complexTableStrategy')?.value,
           detailsStrategy: gv('setting-detailsStrategy')?.value,
@@ -3202,12 +3266,14 @@
 
           if (!confirm(t('importConfirm'))) return;
 
-          const success = importSettings(json);
+          const result = importSettings(json);
           importDialog.remove();
-          if (success) {
+          if (result.success) {
             close(false);
             this.refresh();
-            this.showToast('success', t('importSuccess'));
+            const details = [t('importSuccessDetail', { count: result.importedCount })];
+            if (result.ignoredCount > 0) details.push(t('importIgnoredDetail', { count: result.ignoredCount }));
+            this.showToast('success', t('importSuccess'), details.join('\n'));
           } else {
             this.showToast('error', t('importFailed'));
           }
@@ -4938,6 +5004,7 @@
   function findArticleRoot() {
     const candidates = [];
     try {
+      const startedAt = performance?.now?.() || Date.now();
       // ═══════════════════════════════════════════════════════════
       // 🔧 增強的選擇器列表（包含 AI 聊天平台特定容器）
       // ═══════════════════════════════════════════════════════════
@@ -5010,6 +5077,8 @@
         const sc = score(el);
         if (sc > bestScore) { bestScore = sc; best = el; }
       }
+      const elapsed = (performance?.now?.() || Date.now()) - startedAt;
+      diagLog('Article root scan', { candidates: candidates.length, shortlisted: quickScored.length, bestScore, elapsedMs: Math.round(elapsed) });
       return best || document.body;
     } catch { return document.body; }
   }
@@ -5190,7 +5259,7 @@
       ui.init();
       installHotkey();
       installMenu();
-      console.log('[mdltx] Copy MD + LaTeX v3.2.3 initialized.');
+      console.log('[mdltx] Copy MD + LaTeX v3.2.7 initialized.');
     } catch (e) { console.error('[mdltx] Initialization failed:', e); }
   }
 
