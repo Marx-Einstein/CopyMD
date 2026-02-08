@@ -1700,7 +1700,7 @@
           createElement('div', { className: 'mdltx-preview-pane-header', textContent: t('previewModePreview') }),
           createElement('div', { className: 'mdltx-preview-rendered', id: 'mdltx-preview-rendered' }),
         ]);
-        previewPane.querySelector('.mdltx-preview-rendered').innerHTML = this._renderMarkdown(this.content);
+        safeSetInnerHTML(previewPane.querySelector('.mdltx-preview-rendered'), this._renderMarkdown(this.content));
 
         container.style.maxHeight = maxH;
         container.append(editPane, previewPane);
@@ -1731,7 +1731,7 @@
       } else {
         // 純預覽
         const rendered = createElement('div', { className: 'mdltx-preview-rendered', id: 'mdltx-preview-rendered' });
-        rendered.innerHTML = this._renderMarkdown(this.content);
+        safeSetInnerHTML(rendered, this._renderMarkdown(this.content));
         this._bindMathCopyHandlers(rendered);
 
         rendered.style.maxHeight = maxH;
@@ -1743,7 +1743,7 @@
     _updatePreviewPane() {
       const rendered = this.modal?.querySelector('#mdltx-preview-rendered');
       if (rendered) {
-        rendered.innerHTML = this._renderMarkdown(this.content);
+        safeSetInnerHTML(rendered, this._renderMarkdown(this.content));
         this._bindMathCopyHandlers(rendered);
       }
     }
@@ -1941,6 +1941,19 @@
         .replace(/>/g,'&gt;')
         .replace(/"/g,'&quot;')
         .replace(/'/g,'&#39;');
+      const sanitizeUrl = (url) => {
+        const raw = String(url || '').trim();
+        if (!raw) return '';
+        if (raw.startsWith('#')) return raw;
+        if (/^(javascript|data):/i.test(raw)) return '';
+        try {
+          const parsed = new URL(raw, location.href);
+          if (/^(javascript|data):/i.test(parsed.protocol)) return '';
+          return parsed.href;
+        } catch {
+          return raw;
+        }
+      };
 
       let html = md;
 
@@ -2014,10 +2027,20 @@
       html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
 
       // 圖片
-      html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" style="max-width:100%;" />');
+      html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) => {
+        const safeUrl = sanitizeUrl(url);
+        const safeAlt = escapeHtmlAttr(alt);
+        if (!safeUrl) return alt ? escapeHtml(alt) : '';
+        return `<img alt="${safeAlt}" src="${escapeHtmlAttr(safeUrl)}" style="max-width:100%;" />`;
+      });
 
       // 連結
-      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:var(--mdltx-primary);">$1</a>');
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
+        const safeUrl = sanitizeUrl(url);
+        const safeText = escapeHtml(text);
+        if (!safeUrl) return safeText;
+        return `<a href="${escapeHtmlAttr(safeUrl)}" target="_blank" style="color:var(--mdltx-primary);">${safeText}</a>`;
+      });
 
       // 引用區塊
       html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
