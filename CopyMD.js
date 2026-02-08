@@ -1996,6 +1996,12 @@
           'font-size:0.95em;">' + escaped + '</span>');
       });
 
+      // 逸出未受保護的 HTML，避免在預覽中注入
+      html = html
+        .split(/(\x00PBLOCK\d+\x00)/)
+        .map(part => (part.startsWith('\x00PBLOCK') ? part : escapeHtml(part)))
+        .join('');
+
       // 標題
       html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
       html = html.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>');
