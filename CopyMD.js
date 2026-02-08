@@ -3,7 +3,7 @@
 // @name:zh-TW   複製為 Markdown + LaTeX
 // @name:zh-CN   复制为 Markdown + LaTeX
 // @namespace    mdltx.copy.self
-// @version      3.2.3
+// @version      3.2.4
 // @description  Copy selection/article/page as Markdown, preserving LaTeX from KaTeX/MathJax/MathML. Enhanced code block language detection for AI chat platforms. Self-contained with modern UI.
 // @description:zh-TW  將選取範圍／文章／整頁複製為 Markdown，完整保留 KaTeX/MathJax/MathML 數學公式。增強 AI 聊天平台的程式碼區塊語言偵測。獨立運作，相容 Trusted Types。
 // @description:zh-CN  将选取范围／文章／整页复制为 Markdown，完整保留 KaTeX/MathJax/MathML 数学公式。增强 AI 聊天平台的代码区块语言检测。独立运作，相容 Trusted Types。
@@ -281,6 +281,7 @@
 
       downloadSettings: '下載設定',
       downloadFilenameTemplate: '檔名模板',
+      downloadFilenameHint: '可用變數：{title} {date} {time} {timestamp} {host} {path} {slug}',
       hiddenScanMaxElements: '隱藏元素掃描上限',
       hiddenUntilFoundVisible: '將 hidden="until-found" 視為可見',
       unknownEmptyTagStrategy: '未知空標籤策略',
@@ -408,6 +409,7 @@
 
       downloadSettings: '下载设置',
       downloadFilenameTemplate: '文件名模板',
+      downloadFilenameHint: '可用变量：{title} {date} {time} {timestamp} {host} {path} {slug}',
       hiddenScanMaxElements: '隐藏元素扫描上限',
       hiddenUntilFoundVisible: '将 hidden="until-found" 视为可见',
       unknownEmptyTagStrategy: '未知空标签策略',
@@ -535,6 +537,7 @@
 
       downloadSettings: 'Download Settings',
       downloadFilenameTemplate: 'Filename Template',
+      downloadFilenameHint: 'Available variables: {title} {date} {time} {timestamp} {host} {path} {slug}',
       hiddenScanMaxElements: 'Max hidden elements to scan',
       hiddenUntilFoundVisible: 'Treat hidden="until-found" as visible',
       unknownEmptyTagStrategy: 'Unknown empty tag strategy',
@@ -787,6 +790,7 @@
 .mdltx-field:last-child{margin-bottom:0}
 .mdltx-field.hidden{display:none}
 .mdltx-field-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.mdltx-field-hint{margin-top:6px;font-size:12px;color:var(--mdltx-text-secondary)}
 .mdltx-label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mdltx-text);cursor:pointer}
 .mdltx-label-text{flex:1}
 .mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cursor:pointer}
@@ -950,16 +954,28 @@
     return String(name || fallback).replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 100) || fallback;
   }
 
-  function generateFilename() {
+  function getFilenameTokens() {
     const title = sanitizeFilename(document.title || 'untitled');
-    const date = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const date = now.toISOString().slice(0, 10);
+    const time = now.toISOString().slice(11, 19).replace(/:/g, '');
     const timestamp = Date.now().toString();
+    const host = sanitizeFilename(location.hostname || 'site');
+    const rawPath = (location.pathname || '').replace(/\/+/g, '/').replace(/^\/|\/$/g, '');
+    const path = sanitizeFilename(rawPath || 'page');
+    const slug = sanitizeFilename(rawPath.split('/').filter(Boolean).pop() || title);
+    return { title, date, time, timestamp, host, path, slug };
+  }
+
+  function generateFilename() {
+    const tokens = getFilenameTokens();
     const template = S.get('downloadFilenameTemplate') || '{title}_{date}';
-    const filename = template
-      .split('{title}').join(title)
-      .split('{date}').join(date)
-      .split('{timestamp}').join(timestamp);
-    return filename + '.md';
+    let filename = template;
+    for (const [key, value] of Object.entries(tokens)) {
+      filename = filename.split(`{${key}}`).join(value);
+    }
+    filename = sanitizeFilename(filename);
+    return (filename || tokens.title || 'document') + '.md';
   }
 
   function downloadAsFile(content, filename) {
@@ -1192,7 +1208,6 @@
       document.addEventListener('click', this._onClick, true);
       document.addEventListener('keydown', this._onKeyDown, true);
       window.addEventListener('scroll', this._onScroll, true);
-      this.modal.addEventListener('keydown', e => this._handleEditorHotkeys(e), true);
     }
 
     _unbindEvents() {
@@ -2743,7 +2758,8 @@
                 value: settings.downloadFilenameTemplate, style: { width: '100%', maxWidth: '280px' },
                 placeholder: '{title}_{date}'
               })
-            ])
+            ]),
+            createElement('div', { className: 'mdltx-field-hint', textContent: t('downloadFilenameHint') })
           ])
         ),
 
