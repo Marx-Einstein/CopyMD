@@ -76,6 +76,14 @@
     previewAlwaysShow: false,
     previewSplitView: false,
     previewRenderer: 'simple',
+    previewSyncScroll: true,
+    previewChromeLayout: 'stacked',
+    previewChromeAutoHide: false,
+    previewChromeAutoHideDelay: 1200,
+    previewToolbarStyle: 'icon-text',
+    previewToolbarSize: 'md',
+    previewToolbarHiddenButtons: '',
+    previewShowMoreButton: true,
 
     // ═══ 第三方腳本兼容性 ═══
     thirdPartyCompatibility: true,
@@ -91,7 +99,7 @@
     assetsFolderTemplate: '{slug}_assets',
     batchDownloadUrls: '',
 
-    settingsVersion: 8,
+    settingsVersion: 10,
   };
 
   const SETTING_TYPES = {
@@ -141,6 +149,14 @@
     previewAlwaysShow: 'boolean',
     previewSplitView: 'boolean',
     previewRenderer: 'string',
+    previewSyncScroll: 'boolean',
+    previewChromeLayout: 'string',
+    previewChromeAutoHide: 'boolean',
+    previewChromeAutoHideDelay: 'number',
+    previewToolbarStyle: 'string',
+    previewToolbarSize: 'string',
+    previewToolbarHiddenButtons: 'string',
+    previewShowMoreButton: 'boolean',
 
     // Third-party compatibility
     thirdPartyCompatibility: 'boolean',
@@ -182,6 +198,8 @@
         [6, ['downloadFrontmatter', 'frontmatterTitle', 'frontmatterDate', 'frontmatterUrl', 'frontmatterDescription', 'frontmatterAuthor', 'frontmatterTags', 'frontmatterCustom', 'elementPickerEnabled', 'elementPickerHotkey', 'buttonDoubleClickAction', 'previewEnabled', 'previewHotkey', 'previewDefaultMode', 'previewMaxHeight', 'previewFontSize', 'thirdPartyCompatibility', 'ignoreCollapsedCodeBlocks', 'customExcludeSelectors', 'customIgnoreHiddenSelectors']],
         [7, ['diagnosticLogging']],
         [8, ['frontmatterCanonical', 'frontmatterPublished', 'frontmatterUpdated', 'frontmatterSite', 'previewRenderer', 'articleExtractionMode', 'downloadAssets', 'assetsFolderTemplate', 'batchDownloadUrls']],
+        [9, ['previewSyncScroll']],
+        [10, ['previewChromeLayout', 'previewChromeAutoHide', 'previewChromeAutoHideDelay', 'previewToolbarStyle', 'previewToolbarSize', 'previewToolbarHiddenButtons', 'previewShowMoreButton']],
       ];
       for (const [ver, keys] of migrations) {
         if (cur < ver) for (const k of keys) if (GM_getValue(k) === undefined) GM_setValue(k, DEFAULTS[k]);
@@ -316,6 +334,25 @@
       previewEdit: '預覽編輯',
       previewAlwaysShow: '複製/下載前總是預覽',
       previewSplitView: '並列模式',
+      previewSyncScroll: '同步捲動',
+      previewChromeLayout: '介面配置',
+      previewChromeLayoutStacked: '分離（預設）',
+      previewChromeLayoutMerged: '合併',
+      previewChromeAutoHide: '自動隱藏工具列',
+      previewChromeAutoHideDelay: '自動隱藏延遲 (ms)',
+      previewToolbarStyle: '工具列顯示方式',
+      previewToolbarStyleIcon: '只顯示圖示',
+      previewToolbarStyleText: '只顯示文字',
+      previewToolbarStyleBoth: '圖示＋文字',
+      previewToolbarSize: '工具列按鈕大小',
+      previewToolbarSizeSm: '小',
+      previewToolbarSizeMd: '中',
+      previewToolbarSizeLg: '大',
+      previewToolbarButtons: '工具列按鈕',
+      previewShowMoreButton: '顯示更多按鈕',
+      previewMore: '更多',
+      toolUndo: '復原',
+      toolRedo: '重作',
       previewFullscreen: '全螢幕',
       previewExitFullscreen: '退出全螢幕',
       previewToolbar: '編輯工具',
@@ -493,6 +530,25 @@
       previewEdit: '预览编辑',
       previewAlwaysShow: '复制/下载前总是预览',
       previewSplitView: '并列模式',
+      previewSyncScroll: '同步滚动',
+      previewChromeLayout: '界面布局',
+      previewChromeLayoutStacked: '分离（默认）',
+      previewChromeLayoutMerged: '合并',
+      previewChromeAutoHide: '自动隐藏工具栏',
+      previewChromeAutoHideDelay: '自动隐藏延迟 (ms)',
+      previewToolbarStyle: '工具栏显示方式',
+      previewToolbarStyleIcon: '仅图标',
+      previewToolbarStyleText: '仅文字',
+      previewToolbarStyleBoth: '图标＋文字',
+      previewToolbarSize: '工具栏按钮大小',
+      previewToolbarSizeSm: '小',
+      previewToolbarSizeMd: '中',
+      previewToolbarSizeLg: '大',
+      previewToolbarButtons: '工具栏按钮',
+      previewShowMoreButton: '显示更多按钮',
+      previewMore: '更多',
+      toolUndo: '撤销',
+      toolRedo: '重做',
       previewFullscreen: '全屏',
       previewExitFullscreen: '退出全屏',
       previewToolbar: '编辑工具',
@@ -668,6 +724,25 @@
       previewEdit: 'Preview & Edit',
       previewAlwaysShow: 'Always preview before copy/download',
       previewSplitView: 'Split View',
+      previewSyncScroll: 'Sync Scroll',
+      previewChromeLayout: 'Layout',
+      previewChromeLayoutStacked: 'Stacked (default)',
+      previewChromeLayoutMerged: 'Merged',
+      previewChromeAutoHide: 'Auto-hide chrome',
+      previewChromeAutoHideDelay: 'Auto-hide delay (ms)',
+      previewToolbarStyle: 'Toolbar display',
+      previewToolbarStyleIcon: 'Icons only',
+      previewToolbarStyleText: 'Text only',
+      previewToolbarStyleBoth: 'Icon + Text',
+      previewToolbarSize: 'Toolbar size',
+      previewToolbarSizeSm: 'Small',
+      previewToolbarSizeMd: 'Medium',
+      previewToolbarSizeLg: 'Large',
+      previewToolbarButtons: 'Toolbar buttons',
+      previewShowMoreButton: 'Show More button',
+      previewMore: 'More',
+      toolUndo: 'Undo',
+      toolRedo: 'Redo',
       previewFullscreen: 'Fullscreen',
       previewExitFullscreen: 'Exit Fullscreen',
       previewToolbar: 'Edit Tools',
@@ -828,6 +903,9 @@
     list: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
     quote: 'M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21zm12 0c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3z',
     minus: 'M5 12h14',
+    undo: 'M9 14H4v-4M4 10a7 7 0 0 1 12-4l2 2',
+    redo: 'M15 14h5v-4M20 10a7 7 0 0 0-12-4l-2 2',
+    more: 'M12 6h.01M12 12h.01M12 18h.01',
     xCircle: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6',
     upload: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12',
     clipboard: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 2h6a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z',
@@ -1006,6 +1084,7 @@
 .icon{display:inline-block;vertical-align:middle}
 .mdltx-conditional{margin-left:26px;padding-left:12px;border-left:2px solid var(--mdltx-border);margin-top:8px}
 .mdltx-conditional.hidden{display:none}
+.mdltx-toolbar-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin-top:8px}
 
 /* ═══ 元素選取模式 ═══ */
 .mdltx-picker-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483645;pointer-events:none}
@@ -1017,23 +1096,24 @@
 .mdltx-picker-toolbar kbd{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 6px;background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);border-radius:4px;font-size:11px;font-weight:500;color:var(--mdltx-text)}
 
 /* ═══ 預覽編輯視窗 ═══ */
-.mdltx-preview-modal{width:100%;max-width:900px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:16px;box-shadow:0 24px 48px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease;border:1px solid var(--mdltx-border-subtle)}
+.mdltx-preview-chrome{display:flex;flex-direction:column;gap:0}
+.mdltx-preview-modal{width:min(98vw,1400px);max-width:1400px;height:94vh;max-height:calc(100vh - 20px);background:var(--mdltx-bg);border-radius:14px;box-shadow:0 24px 48px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-modal-overlay.open .mdltx-preview-modal{transform:scale(1)}
-.mdltx-preview-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--mdltx-border);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
+.mdltx-preview-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--mdltx-border);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
 .mdltx-root[data-theme="dark"] .mdltx-preview-header{background:linear-gradient(180deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
-.mdltx-preview-title{font-size:16px;font-weight:600;color:var(--mdltx-text);display:flex;align-items:center;gap:8px}
+.mdltx-preview-title{font-size:14px;font-weight:600;color:var(--mdltx-text);display:flex;align-items:center;gap:6px}
 .mdltx-preview-actions{display:flex;align-items:center;gap:8px}
 .mdltx-preview-tabs{display:flex;background:var(--mdltx-bg-secondary);border-radius:8px;padding:3px;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-preview-tab{padding:6px 14px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all 0.15s ease;font-family:inherit;letter-spacing:0.2px}
 .mdltx-preview-tab:hover{color:var(--mdltx-text)}
 .mdltx-preview-tab.active{background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 1px 3px var(--mdltx-shadow)}
 .mdltx-preview-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
-.mdltx-preview-hint{padding:10px 20px;font-size:12px;color:var(--mdltx-text-secondary);background:var(--mdltx-bg-secondary);border-bottom:1px solid var(--mdltx-border)}
+.mdltx-preview-hint{font-size:11px;color:var(--mdltx-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mdltx-preview-hint.hidden{display:none}
 .mdltx-preview-content{flex:1;overflow:auto;padding:0}
-.mdltx-preview-editor{width:100%;height:100%;border:none;resize:none;padding:16px 20px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6;color:var(--mdltx-text);background:var(--mdltx-bg);outline:none;transition:box-shadow 0.15s ease}
+.mdltx-preview-editor{width:100%;height:100%;border:none;resize:none;padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6;color:var(--mdltx-text);background:var(--mdltx-bg);outline:none;transition:box-shadow 0.15s ease}
 .mdltx-preview-editor:focus{box-shadow:inset 0 0 0 2px rgba(37,99,235,0.15)}
-.mdltx-preview-rendered{padding:16px 20px;font-size:14px;line-height:1.7;color:var(--mdltx-text)}
+.mdltx-preview-rendered{padding:12px 14px;font-size:14px;line-height:1.7;color:var(--mdltx-text)}
 .mdltx-preview-rendered pre{background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);border-radius:8px;padding:12px 16px;overflow-x:auto;margin:12px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,0.2)}
 .mdltx-preview-rendered code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}
 .mdltx-preview-rendered p{margin:8px 0}
@@ -1062,7 +1142,8 @@
 .math-block-copy:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
 .mdltx-preview-rendered a{color:var(--mdltx-primary);text-decoration:none}
 .mdltx-preview-rendered a:hover{text-decoration:underline}
-.mdltx-preview-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--mdltx-border);flex-shrink:0}
+.mdltx-preview-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--mdltx-border);flex-shrink:0}
+.mdltx-preview-footer-left{display:flex;align-items:center;gap:12px;min-width:0}
 .mdltx-preview-stats{display:flex;gap:16px;font-size:12px;color:var(--mdltx-text-secondary)}
 .mdltx-preview-stat{display:flex;align-items:center;gap:4px}
 .mdltx-preview-buttons{display:flex;gap:8px}
@@ -1076,9 +1157,10 @@
 .mdltx-preview-modal.split-view .mdltx-preview-pane-header{padding:8px 12px;background:var(--mdltx-bg-secondary);font-size:12px;font-weight:600;color:var(--mdltx-text-secondary);border-bottom:1px solid var(--mdltx-border)}
 .mdltx-preview-modal.split-view .mdltx-preview-editor{border:none;flex:1;resize:none}
 .mdltx-preview-modal.split-view .mdltx-preview-rendered{flex:1;overflow:auto}
-.mdltx-preview-toolbar{display:flex;align-items:center;gap:4px;padding:8px 12px;border-bottom:1px solid var(--mdltx-border);background:var(--mdltx-bg-secondary);flex-wrap:wrap}
+.mdltx-preview-toolbar{display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--mdltx-border);background:var(--mdltx-bg-secondary);flex-wrap:wrap}
 .mdltx-preview-toolbar-group{display:flex;align-items:center;gap:2px;padding-right:8px;border-right:1px solid var(--mdltx-border);margin-right:8px}
 .mdltx-preview-toolbar-group:last-child{border-right:none;margin-right:0;padding-right:0}
+.mdltx-preview-toolbar-group.hidden{display:none}
 .mdltx-toolbar-btn{width:28px;height:28px;padding:4px;border:none;background:none;color:var(--mdltx-text-secondary);cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all 0.15s ease}
 .mdltx-toolbar-btn:hover{background:var(--mdltx-bg-tertiary);color:var(--mdltx-text)}
 .mdltx-toolbar-btn:active{transform:scale(0.95)}
@@ -1096,6 +1178,29 @@
 .mdltx-preview-view-btn:hover{color:var(--mdltx-text)}
 .mdltx-preview-view-btn.active{background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 1px 2px var(--mdltx-shadow)}
 .mdltx-preview-view-btn svg{width:14px;height:14px}
+.mdltx-preview-more{position:relative}
+.mdltx-preview-more-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:160px;padding:6px;background:var(--mdltx-bg-elevated);border:1px solid var(--mdltx-border-subtle);border-radius:10px;box-shadow:0 14px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transform:scale(0.95) translateY(-4px);transform-origin:top right;transition:opacity 0.15s ease,visibility 0.15s ease,transform 0.15s ease;z-index:2}
+.mdltx-preview-more-menu.open{opacity:1;visibility:visible;transform:scale(1) translateY(0)}
+.mdltx-preview-more-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;border:none;background:none;color:var(--mdltx-text);font-size:12px;text-align:left;cursor:pointer;width:100%}
+.mdltx-preview-more-item:hover{background:var(--mdltx-bg-secondary)}
+.mdltx-preview-more-item svg{width:14px;height:14px}
+.mdltx-preview-modal.toolbar-icons .mdltx-editor-btn-label,.mdltx-preview-modal.toolbar-icons .mdltx-editor-btn-shortcut{display:none}
+.mdltx-preview-modal.toolbar-text .mdltx-editor-btn svg{display:none}
+.mdltx-preview-modal.toolbar-text .mdltx-editor-btn-shortcut{display:none}
+.mdltx-preview-modal.toolbar-text .mdltx-editor-btn{padding:6px 8px}
+.mdltx-preview-modal.toolbar-size-sm .mdltx-toolbar-btn{width:24px;height:24px}
+.mdltx-preview-modal.toolbar-size-sm .mdltx-editor-btn{font-size:11px;padding:4px 6px;border-radius:6px}
+.mdltx-preview-modal.toolbar-size-sm .mdltx-editor-btn .mdltx-editor-btn-shortcut{font-size:9px;padding:1px 4px}
+.mdltx-preview-modal.toolbar-size-lg .mdltx-toolbar-btn{width:32px;height:32px}
+.mdltx-preview-modal.toolbar-size-lg .mdltx-editor-btn{font-size:13px;padding:8px 12px;border-radius:10px}
+.mdltx-preview-modal.toolbar-size-lg .mdltx-editor-btn .mdltx-editor-btn-shortcut{font-size:11px;padding:3px 6px}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-header{border-bottom:none;padding:6px 10px}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-header{flex-wrap:wrap;row-gap:4px}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-toolbar{width:100%;order:2;border-bottom:none;padding:2px 0 4px;background:transparent}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-footer{display:none}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-actions .mdltx-preview-footer-left{margin-left:8px}
+.mdltx-preview-modal.chrome-autohide .mdltx-preview-chrome{transition:opacity 0.2s ease,transform 0.2s ease}
+.mdltx-preview-modal.chrome-autohide.chrome-hidden .mdltx-preview-chrome{opacity:0;transform:translateY(-6px)}
 
 /* ═══ 元素選取工具欄增強 ═══ */
 .mdltx-picker-toolbar{gap:16px}
@@ -1869,6 +1974,15 @@
       this._focusTrap = null;
       this._editorRef = null;
       this._wrapBtn = null;
+      this._history = [];
+      this._historyIndex = -1;
+      this._historyMax = 200;
+      this._isApplyingHistory = false;
+      this._hiddenToolbarButtons = new Set();
+      this._toolbarOverflowActions = [];
+      this._moreMenu = null;
+      this._chrome = null;
+      this._chromeAutoHideTimer = null;
     }
 
     async show(markdown, options = {}) {
@@ -1877,6 +1991,9 @@
       this.options = options;
       this.mode = S.get('previewSplitView') ? 'split' : (S.get('previewDefaultMode') || 'preview');
       this.isFullscreen = false;
+      this._history = [];
+      this._historyIndex = -1;
+      this._isApplyingHistory = false;
       this.ui.lockScroll();
       this._createModal();
 
@@ -1975,6 +2092,8 @@
 
       const overlay = createElement('div', { className: 'mdltx-modal-overlay preview-modal', tabindex: '-1' });
       const modal = createElement('div', { className: 'mdltx-preview-modal', role: 'dialog', 'aria-labelledby': 'mdltx-preview-title', 'aria-modal': 'true' });
+      this._hiddenToolbarButtons = this._getHiddenToolbarButtons();
+      this._toolbarOverflowActions = [];
 
       // 標題列
       const header = createElement('div', { className: 'mdltx-preview-header' }, [
@@ -2005,37 +2124,50 @@
       ]);
 
       // 編輯工具列
+      const formatGroup = createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
+        this._createToolBtn('undo', t('toolUndo'), () => this._handleUndo(), { shortcut: '⌘/Ctrl+Z', id: 'undo' }),
+        this._createToolBtn('redo', t('toolRedo'), () => this._handleRedo(), { shortcut: '⌘/Ctrl+Shift+Z', id: 'redo' }),
+        this._createToolBtn('bold', t('toolBold'), () => this._insertFormat('**', '**'), { shortcut: '⌘/Ctrl+B', id: 'bold' }),
+        this._createToolBtn('italic', t('toolItalic'), () => this._insertFormat('*', '*'), { shortcut: '⌘/Ctrl+I', id: 'italic' }),
+        this._createToolBtn('code', t('toolCode'), () => this._insertFormat('`', '`'), { shortcut: '⌘/Ctrl+`', id: 'code' }),
+        this._createToolBtn('codeBlock', t('toolCodeBlock'), () => this._insertCodeBlock(), { id: 'codeBlock' }),
+      ].filter(Boolean));
+      const structureGroup = createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
+        this._createToolBtn('heading', t('toolHeading'), () => this._insertPrefix('## '), { id: 'heading' }),
+        this._createToolBtn('list', t('toolList'), () => this._insertPrefix('- '), { id: 'list' }),
+        this._createToolBtn('quote', t('toolQuote'), () => this._insertPrefix('> '), { id: 'quote' }),
+      ].filter(Boolean));
+      const insertGroup = createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
+        this._createToolBtn('link', t('toolLink'), () => this._insertFormat('[', '](url)'), { shortcut: '⌘/Ctrl+K', id: 'link' }),
+        this._createToolBtn('minus', t('toolHr'), () => this._insertBlock('\n\n---\n\n'), { id: 'hr' }),
+        (() => {
+          this._wrapBtn = this._createToolBtn('wrapText', t(this.isWrapEnabled ? 'toolWrapOn' : 'toolWrapOff'), () => this._toggleWrap(), { isToggle: true, pressed: this.isWrapEnabled, id: 'wrap' });
+          return this._wrapBtn;
+        })(),
+      ].filter(Boolean));
+
+      [formatGroup, structureGroup, insertGroup].forEach(group => {
+        if (!group.children.length) group.classList.add('hidden');
+      });
+
       const toolbar = createElement('div', { className: 'mdltx-preview-toolbar', id: 'mdltx-preview-toolbar' }, [
-        createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
-          this._createToolBtn('bold', t('toolBold'), () => this._insertFormat('**', '**'), { shortcut: '⌘/Ctrl+B' }),
-          this._createToolBtn('italic', t('toolItalic'), () => this._insertFormat('*', '*'), { shortcut: '⌘/Ctrl+I' }),
-          this._createToolBtn('code', t('toolCode'), () => this._insertFormat('`', '`'), { shortcut: '⌘/Ctrl+`' }),
-          this._createToolBtn('codeBlock', t('toolCodeBlock'), () => this._insertCodeBlock()),
-        ]),
-        createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
-          this._createToolBtn('heading', t('toolHeading'), () => this._insertPrefix('## ')),
-          this._createToolBtn('list', t('toolList'), () => this._insertPrefix('- ')),
-          this._createToolBtn('quote', t('toolQuote'), () => this._insertPrefix('> ')),
-        ]),
-        createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
-          this._createToolBtn('link', t('toolLink'), () => this._insertFormat('[', '](url)'), { shortcut: '⌘/Ctrl+K' }),
-          this._createToolBtn('minus', t('toolHr'), () => this._insertBlock('\n\n---\n\n')),
-          (() => {
-            this._wrapBtn = this._createToolBtn('wrapText', t(this.isWrapEnabled ? 'toolWrapOn' : 'toolWrapOff'), () => this._toggleWrap(), { isToggle: true, pressed: this.isWrapEnabled });
-            return this._wrapBtn;
-          })(),
-        ]),
-      ]);
+        formatGroup,
+        structureGroup,
+        insertGroup,
+        this._createMoreButton(),
+      ].filter(Boolean));
 
       // 內容區
       const body = createElement('div', { className: 'mdltx-preview-body' }, [
-        createElement('div', { className: 'mdltx-preview-hint', id: 'mdltx-preview-hint' }),
         createElement('div', { className: 'mdltx-preview-content', id: 'mdltx-preview-content' }),
       ]);
 
       // 底部
+      const hint = createElement('div', { className: 'mdltx-preview-hint', id: 'mdltx-preview-hint' });
+      const stats = createElement('div', { className: 'mdltx-preview-stats', id: 'mdltx-preview-stats' });
+      const footerLeft = createElement('div', { className: 'mdltx-preview-footer-left' }, [hint, stats]);
       const footer = createElement('div', { className: 'mdltx-preview-footer' }, [
-        createElement('div', { className: 'mdltx-preview-stats', id: 'mdltx-preview-stats' }),
+        footerLeft,
         createElement('div', { className: 'mdltx-preview-buttons' }, [
           createElement('button', { className: 'mdltx-btn-secondary', type: 'button', id: 'preview-copy-btn' }, [
             createIcon('copy', 16), document.createTextNode(' ' + t('previewCopyBtn')),
@@ -2046,20 +2178,31 @@
         ]),
       ]);
 
-      modal.append(header, toolbar, body, footer);
+      const chrome = createElement('div', { className: 'mdltx-preview-chrome' }, [header, toolbar, footer]);
+      modal.append(chrome, body);
       overlay.appendChild(modal);
       root.appendChild(overlay);
       this.modal = overlay;
+      this._chrome = chrome;
+      this._applyToolbarAppearance();
+      this._applyChromeLayout();
+      this._setupChromeAutoHide();
     }
 
     _createToolBtn(icon, title, onClick, options = {}) {
       const shortcut = options.shortcut || '';
       const isToggle = options.isToggle || false;
       const pressed = options.pressed || false;
+      const id = options.id || icon;
+      if (this._hiddenToolbarButtons.has(id)) {
+        this._registerToolbarAction(id, title, icon, onClick);
+        return null;
+      }
       const attrs = {
         className: `mdltx-toolbar-btn mdltx-editor-btn${pressed ? ' active' : ''}`,
         type: 'button',
         title: shortcut ? `${title} (${shortcut})` : title,
+        dataset: { buttonId: id }
       };
       if (isToggle) attrs['aria-pressed'] = String(pressed);
       const btn = createElement('button', attrs, [
@@ -2071,11 +2214,119 @@
       return btn;
     }
 
+    _getHiddenToolbarButtons() {
+      const raw = S.get('previewToolbarHiddenButtons') || '';
+      return new Set(raw.split(',').map(v => v.trim()).filter(Boolean));
+    }
+
+    _registerToolbarAction(id, title, icon, onClick) {
+      if (this._toolbarOverflowActions.some(item => item.id === id)) return;
+      this._toolbarOverflowActions.push({ id, title, icon, onClick });
+    }
+
+    _createMoreButton() {
+      if (!S.get('previewShowMoreButton') || this._toolbarOverflowActions.length === 0) return null;
+      const moreBtn = createElement('button', { className: 'mdltx-toolbar-btn mdltx-editor-btn', type: 'button', title: t('previewMore') }, [
+        createIcon('more', 16),
+        createElement('span', { className: 'mdltx-editor-btn-label', textContent: t('previewMore') })
+      ]);
+      const menu = createElement('div', { className: 'mdltx-preview-more-menu', id: 'mdltx-preview-more-menu' },
+        this._toolbarOverflowActions.map(item =>
+          createElement('button', { className: 'mdltx-preview-more-item', type: 'button', dataset: { action: item.id } }, [
+            createIcon(item.icon, 14),
+            createElement('span', { textContent: item.title })
+          ])
+        )
+      );
+      const wrap = createElement('div', { className: 'mdltx-preview-more' }, [moreBtn, menu]);
+      this._moreMenu = menu;
+      moreBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        menu.classList.toggle('open');
+      });
+      menu.addEventListener('click', e => {
+        const btn = e.target?.closest?.('.mdltx-preview-more-item');
+        if (!btn) return;
+        const action = btn.dataset?.action;
+        const item = this._toolbarOverflowActions.find(it => it.id === action);
+        if (item) item.onClick();
+        menu.classList.remove('open');
+      });
+      return wrap;
+    }
+
+    _applyToolbarAppearance() {
+      const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
+      if (!modalEl) return;
+      const style = S.get('previewToolbarStyle');
+      modalEl.classList.toggle('toolbar-icons', style === 'icon');
+      modalEl.classList.toggle('toolbar-text', style === 'text');
+      modalEl.classList.toggle('toolbar-size-sm', S.get('previewToolbarSize') === 'sm');
+      modalEl.classList.toggle('toolbar-size-lg', S.get('previewToolbarSize') === 'lg');
+    }
+
+    _applyChromeLayout() {
+      const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
+      if (!modalEl || !this.modal) return;
+      const merged = S.get('previewChromeLayout') === 'merged';
+      modalEl.classList.toggle('chrome-merged', merged);
+      const footer = this.modal.querySelector('.mdltx-preview-footer');
+      const footerLeft = footer?.querySelector('.mdltx-preview-footer-left');
+      const headerActions = this.modal.querySelector('.mdltx-preview-actions');
+      const header = this.modal.querySelector('.mdltx-preview-header');
+      const toolbar = this.modal.querySelector('#mdltx-preview-toolbar');
+      if (!footer || !footerLeft || !headerActions) return;
+      if (merged) {
+        if (footerLeft.parentElement !== headerActions) headerActions.appendChild(footerLeft);
+        if (toolbar && header && toolbar.parentElement !== header) header.appendChild(toolbar);
+      } else {
+        if (footerLeft.parentElement !== footer) footer.insertBefore(footerLeft, footer.firstChild);
+        if (toolbar && this._chrome && toolbar.parentElement !== this._chrome) this._chrome.insertBefore(toolbar, footer);
+      }
+    }
+
+    _setupChromeAutoHide() {
+      const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
+      if (!modalEl || !this._chrome) return;
+      const enable = S.get('previewChromeAutoHide');
+      modalEl.classList.toggle('chrome-autohide', enable);
+      if (!enable) {
+        modalEl.classList.remove('chrome-hidden');
+        return;
+      }
+      const delay = Math.max(0, Number(S.get('previewChromeAutoHideDelay')) || 0);
+      const show = () => {
+        if (this._chromeAutoHideTimer) clearTimeout(this._chromeAutoHideTimer);
+        modalEl.classList.remove('chrome-hidden');
+      };
+      const hide = () => {
+        if (this._chromeAutoHideTimer) clearTimeout(this._chromeAutoHideTimer);
+        this._chromeAutoHideTimer = setTimeout(() => {
+          modalEl.classList.add('chrome-hidden');
+        }, delay);
+      };
+      this._chrome.addEventListener('mouseenter', show);
+      this._chrome.addEventListener('mouseleave', hide);
+      hide();
+    }
+
     _bindEvents() {
       if (!this.modal) return;
       this.modal.querySelector('.mdltx-modal-close')?.addEventListener('click', () => this.close());
-      this.modal.addEventListener('click', e => { if (e.target === this.modal) this.close(); });
-      this.modal.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); this.close(); } });
+      this.modal.addEventListener('click', e => {
+        if (this._moreMenu) this._moreMenu.classList.remove('open');
+        if (e.target === this.modal) this.close();
+      });
+      this.modal.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          if (this._moreMenu?.classList.contains('open')) {
+            this._moreMenu.classList.remove('open');
+            return;
+          }
+          this.close();
+        }
+      });
 
       // 編輯器快捷鍵（Ctrl/Cmd + B/I/K/`）
       this.modal.addEventListener('keydown', e => this._handleEditorHotkeys(e), true);
@@ -2170,9 +2421,10 @@
         textarea.style.fontSize = fontSize;
         textarea.style.minHeight = maxH;
         this._applyWrapState(textarea);
-        textarea.addEventListener('input', () => { this.content = textarea.value; this._updateStats(); });
+        textarea.addEventListener('input', () => this._handleEditorInput(textarea));
         container.appendChild(textarea);
         this._editorRef = textarea;
+        this._initEditorHistory(textarea);
 
         const updateCursor = () => this._updateCursorPosition();
         textarea.addEventListener('keyup', updateCursor);
@@ -2191,13 +2443,10 @@
         textarea.value = this.content;
         textarea.style.fontSize = fontSize;
         this._applyWrapState(textarea);
-        textarea.addEventListener('input', () => {
-          this.content = textarea.value;
-          this._updateStats();
-          this._updatePreviewPane();
-        });
+        textarea.addEventListener('input', () => this._handleEditorInput(textarea));
         editPane.appendChild(textarea);
         this._editorRef = textarea;
+        this._initEditorHistory(textarea);
 
         const updateCursor2 = () => this._updateCursorPosition();
         textarea.addEventListener('keyup', updateCursor2);
@@ -2220,6 +2469,7 @@
         const renderedEl = previewPane.querySelector('.mdltx-preview-rendered');
 
         const syncScroll = (source, target) => {
+          if (!S.get('previewSyncScroll')) return;
           if (this._isSyncing || !source || !target) return;
           this._isSyncing = true;
           requestAnimationFrame(() => {
@@ -2265,6 +2515,11 @@
       if (!hint) return;
       const mode = S.get('previewRenderer');
       const fallback = this._previewRendererFallback;
+      if (this.mode === 'edit') {
+        hint.textContent = '';
+        hint.classList.add('hidden');
+        return;
+      }
       if (mode === 'full') {
         hint.textContent = fallback ? t('previewRendererFallback') : '';
         hint.classList.toggle('hidden', !fallback);
@@ -2272,6 +2527,67 @@
         hint.textContent = t('previewRendererHint');
         hint.classList.remove('hidden');
       }
+    }
+
+    _handleEditorInput(editor) {
+      if (!editor) return;
+      this.content = editor.value;
+      this._updateStats();
+      if (this.mode === 'split') this._updatePreviewPane();
+      this._recordHistory(editor);
+    }
+
+    _initEditorHistory(editor) {
+      if (!editor) return;
+      if (this._historyIndex === -1) {
+        this._recordHistory(editor, true);
+      } else {
+        this._restoreEditorState(editor);
+      }
+    }
+
+    _recordHistory(editor, force = false) {
+      if (!editor || this._isApplyingHistory) return;
+      const entry = {
+        value: editor.value,
+        selectionStart: editor.selectionStart,
+        selectionEnd: editor.selectionEnd,
+      };
+      const current = this._history[this._historyIndex];
+      if (!force && current && current.value === entry.value &&
+          current.selectionStart === entry.selectionStart &&
+          current.selectionEnd === entry.selectionEnd) {
+        return;
+      }
+      if (this._historyIndex < this._history.length - 1) {
+        this._history = this._history.slice(0, this._historyIndex + 1);
+      }
+      this._history.push(entry);
+      this._historyIndex = this._history.length - 1;
+      if (this._history.length > this._historyMax) {
+        this._history.shift();
+        this._historyIndex = this._history.length - 1;
+      }
+    }
+
+    _restoreEditorState(editor) {
+      const entry = this._history[this._historyIndex];
+      if (!entry || !editor) return;
+      this._applyHistoryEntry(editor, entry);
+    }
+
+    _applyHistoryEntry(editor, entry) {
+      if (!editor || !entry) return;
+      this._isApplyingHistory = true;
+      editor.value = entry.value;
+      this.content = entry.value;
+      this._updateStats();
+      if (this.mode === 'split') this._updatePreviewPane();
+      requestAnimationFrame(() => {
+        editor.setSelectionRange(entry.selectionStart, entry.selectionEnd);
+        this._scrollToCursor(editor, entry.selectionEnd);
+        this._isApplyingHistory = false;
+      });
     }
 
     _handleEditorHotkeys(e) {
@@ -2294,6 +2610,13 @@
       } else if (key === 'i' && !e.shiftKey) {
         e.preventDefault(); e.stopPropagation();
         this._insertFormat('*', '*');
+      } else if (key === 'z') {
+        e.preventDefault(); e.stopPropagation();
+        if (e.shiftKey) this._handleRedo();
+        else this._handleUndo();
+      } else if (key === 'y' && !e.shiftKey) {
+        e.preventDefault(); e.stopPropagation();
+        this._handleRedo();
       } else if (key === 'k' && !e.shiftKey) {
         e.preventDefault(); e.stopPropagation();
         this._insertFormat('[', '](url)');
@@ -2301,6 +2624,22 @@
         e.preventDefault(); e.stopPropagation();
         this._insertFormat('`', '`');
       }
+    }
+
+    _handleUndo() {
+      const editor = this._editorRef;
+      if (!editor || this._historyIndex <= 0) return;
+      editor.focus();
+      this._historyIndex -= 1;
+      this._applyHistoryEntry(editor, this._history[this._historyIndex]);
+    }
+
+    _handleRedo() {
+      const editor = this._editorRef;
+      if (!editor || this._historyIndex >= this._history.length - 1) return;
+      editor.focus();
+      this._historyIndex += 1;
+      this._applyHistoryEntry(editor, this._history[this._historyIndex]);
     }
 
     _bindMathCopyHandlers(container) {
@@ -2332,36 +2671,22 @@
 
       const start = editor.selectionStart;
       const end = editor.selectionEnd;
-      const selected = this.content.substring(start, end);
-      const textToWrap = selected || 'text';
-      const newText = before + textToWrap + after;
+      const selected = editor.value.substring(start, end);
+      const hasSelection = start !== end;
+      const shouldUnwrap = hasSelection && this._isWrappedWith(editor.value, start, end, before, after);
 
-      // 更新內容
-      this.content = this.content.substring(0, start) + newText + this.content.substring(end);
-      editor.value = this.content;
-
-      // 計算新的游標位置
-      let newStart, newEnd;
-      if (selected) {
-        // 有選取文字：選取被包裹的文字
-        newStart = start + before.length;
-        newEnd = newStart + selected.length;
-      } else {
-        // 沒有選取：選取預設的 "text"
-        newStart = start + before.length;
-        newEnd = newStart + textToWrap.length;
+      if (shouldUnwrap) {
+        const wrapStart = start - before.length;
+        const wrapEnd = end + after.length;
+        this._replaceEditorRange(editor, wrapStart, wrapEnd, selected, start - before.length, end - before.length);
+        return;
       }
 
-      // 使用 requestAnimationFrame 確保 DOM 更新後再設置游標
-      requestAnimationFrame(() => {
-        editor.focus();
-        editor.setSelectionRange(newStart, newEnd);
-        // 確保游標可見
-        this._scrollToCursor(editor, newStart);
-      });
-
-      this._updateStats();
-      if (this.mode === 'split') this._updatePreviewPane();
+      const textToWrap = selected || 'text';
+      const newText = before + textToWrap + after;
+      const newStart = start + before.length;
+      const newEnd = newStart + textToWrap.length;
+      this._replaceEditorRange(editor, start, end, newText, newStart, newEnd);
     }
 
     _insertPrefix(prefix) {
@@ -2370,7 +2695,7 @@
 
       const start = editor.selectionStart;
       const end = editor.selectionEnd;
-      const selected = this.content.substring(start, end);
+      const selected = editor.value.substring(start, end);
 
       // 檢查是否有選取多行文字
       if (selected && selected.includes('\n')) {
@@ -2384,22 +2709,13 @@
           return prefix + line;
         });
         const newText = prefixedLines.join('\n');
-
-        this.content = this.content.substring(0, start) + newText + this.content.substring(end);
-        editor.value = this.content;
-
-        // 保持選取狀態
-        requestAnimationFrame(() => {
-          editor.focus();
-          editor.setSelectionRange(start, start + newText.length);
-          this._scrollToCursor(editor, start);
-        });
+        this._replaceEditorRange(editor, start, end, newText, start, start + newText.length);
       } else {
         // 單行處理：在當前行開頭插入前綴
-        const lineStart = this.content.lastIndexOf('\n', start - 1) + 1;
-        const lineEnd = this.content.indexOf('\n', start);
-        const actualLineEnd = lineEnd === -1 ? this.content.length : lineEnd;
-        const currentLine = this.content.substring(lineStart, actualLineEnd);
+        const lineStart = editor.value.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = editor.value.indexOf('\n', start);
+        const actualLineEnd = lineEnd === -1 ? editor.value.length : lineEnd;
+        const currentLine = editor.value.substring(lineStart, actualLineEnd);
 
         // 檢查是否已有前綴
         if (currentLine.trimStart().startsWith(prefix.trim())) {
@@ -2407,20 +2723,9 @@
           return;
         }
 
-        this.content = this.content.substring(0, lineStart) + prefix + this.content.substring(lineStart);
-        editor.value = this.content;
-
-        // 游標移到原位置 + 前綴長度
         const newPos = start + prefix.length;
-        requestAnimationFrame(() => {
-          editor.focus();
-          editor.setSelectionRange(newPos, newPos);
-          this._scrollToCursor(editor, newPos);
-        });
+        this._replaceEditorRange(editor, lineStart, lineStart, prefix, newPos, newPos);
       }
-
-      this._updateStats();
-      if (this.mode === 'split') this._updatePreviewPane();
     }
 
     _insertBlock(block) {
@@ -2428,19 +2733,8 @@
       if (!editor) return;
 
       const pos = editor.selectionStart;
-      this.content = this.content.substring(0, pos) + block + this.content.substring(pos);
-      editor.value = this.content;
-
-      // 游標移到插入內容之後
       const newPos = pos + block.length;
-      requestAnimationFrame(() => {
-        editor.focus();
-        editor.setSelectionRange(newPos, newPos);
-        this._scrollToCursor(editor, newPos);
-      });
-
-      this._updateStats();
-      if (this.mode === 'split') this._updatePreviewPane();
+      this._replaceEditorRange(editor, pos, pos, block, newPos, newPos);
     }
 
     _insertCodeBlock() {
@@ -2449,23 +2743,42 @@
 
       const start = editor.selectionStart;
       const end = editor.selectionEnd;
-      const selected = this.content.substring(start, end);
+      const selected = editor.value.substring(start, end);
       const block = `\n\n\`\`\`\n${selected}\n\`\`\`\n\n`;
-
-      this.content = this.content.substring(0, start) + block + this.content.substring(end);
-      editor.value = this.content;
 
       const blockStart = start + 6;
       const blockEnd = blockStart + selected.length;
+      this._replaceEditorRange(editor, start, end, block, blockStart, blockEnd);
+    }
 
-      requestAnimationFrame(() => {
-        editor.focus();
-        editor.setSelectionRange(blockStart, blockEnd);
-        this._scrollToCursor(editor, blockStart);
-      });
-
+    _replaceEditorRange(editor, start, end, text, newStart, newEnd) {
+      editor.setRangeText(text, start, end, 'preserve');
+      this.content = editor.value;
       this._updateStats();
       if (this.mode === 'split') this._updatePreviewPane();
+      requestAnimationFrame(() => {
+        editor.focus();
+        editor.setSelectionRange(newStart, newEnd);
+        this._scrollToCursor(editor, newStart);
+        this._recordHistory(editor);
+      });
+    }
+
+    _isWrappedWith(content, start, end, before, after) {
+      if (start < before.length || end + after.length > content.length) return false;
+      if (content.slice(start - before.length, start) !== before) return false;
+      if (content.slice(end, end + after.length) !== after) return false;
+      const isSingleAsterisk = before === '*' && after === '*';
+      const isSingleUnderscore = before === '_' && after === '_';
+      if (isSingleAsterisk) {
+        if (content.slice(start - 2, start) === '**') return false;
+        if (content.slice(end, end + 2) === '**') return false;
+      }
+      if (isSingleUnderscore) {
+        if (content.slice(start - 2, start) === '__') return false;
+        if (content.slice(end, end + 2) === '__') return false;
+      }
+      return true;
     }
 
     // 新增：確保游標可見的輔助方法
@@ -3507,10 +3820,59 @@
           mkCheck('setting-previewEnabled', t('previewEnabled'), settings.previewEnabled),
           (() => {
             const previewCond = createElement('div', { className: `mdltx-conditional ${settings.previewEnabled ? '' : 'hidden'}`, id: 'preview-conditional' });
+            const hiddenToolbarButtons = new Set((settings.previewToolbarHiddenButtons || '').split(',').map(v => v.trim()).filter(Boolean));
+            const toolbarButtonDefs = [
+              { id: 'undo', label: t('toolUndo') },
+              { id: 'redo', label: t('toolRedo') },
+              { id: 'bold', label: t('toolBold') },
+              { id: 'italic', label: t('toolItalic') },
+              { id: 'code', label: t('toolCode') },
+              { id: 'codeBlock', label: t('toolCodeBlock') },
+              { id: 'heading', label: t('toolHeading') },
+              { id: 'list', label: t('toolList') },
+              { id: 'quote', label: t('toolQuote') },
+              { id: 'link', label: t('toolLink') },
+              { id: 'hr', label: t('toolHr') },
+              { id: 'wrap', label: t('toolWrapOn') },
+            ];
+            const chromeAutoHideCond = createElement('div', { className: `mdltx-conditional ${settings.previewChromeAutoHide ? '' : 'hidden'}`, id: 'preview-chrome-autohide-conditional' });
+            chromeAutoHideCond.append(
+              mkNum('setting-previewChromeAutoHideDelay', t('previewChromeAutoHideDelay'), settings.previewChromeAutoHideDelay, 0, 5000, 100)
+            );
+            const toolbarButtonsField = createElement('div', { className: 'mdltx-field' }, [
+              createElement('div', { className: 'mdltx-field-row' }, [
+                createElement('span', { className: 'mdltx-label-text', textContent: t('previewToolbarButtons') })
+              ]),
+              createElement('div', { className: 'mdltx-toolbar-config' },
+                toolbarButtonDefs.map(def => createElement('label', { className: 'mdltx-checkbox' }, [
+                  createElement('input', { type: 'checkbox', id: `setting-previewToolbarButton-${def.id}`, checked: !hiddenToolbarButtons.has(def.id) }),
+                  createElement('span', { textContent: def.label })
+                ]))
+              )
+            ]);
             previewCond.append(
               // 新增：總是預覽選項
               mkCheck('setting-previewAlwaysShow', t('previewAlwaysShow'), settings.previewAlwaysShow),
               mkCheck('setting-previewSplitView', t('previewSplitView'), settings.previewSplitView),
+              mkCheck('setting-previewSyncScroll', t('previewSyncScroll'), settings.previewSyncScroll),
+              mkSelect('setting-previewChromeLayout', t('previewChromeLayout'), [
+                { value: 'stacked', label: t('previewChromeLayoutStacked') },
+                { value: 'merged', label: t('previewChromeLayoutMerged') }
+              ], settings.previewChromeLayout),
+              mkCheck('setting-previewChromeAutoHide', t('previewChromeAutoHide'), settings.previewChromeAutoHide),
+              chromeAutoHideCond,
+              mkSelect('setting-previewToolbarStyle', t('previewToolbarStyle'), [
+                { value: 'icon', label: t('previewToolbarStyleIcon') },
+                { value: 'text', label: t('previewToolbarStyleText') },
+                { value: 'icon-text', label: t('previewToolbarStyleBoth') }
+              ], settings.previewToolbarStyle),
+              mkSelect('setting-previewToolbarSize', t('previewToolbarSize'), [
+                { value: 'sm', label: t('previewToolbarSizeSm') },
+                { value: 'md', label: t('previewToolbarSizeMd') },
+                { value: 'lg', label: t('previewToolbarSizeLg') }
+              ], settings.previewToolbarSize),
+              mkCheck('setting-previewShowMoreButton', t('previewShowMoreButton'), settings.previewShowMoreButton),
+              toolbarButtonsField,
               mkSelect('setting-previewRenderer', t('previewRenderer'), [
                 { value: 'simple', label: t('previewRendererSimple') },
                 { value: 'full', label: t('previewRendererFull') }
@@ -3620,6 +3982,7 @@
       const origOpacity = originalSettings.buttonOpacity, origSize = originalSettings.buttonSize, origTheme = getEffectiveTheme();
       let tempHotkey = { ctrl: originalSettings.hotkeyCtrl, alt: originalSettings.hotkeyAlt, shift: originalSettings.hotkeyShift, key: originalSettings.hotkeyKey };
       let currentMode = originalSettings.settingsMode;
+      const toolbarButtonIds = ['undo', 'redo', 'bold', 'italic', 'code', 'codeBlock', 'heading', 'list', 'quote', 'link', 'hr', 'wrap'];
       const gv = id => overlay.querySelector(`#${id}`);
 
       const stopRec = () => {
@@ -3670,6 +4033,9 @@
         }
 
         const valNum = (v, min, max, def) => { const n = parseFloat(v); return isNaN(n) ? def : Math.max(min, Math.min(max, n)); };
+        const hiddenToolbarButtons = toolbarButtonIds
+          .filter(id => !gv(`setting-previewToolbarButton-${id}`)?.checked)
+          .join(',');
         const vals = {
           showButton: gv('setting-showButton')?.checked,
           buttonPosition: gv('setting-buttonPosition')?.value,
@@ -3747,6 +4113,14 @@
           previewEnabled: gv('setting-previewEnabled')?.checked,
           previewAlwaysShow: gv('setting-previewAlwaysShow')?.checked,
           previewSplitView: gv('setting-previewSplitView')?.checked,
+          previewSyncScroll: gv('setting-previewSyncScroll')?.checked,
+          previewChromeLayout: gv('setting-previewChromeLayout')?.value,
+          previewChromeAutoHide: gv('setting-previewChromeAutoHide')?.checked,
+          previewChromeAutoHideDelay: valNum(gv('setting-previewChromeAutoHideDelay')?.value, 0, 5000, 1200),
+          previewToolbarStyle: gv('setting-previewToolbarStyle')?.value,
+          previewToolbarSize: gv('setting-previewToolbarSize')?.value,
+          previewToolbarHiddenButtons: hiddenToolbarButtons,
+          previewShowMoreButton: gv('setting-previewShowMoreButton')?.checked,
           previewHotkey: (gv('setting-previewHotkey')?.value || 'p').toLowerCase().slice(0, 1),
           previewDefaultMode: gv('setting-previewDefaultMode')?.value,
           previewMaxHeight: valNum(gv('setting-previewMaxHeight')?.value, 30, 90, 70),
@@ -3800,11 +4174,14 @@
       setupNumVal('setting-articleMinChars', 100, 10000); setupNumVal('setting-articleMinRatio', 0.1, 1); setupNumVal('setting-toastDuration', 500, 10000);
       setupNumVal('setting-waitBeforeCaptureMs', 0, 30000); setupNumVal('setting-waitDomIdleMs', 0, 5000);
       setupNumVal('setting-offscreenMargin', 0, 500); setupNumVal('setting-buttonAutoHideDelay', 300, 10000);
+      setupNumVal('setting-previewChromeAutoHideDelay', 0, 5000);
 
       const strictCb = gv('setting-strictOffscreen'), offCond = gv('offscreen-conditional');
       if (strictCb && offCond) strictCb.addEventListener('change', () => offCond.classList.toggle('hidden', !strictCb.checked));
       const autoHideCb = gv('setting-buttonAutoHide'), autoHideCond = gv('autohide-conditional');
       if (autoHideCb && autoHideCond) autoHideCb.addEventListener('change', () => autoHideCond.classList.toggle('hidden', !autoHideCb.checked));
+      const chromeAutoHideCb = gv('setting-previewChromeAutoHide'), chromeAutoHideCond = gv('preview-chrome-autohide-conditional');
+      if (chromeAutoHideCb && chromeAutoHideCond) chromeAutoHideCb.addEventListener('change', () => chromeAutoHideCond.classList.toggle('hidden', !chromeAutoHideCb.checked));
 
       // ═══ 條件區塊 toggle 綁定 ═══
       const conditionalBindings = [
