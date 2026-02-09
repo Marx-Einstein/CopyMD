@@ -3,7 +3,7 @@
 // @name:zh-TW   複製為 Markdown + LaTeX
 // @name:zh-CN   复制为 Markdown + LaTeX
 // @namespace    mdltx.copy.self
-// @version      3.2.9
+// @version      3.2.4
 // @description  Copy selection/article/page as Markdown, preserving LaTeX from KaTeX/MathJax/MathML. Enhanced code block language detection for AI chat platforms. Self-contained with modern UI.
 // @description:zh-TW  將選取範圍／文章／整頁複製為 Markdown，完整保留 KaTeX/MathJax/MathML 數學公式。增強 AI 聊天平台的程式碼區塊語言偵測。獨立運作，相容 Trusted Types。
 // @description:zh-CN  将选取范围／文章／整页复制为 Markdown，完整保留 KaTeX/MathJax/MathML 数学公式。增强 AI 聊天平台的代码区块语言检测。独立运作，相容 Trusted Types。
@@ -36,7 +36,7 @@
     buttonAutoHide: false, buttonAutoHideDelay: 1500, buttonHiddenOpacity: 0,
     buttonClickAction: 'auto',
     noSelectionMode: 'page', stripCommonIndentInBlockMath: true, absoluteUrls: true, waitMathJax: true, escapeMarkdownChars: true,
-    listMarker: '-', emphasisMarker: '*', strongMarker: '**', horizontalRule: '---',
+    listMarker: '-', emphasisMarker: '*', strongMarker: '**', horizontalRule: '---', inlineMathDelimiter: '$', blockMathDelimiter: '$$',
     articleMinChars: 600, articleMinRatio: 0.55, ignoreNav: false,
     visibilityMode: 'loose', hiddenScanMaxElements: 5000, hiddenUntilFoundVisible: true, strictOffscreen: false, offscreenMargin: 100,
     extractShadowDOM: true, extractIframes: false,
@@ -103,7 +103,7 @@
     assetsFolderTemplate: '{slug}_assets',
     batchDownloadUrls: '',
 
-    settingsVersion: 12,
+    settingsVersion: 13,
   };
 
   const SETTING_TYPES = {
@@ -113,7 +113,7 @@
     buttonAutoHide: 'boolean', buttonAutoHideDelay: 'number', buttonHiddenOpacity: 'number',
     buttonClickAction: 'string',
     noSelectionMode: 'string', stripCommonIndentInBlockMath: 'boolean', absoluteUrls: 'boolean', waitMathJax: 'boolean', escapeMarkdownChars: 'boolean',
-    listMarker: 'string', emphasisMarker: 'string', strongMarker: 'string', horizontalRule: 'string',
+    listMarker: 'string', emphasisMarker: 'string', strongMarker: 'string', horizontalRule: 'string', inlineMathDelimiter: 'string', blockMathDelimiter: 'string',
     articleMinChars: 'number', articleMinRatio: 'number', ignoreNav: 'boolean',
     visibilityMode: 'string', hiddenScanMaxElements: 'number', hiddenUntilFoundVisible: 'boolean', strictOffscreen: 'boolean', offscreenMargin: 'number',
     extractShadowDOM: 'boolean', extractIframes: 'boolean',
@@ -212,6 +212,7 @@
         [10, ['previewChromeLayout', 'previewChromeAutoHide', 'previewChromeAutoHideDelay', 'previewToolbarStyle', 'previewToolbarSize', 'previewToolbarHiddenButtons', 'previewShowMoreButton']],
         [11, ['previewShowHeader', 'previewShowToolbar', 'previewShowFooter']],
         [12, ['previewShowRendererHint']],
+        [13, ['inlineMathDelimiter', 'blockMathDelimiter']],
       ];
       for (const [ver, keys] of migrations) {
         if (cur < ver) for (const k of keys) if (GM_getValue(k) === undefined) GM_setValue(k, DEFAULTS[k]);
@@ -246,6 +247,7 @@
       markdownFormat: 'Markdown 格式',
       markdownFormatDesc: '調整 Markdown 輸出偏好，符合你的寫作格式。',
       listMarker: '清單符號', emphasisMarker: '斜體符號', strongMarker: '粗體符號', horizontalRule: '水平線符號',
+      inlineMathDelimiter: '行內數學分隔符', blockMathDelimiter: '區塊數學分隔符',
       captureSettings: '擷取時機設定',
       captureSettingsDesc: '控制擷取前的等待節奏，適合動態載入頁面。',
       waitBeforeCapture: '抽取前等待時間 (ms)', waitDomIdle: 'DOM 穩定後等待 (ms)',
@@ -278,6 +280,8 @@
       buttonHint: '左鍵：{action}\n右鍵：選單\n拖曳：移動',
       buttonHintHotkey: '快捷鍵：{hotkey}',
       settingsHint: 'Enter 儲存 · Esc 取消',
+      importFailedInvalid: '匯入失敗：格式不正確，請確認為 JSON 物件。',
+      importFailedNoValid: '匯入失敗：未找到可用的設定項目。',
 
       // 新增選單項目
       pickElement: '選取元素',
@@ -458,6 +462,7 @@
       markdownFormat: 'Markdown 格式',
       markdownFormatDesc: '调整 Markdown 输出偏好，符合你的写作格式。',
       listMarker: '列表符号', emphasisMarker: '斜体符号', strongMarker: '粗体符号', horizontalRule: '水平线符号',
+      inlineMathDelimiter: '行内数学分隔符', blockMathDelimiter: '块级数学分隔符',
       captureSettings: '抓取时机设置',
       captureSettingsDesc: '控制提取前的等待节奏，适合动态加载页面。',
       waitBeforeCapture: '抓取前等待时间 (ms)', waitDomIdle: 'DOM 稳定后等待 (ms)',
@@ -490,6 +495,8 @@
       buttonHint: '左键：{action}\n右键：菜单\n拖拽：移动',
       buttonHintHotkey: '快捷键：{hotkey}',
       settingsHint: 'Enter 保存 · Esc 取消',
+      importFailedInvalid: '导入失败：格式不正确，请确认是 JSON 对象。',
+      importFailedNoValid: '导入失败：未找到可用的设置项。',
 
       pickElement: '选取元素',
       previewCopy: '预览后复制',
@@ -659,6 +666,7 @@
       markdownFormat: 'Markdown Format',
       markdownFormatDesc: 'Adjust Markdown output preferences to match your writing style.',
       listMarker: 'List Marker', emphasisMarker: 'Emphasis Marker', strongMarker: 'Strong Marker', horizontalRule: 'Horizontal Rule',
+      inlineMathDelimiter: 'Inline Math Delimiter', blockMathDelimiter: 'Block Math Delimiter',
       captureSettings: 'Capture Timing Settings',
       captureSettingsDesc: 'Tune capture timing for dynamic, late-loading pages.',
       waitBeforeCapture: 'Wait before capture (ms)', waitDomIdle: 'Wait after DOM idle (ms)',
@@ -691,6 +699,8 @@
       buttonHint: 'Left: {action}\nRight: Menu\nDrag: Move',
       buttonHintHotkey: 'Hotkey: {hotkey}',
       settingsHint: 'Enter to Save · Esc to Cancel',
+      importFailedInvalid: 'Import failed: invalid format, expected a JSON object.',
+      importFailedNoValid: 'Import failed: no valid settings found.',
 
       pickElement: 'Pick Element',
       previewCopy: 'Preview & Copy',
@@ -1366,7 +1376,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
   function normalizeAssetUrl(rawUrl, baseUri) {
     if (!rawUrl) return '';
-    const trimmed = rawUrl.replace(/^<|>$/g, '').trim().split(/\s+/)[0];
+    const raw = rawUrl.trim();
+    const isAngleWrapped = raw.startsWith('<') && raw.endsWith('>');
+    const trimmed = (isAngleWrapped ? raw.slice(1, -1).trim() : raw.replace(/^<|>$/g, '').trim().split(/\s+/)[0]);
     if (/^data:/i.test(trimmed)) return '';
     try {
       const url = new URL(trimmed, baseUri || document.baseURI);
@@ -1463,9 +1475,11 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
   function startBatchDownload(urls) {
     const list = (urls || '').split('\n').map(u => u.trim()).filter(Boolean);
     if (!list.length) return 0;
+    const canOpenInTab = typeof GM_openInTab === 'function';
+    const delay = canOpenInTab ? 400 : 0;
     const openTab = url => {
       try {
-        if (typeof GM_openInTab === 'function') GM_openInTab(url, { active: false, insert: true, setParent: true });
+        if (canOpenInTab) GM_openInTab(url, { active: false, insert: true, setParent: true });
         else window.open(url, '_blank', 'noopener');
       } catch { window.open(url, '_blank', 'noopener'); }
     };
@@ -1473,8 +1487,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       try {
         const parsed = new URL(u, location.href);
         parsed.searchParams.set('mdltx_autodownload', '1');
-        setTimeout(() => openTab(parsed.toString()), idx * 400);
-      } catch { setTimeout(() => openTab(u), idx * 400); }
+        if (delay > 0) setTimeout(() => openTab(parsed.toString()), idx * delay);
+        else openTab(parsed.toString());
+      } catch {
+        if (delay > 0) setTimeout(() => openTab(u), idx * delay);
+        else openTab(u);
+      }
     });
     return list.length;
   }
@@ -1514,6 +1532,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         return;
       } catch (e) {
         console.warn('[mdltx] DOMParser fallback failed:', e);
+        el.textContent = html;
+        return;
       }
     }
     const template = document.createElement('template');
@@ -1536,7 +1556,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
   function importSettings(jsonString) {
     try {
       const parsed = JSON.parse(jsonString);
-      if (typeof parsed !== 'object' || parsed === null) return { success: false, importedCount: 0, ignoredCount: 0 };
+      if (typeof parsed !== 'object' || parsed === null) {
+        return { success: false, importedCount: 0, ignoredCount: 0, error: { type: 'invalid' } };
+      }
       let importedCount = 0, ignoredCount = 0;
       for (const [k, v] of Object.entries(parsed)) {
         if (k in DEFAULTS && k in SETTING_TYPES) {
@@ -1551,11 +1573,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       }
       if (importedCount > 0) migrateSettings();
       const result = { success: importedCount > 0, importedCount, ignoredCount };
+      if (!result.success) result.error = { type: 'no_valid' };
       if (result.success) diagLog('Settings imported', result);
       return result;
     } catch (e) {
       console.warn('[mdltx] importSettings error:', e);
-      return { success: false, importedCount: 0, ignoredCount: 0 };
+      return { success: false, importedCount: 0, ignoredCount: 0, error: { type: 'parse', message: e?.message || String(e) } };
     }
   }
 
@@ -2964,6 +2987,15 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           return raw;
         }
       };
+      const escapeRegex = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const inlineDelims = getInlineMathDelimiters();
+      const blockDelims = getBlockMathDelimiters();
+      const blockRegex = blockDelims.open === '$$'
+        ? /\$\$\n?([\s\S]*?)\n?\$\$/g
+        : new RegExp(`${escapeRegex(blockDelims.open)}\\s*([\\s\\S]*?)\\s*${escapeRegex(blockDelims.close)}`, 'g');
+      const inlineRegex = inlineDelims.open === '$'
+        ? /\$([^\$\n]+)\$/g
+        : new RegExp(`${escapeRegex(inlineDelims.open)}([^\\n]+?)${escapeRegex(inlineDelims.close)}`, 'g');
 
       let html = md;
 
@@ -2984,7 +3016,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         protectBlock(`<code>${escapeHtml(code)}</code>`));
 
       // 數學公式（區塊）——以數學字型顯示原始 LaTeX，附加類型標籤
-      html = html.replace(/\$\$\n?([\s\S]*?)\n?\$\$/g, (_, content) => {
+      html = html.replace(blockRegex, (_, content) => {
         const escaped = escapeHtml(content.trim());
         const rawForCopy = escapeHtmlAttr(content.trim());
         return protectBlock('<div class="math-block" style="text-align:center;padding:12px 16px;' +
@@ -2999,7 +3031,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       });
 
       // 數學公式（行內）——以數學字型顯示，背景色區隔
-      html = html.replace(/\$([^\$\n]+)\$/g, (_, content) => {
+      html = html.replace(inlineRegex, (_, content) => {
         const escaped = escapeHtml(content);
         return protectBlock('<span class="math-inline" style="font-family:\'Cambria Math\',\'Latin Modern Math\',' +
           'serif;background:var(--mdltx-bg-secondary);padding:1px 5px;border-radius:3px;' +
@@ -3269,6 +3301,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       this.button = null; this.sensor = null; this.tooltip = null; this.menu = null; this.toast = null; this.modal = null;
       this.isProcessing = false; this.isDragging = false; this.dragPointerId = null; this.dragOffset = { x: 0, y: 0 };
       this.menuOpen = false; this.toastTimeoutId = null;
+      this._importDialogCleanup = null;
       // 新增模組
       this.elementPicker = null;
       this.previewModal = null;
@@ -3790,7 +3823,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           mkSelect('setting-listMarker', t('listMarker'), [{ value: '-', label: '- (dash)' }, { value: '*', label: '* (asterisk)' }, { value: '+', label: '+ (plus)' }], settings.listMarker),
           mkSelect('setting-emphasisMarker', t('emphasisMarker'), [{ value: '*', label: '*text*' }, { value: '_', label: '_text_' }], settings.emphasisMarker),
           mkSelect('setting-strongMarker', t('strongMarker'), [{ value: '**', label: '**text**' }, { value: '__', label: '__text__' }], settings.strongMarker),
-          mkSelect('setting-horizontalRule', t('horizontalRule'), [{ value: '---', label: '---' }, { value: '***', label: '***' }, { value: '___', label: '___' }], settings.horizontalRule)
+          mkSelect('setting-horizontalRule', t('horizontalRule'), [{ value: '---', label: '---' }, { value: '***', label: '***' }, { value: '___', label: '___' }], settings.horizontalRule),
+          mkSelect('setting-inlineMathDelimiter', t('inlineMathDelimiter'), [{ value: '$', label: '$...$' }, { value: '\\(', label: '\\(...\\)' }], settings.inlineMathDelimiter),
+          mkSelect('setting-blockMathDelimiter', t('blockMathDelimiter'), [{ value: '$$', label: '$$...$$' }, { value: '\\[', label: '\\[...\\]' }], settings.blockMathDelimiter)
         ),
         mkSection(t('codeBlockSettings'), true, t('codeBlockSettingsDesc'),
           (() => { const f = mkCheck('setting-enableContentBasedLangDetection', t('enableContentBasedLangDetection'), settings.enableContentBasedLangDetection, true); f.querySelector('label')?.setAttribute('title', t('enableContentBasedLangDetectionTooltip')); return f; })(),
@@ -4098,6 +4133,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
     closeSettings() {
       if (!this.modal) return;
+      if (this._importDialogCleanup) { this._importDialogCleanup(); this._importDialogCleanup = null; }
       if (this._focusTrap) { this._focusTrap.deactivate(); this._focusTrap = null; }
       this.unlockScroll();
       this._prevBodyOverflow = '';
@@ -4185,6 +4221,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           extractShadowDOM: gv('setting-extractShadowDOM')?.checked, extractIframes: gv('setting-extractIframes')?.checked,
           listMarker: gv('setting-listMarker')?.value, emphasisMarker: gv('setting-emphasisMarker')?.value,
           strongMarker: gv('setting-strongMarker')?.value, horizontalRule: gv('setting-horizontalRule')?.value,
+          inlineMathDelimiter: gv('setting-inlineMathDelimiter')?.value,
+          blockMathDelimiter: gv('setting-blockMathDelimiter')?.value,
           waitBeforeCaptureMs: valNum(gv('setting-waitBeforeCaptureMs')?.value, 0, 30000, 0),
           waitDomIdleMs: valNum(gv('setting-waitDomIdleMs')?.value, 0, 5000, 0),
           visibilityMode: gv('setting-visibilityMode')?.value,
@@ -4281,6 +4319,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           const mode = btn.dataset.mode; currentMode = mode;
           overlay.querySelectorAll('.mdltx-mode-toggle-btn').forEach(b => { const active = b.dataset.mode === mode; b.classList.toggle('active', active); b.setAttribute('aria-selected', active ? 'true' : 'false'); });
           this._updateSettingsVisibility(mode === 'advanced');
+          S.set('settingsMode', mode);
         });
       });
 
@@ -4350,9 +4389,11 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           if (recording) { stopRec(); return; }
           recording = true; recordBtn.classList.add('recording'); recordBtn.textContent = '...';
           hotkeyHandler = e => {
-            if (!recording || ignoredKeys.has(e.key)) return;
+            const key = e.key;
+            if (!recording || ignoredKeys.has(key)) return;
+            if (!key || key.length !== 1 || /\s/.test(key)) return;
             e.preventDefault(); e.stopPropagation();
-            tempHotkey = { ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, key: e.key.toLowerCase() };
+            tempHotkey = { ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, key: key.toLowerCase() };
             updateHotkeyDisp(); stopRec();
           };
           document.addEventListener('keydown', hotkeyHandler, true);
@@ -4383,6 +4424,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
       // ═══ 匯入設定 ═══
       gv('settings-import')?.addEventListener('click', () => {
+        if (this._importDialogCleanup) { this._importDialogCleanup(); this._importDialogCleanup = null; }
         // 在 modal 內顯示匯入對話框
         const modalEl = overlay.querySelector('.mdltx-modal');
         if (!modalEl) return;
@@ -4407,24 +4449,40 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         ]);
         importDialog.appendChild(dialogInner);
 
+        const removeDialog = () => {
+          importDialog.remove();
+          document.removeEventListener('keydown', onKeydown, true);
+          if (this._importDialogCleanup) this._importDialogCleanup = null;
+        };
+
+        const onKeydown = (e) => {
+          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); removeDialog(); }
+        };
+
+        document.addEventListener('keydown', onKeydown, true);
+        this._importDialogCleanup = () => {
+          if (importDialog?.parentNode) importDialog.remove();
+          document.removeEventListener('keydown', onKeydown, true);
+        };
+
         // 點擊背景關閉
         importDialog.addEventListener('click', (e) => {
-          if (e.target === importDialog) importDialog.remove();
+          if (e.target === importDialog) removeDialog();
         });
 
         // 取消按鈕
-        dialogInner.querySelector('#import-cancel')?.addEventListener('click', () => importDialog.remove());
+        dialogInner.querySelector('#import-cancel')?.addEventListener('click', () => removeDialog());
 
         // 確認匯入
         dialogInner.querySelector('#import-confirm')?.addEventListener('click', () => {
           const textarea = dialogInner.querySelector('#import-textarea');
           const json = textarea?.value?.trim();
-          if (!json) { importDialog.remove(); return; }
+          if (!json) { removeDialog(); return; }
 
           if (!confirm(t('importConfirm'))) return;
 
           const result = importSettings(json);
-          importDialog.remove();
+          removeDialog();
           if (result.success) {
             close(false);
             this.refresh();
@@ -4432,13 +4490,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
             if (result.ignoredCount > 0) details.push(t('importIgnoredDetail', { count: result.ignoredCount }));
             this.showToast('success', t('importSuccess'), details.join('\n'));
           } else {
-            this.showToast('error', t('importFailed'));
+            const type = result.error?.type;
+            const message = type === 'invalid' ? t('importFailedInvalid')
+              : type === 'no_valid' ? t('importFailedNoValid')
+              : t('importFailed');
+            const detail = result.error?.message;
+            this.showToast('error', t('importFailed'), detail ? `${message}\n${detail}` : message);
           }
-        });
-
-        // ESC 關閉
-        importDialog.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); importDialog.remove(); }
         });
 
         modalEl.style.position = 'relative';
@@ -5366,12 +5424,63 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     }
   };
 
+  function normalizeMathDelimiterSetting(value, kind) {
+    const v = String(value || '');
+    if (kind === 'inline') return v === '\\(' ? '\\(' : '$';
+    if (kind === 'block') return v === '\\[' ? '\\[' : '$$';
+    return v;
+  }
+
+  function getInlineMathDelimiters() {
+    const open = normalizeMathDelimiterSetting(S.get('inlineMathDelimiter'), 'inline');
+    return open === '\\(' ? { open: '\\(', close: '\\)' } : { open: '$', close: '$' };
+  }
+
+  function getBlockMathDelimiters() {
+    const open = normalizeMathDelimiterSetting(S.get('blockMathDelimiter'), 'block');
+    return open === '\\[' ? { open: '\\[', close: '\\]' } : { open: '$$', close: '$$' };
+  }
+
+  function wrapMath(tex, isBlock, opts = {}) {
+    const text = String(tex || '').trim();
+    if (!text) return '';
+    const { open, close } = isBlock ? getBlockMathDelimiters() : getInlineMathDelimiters();
+    if (opts.inlineBreaks) return `<br>${open} ${text} ${close}<br>`;
+    if (isBlock) return `\n\n${open}\n${text}\n${close}\n\n`;
+    return `${open}${text}${close}`;
+  }
+
+  function unwrapInlineMath(text) {
+    const value = String(text || '');
+    const { open, close } = getInlineMathDelimiters();
+    if (value.startsWith(open) && value.endsWith(close) && value.length >= open.length + close.length) {
+      return value.slice(open.length, value.length - close.length).trim();
+    }
+    return null;
+  }
+
+  function stripKnownMathDelimiters(text) {
+    let value = String(text || '').trim();
+    const pairs = [
+      ['$$', '$$'],
+      ['\\[', '\\]'],
+      ['$', '$'],
+      ['\\(', '\\)'],
+    ];
+    for (const [open, close] of pairs) {
+      if (value.startsWith(open) && value.endsWith(close) && value.length >= open.length + close.length) {
+        value = value.slice(open.length, value.length - close.length).trim();
+      }
+    }
+    return value;
+  }
+
   function processMathML(mathEl) {
     try {
       const existingTex = extractTex(mathEl);
       if (existingTex) {
         const isBlock = mathEl.getAttribute('display') === 'block' || mathEl.closest?.('[display="block"]');
-        return isBlock ? `\n\n$$\n${existingTex}\n$$\n\n` : `$${existingTex}$`;
+        return wrapMath(existingTex, isBlock);
       }
       const getChildren = node => Array.from(node?.childNodes || []).filter(c => c.nodeType === 1);
       const collect = node => {
@@ -5384,7 +5493,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         return ch.length ? ch.map(collect).join('') : txt();
       };
       const content = collect(mathEl).trim(); if (!content) return '';
-      return mathEl.getAttribute('display') === 'block' ? `\n\n$$\n${content}\n$$\n\n` : `$${content}$`;
+      return wrapMath(content, mathEl.getAttribute('display') === 'block');
     } catch (e) { console.warn('[mdltx] processMathML error:', e); return ''; }
   }
 
@@ -5397,9 +5506,10 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       const isDdOnlyDl = !!(dd && dl && !dl.querySelector?.(':scope > dt'));
       const inDisplayFallback = !!host.closest?.('.mwe-math-fallback-image-display');
       const wrap = (tex, isBlock) => {
-        tex = String(tex || '').trim(); if (!tex) return '';
-        if (isBlock && /^\{\s*\\displaystyle\b/i.test(tex) && /\}\s*$/.test(tex)) tex = tex.replace(/^\{\s*\\displaystyle\s*/i, '').replace(/\}\s*$/i, '').trim();
-        return isBlock ? `\n\n$$\n${tex}\n$$\n\n` : `$${tex}$`;
+        let clean = String(tex || '').trim();
+        if (!clean) return '';
+        if (isBlock && /^\{\s*\\displaystyle\b/i.test(clean) && /\}\s*$/.test(clean)) clean = clean.replace(/^\{\s*\\displaystyle\s*/i, '').replace(/\}\s*$/i, '').trim();
+        return wrapMath(clean, isBlock);
       };
       const mathEl = host.querySelector?.('math') || (host.tagName === 'MATH' ? host : null);
       const shouldBeBlock = (mathEl?.getAttribute?.('display') === 'block') || inMwExtMathDisplay || isDdOnlyDl || inDisplayFallback;
@@ -5407,7 +5517,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         const alttext = mathEl.getAttribute?.('alttext'); if (alttext) return wrap(alttext, shouldBeBlock);
         const tex2 = extractTex(mathEl); if (tex2) return wrap(tex2, shouldBeBlock);
         const res = processMathML(mathEl);
-        if (res) { if (shouldBeBlock && /^\$[^$][\s\S]*\$$/.test(res) && !/^\$\$/.test(res)) { const inner = res.slice(1, -1); return `\n\n$$\n${inner}\n$$\n\n`; } return res; }
+        if (res) {
+          if (shouldBeBlock) {
+            const inner = unwrapInlineMath(res);
+            if (inner !== null) return wrapMath(inner, true);
+          }
+          return res;
+        }
         return null;
       }
       const img = host.querySelector?.('img.mwe-math-fallback-image-inline, img.mwe-math-fallback-image-display');
@@ -5427,9 +5543,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (!isWikiInline && !isWikiBlock) return '';
       const alt = (imgEl.getAttribute('alt') || '').trim(); if (!alt) return '';
       let tex = alt.replace(/^\{\s*\\displaystyle\s*/i, '').replace(/\}\s*$/i, '').trim();
-      tex = tex.replace(/^\$(.*)\$$/, '$1').trim(); if (!tex) return '';
+      tex = stripKnownMathDelimiters(tex); if (!tex) return '';
       const block = isWikiBlock || (imgEl.closest?.('.mw-ext-math-display') !== null);
-      return block ? `\n\n$$\n${tex}\n$$\n\n` : `$${tex}$`;
+      return wrapMath(tex, block);
     } catch { return ''; }
   }
 
@@ -5989,7 +6105,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (T === 'U') return `<u>${processChildrenInline(node, ctx)}</u>`;
       if (T === 'MARK') return `<mark>${processChildrenInline(node, ctx)}</mark>`;
       if (T === 'MATH') return processMathML(node);
-      if (node.matches?.('.katex,.katex-display,mjx-container,.MathJax,span.MathJax,script[type^="math/tex"]')) { if (node.closest?.('pre,code')) return node.textContent || ''; let tex = extractTex(node); if (!tex) return ''; const block = isDisplayMath(node, tex); if (block && S.get('stripCommonIndentInBlockMath')) tex = stripCommonIndent(tex); return block ? `<br>$$ ${tex} $$<br>` : `$${tex}$`; }
+      if (node.matches?.('.katex,.katex-display,mjx-container,.MathJax,span.MathJax,script[type^="math/tex"]')) { if (node.closest?.('pre,code')) return node.textContent || ''; let tex = extractTex(node); if (!tex) return ''; const block = isDisplayMath(node, tex); if (block && S.get('stripCommonIndentInBlockMath')) tex = stripCommonIndent(tex); return block ? wrapMath(tex, true, { inlineBreaks: true }) : wrapMath(tex, false); }
       if (BLOCK_TAGS.has(T)) return processChildrenInline(node, ctx).trim();
       return processChildrenInline(node, ctx);
     } catch (e) { console.warn('[mdltx] mdInline error:', e); return ''; }
@@ -6046,7 +6162,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (T === 'KBD') return `<kbd>${processChildren(node, ctx).trim()}</kbd>`;
       if (T === 'U') return `<u>${processChildren(node, ctx)}</u>`;
       if (T === 'MARK') return `<mark>${processChildren(node, ctx)}</mark>`;
-      if (node.matches?.('.katex,.katex-display,mjx-container,.MathJax,span.MathJax,script[type^="math/tex"]')) { if (node.closest?.('pre,code')) return node.textContent || ''; let tex = extractTex(node); if (!tex) return ''; const block = isDisplayMath(node, tex); if (block && S.get('stripCommonIndentInBlockMath')) tex = stripCommonIndent(tex); return block ? `\n\n$$\n${tex}\n$$\n\n` : `$${tex}$`; }
+      if (node.matches?.('.katex,.katex-display,mjx-container,.MathJax,span.MathJax,script[type^="math/tex"]')) { if (node.closest?.('pre,code')) return node.textContent || ''; let tex = extractTex(node); if (!tex) return ''; const block = isDisplayMath(node, tex); if (block && S.get('stripCommonIndentInBlockMath')) tex = stripCommonIndent(tex); return wrapMath(tex, block); }
       if (T === 'BLOCKQUOTE') { let inner = processChildren(node, ctx).replace(/\n{3,}/g, '\n\n').trim().replace(/^\s{4}([-*+] |\d+\. )/gm, '$1'); return `\n\n${inner.split('\n').map(l => l.trim() === '' ? '>' : `> ${l}`).join('\n')}\n\n`; }
       // ═══════════════════════════════════════════════════════════
       // 🔧 修復：處理 UL/OL 元素（包含非 LI 子元素的情況）
