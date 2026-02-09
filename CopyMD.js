@@ -1350,10 +1350,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
   function generateFilename() {
     const tokens = getFilenameTokens();
     const template = S.get('downloadFilenameTemplate') || '{title}_{date}';
-    let filename = template;
-    for (const [key, value] of Object.entries(tokens)) {
-      filename = filename.split(`{${key}}`).join(value);
-    }
+    let filename = applyTemplate(template, tokens);
     filename = sanitizeFilename(filename);
     return (filename || tokens.title || 'document') + '.md';
   }
@@ -1527,7 +1524,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       try {
         const doc = new DOMParser().parseFromString(html, 'text/html');
         const fragment = document.createDocumentFragment();
-        Array.from(doc.body.childNodes).forEach(node => fragment.appendChild(node));
+        Array.from(doc.body.childNodes).forEach(node => fragment.appendChild(document.importNode(node, true)));
         el.appendChild(fragment);
         return;
       } catch (e) {
@@ -2059,6 +2056,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       this._moreMenu = null;
       this._chrome = null;
       this._chromeAutoHideTimer = null;
+      this._editorInputTimer = null;
+      this._editorInputDelay = 150;
     }
 
     async show(markdown, options = {}) {
@@ -2661,10 +2660,21 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
     _handleEditorInput(editor) {
       if (!editor) return;
-      this.content = editor.value;
-      this._updateStats();
-      if (this.mode === 'split') this._updatePreviewPane();
-      this._recordHistory(editor);
+      const applyInput = () => {
+        this.content = editor.value;
+        this._updateStats();
+        if (this.mode === 'split') this._updatePreviewPane();
+        this._recordHistory(editor);
+      };
+      if (this.mode === 'split') {
+        if (this._editorInputTimer) clearTimeout(this._editorInputTimer);
+        this._editorInputTimer = setTimeout(() => {
+          this._editorInputTimer = null;
+          applyInput();
+        }, this._editorInputDelay);
+        return;
+      }
+      applyInput();
     }
 
     _initEditorHistory(editor) {
@@ -2918,7 +2928,11 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       // 計算游標所在行的大致位置
       const textBeforeCursor = this.content.substring(0, cursorPos);
       const linesBefore = textBeforeCursor.split('\n').length;
-      const lineHeight = parseInt(window.getComputedStyle(editor).lineHeight) || 20;
+      const style = window.getComputedStyle(editor);
+      const rawLineHeight = style.lineHeight;
+      const parsedLineHeight = parseFloat(rawLineHeight);
+      const fallbackLineHeight = parseFloat(style.fontSize) * 1.4 || 20;
+      const lineHeight = Number.isFinite(parsedLineHeight) ? parsedLineHeight : fallbackLineHeight;
       const scrollTarget = (linesBefore - 3) * lineHeight; // 留一些上方空間
 
       // 如果游標位置在可視區域外，滾動到游標位置
@@ -2932,8 +2946,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (S.get('previewRenderer') === 'full') {
         const external = this._getExternalRenderer();
         if (external) {
-          const html = external(md);
-          return this._sanitizeRenderedHtml(html);
+          try {
+            const html = external(md);
+            return this._sanitizeRenderedHtml(html);
+          } catch (e) {
+            console.warn('[mdltx] External renderer failed, fallback to simple:', e);
+            this._previewRendererFallback = true;
+          }
         }
         this._previewRendererFallback = true;
       }
@@ -3095,8 +3114,6 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       html = html.replace(/<\/blockquote>\n<blockquote>/g, '<br>');
 
       // 表格
-      const tableRegex = /^\|(.+)\|$/gm;
-      let tableMatch;
       let inTable = false;
       let tableRows = [];
       const lines = html.split('\n');
@@ -3127,12 +3144,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       html = html.replace(/^[-*+]\s+(?!\[[ x]\])(.+)$/gm, '<li>$1</li>');
 
       // 有序列表
-      html = html.replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>');
+      html = html.replace(/^\d+\.\s+(.+)$/gm, '<li data-ol="1">$1</li>');
 
       // 包裝列表
       html = html.replace(/(<li(?:\s+class="[^"]*")?>[\s\S]*?<\/li>)(\n(?:<li))/g, '$1$2');
       html = html.replace(/(<li[^>]*>.*<\/li>\n?)+/g, (match) => {
         if (match.includes('class="task')) return `<ul style="list-style:none;padding-left:0;">${match}</ul>`;
+        if (match.includes('data-ol="1"')) return `<ol>${match.replace(/ data-ol="1"/g, '')}</ol>`;
         return `<ul>${match}</ul>`;
       });
 
@@ -5908,7 +5926,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
   function absUrl(url, baseUri) { if (!S.get('absoluteUrls')) return url || ''; try { return new URL(url, baseUri || document.baseURI || location.href).href; } catch { return url || ''; } }
 
   function hrefForA(aEl, baseUri) {
-    try { const raw = (aEl.getAttribute?.('href') || '').trim(); if (!raw || raw.startsWith('#') || /^javascript:/i.test(raw)) return raw.startsWith('#') ? raw : ''; return S.get('absoluteUrls') ? absUrl(aEl.href || raw, baseUri) : raw; } catch { return ''; }
+    try { const raw = (aEl.getAttribute?.('href') || '').trim(); if (!raw || raw.startsWith('#') || /^(javascript|data):/i.test(raw)) return raw.startsWith('#') ? raw : ''; return S.get('absoluteUrls') ? absUrl(aEl.href || raw, baseUri) : raw; } catch { return ''; }
   }
 
   function parseSrcset(srcset) {
@@ -5955,7 +5973,14 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
   function processInlineFormat(node, formatTag, ctx) {
     const hasBlock = containsBlockishContent(node);
     if (!hasBlock) { const inner = processChildrenInline(node, ctx).trim(); return inner ? wrapWithFormat(inner, formatTag) : ''; }
-    if (hasUnsafeMarkdownBlocks(node)) return processChildren(node, ctx);
+    if (hasUnsafeMarkdownBlocks(node)) {
+      const strategy = S.get('strongEmBlockStrategy');
+      if (strategy === 'html') {
+        const tagName = formatTag.toLowerCase(), htmlTag = tagName === 'b' ? 'strong' : tagName === 'i' ? 'em' : tagName === 's' ? 'del' : tagName;
+        return `<${htmlTag}>${trimNewlinesOnly(processChildren(node, ctx)).trim()}</${htmlTag}>`;
+      }
+      return processChildren(node, ctx);
+    }
     const strategy = S.get('strongEmBlockStrategy');
     switch (strategy) {
       case 'split': return splitInlineFormatAcrossBlocks(node, formatTag, ctx);
@@ -6063,8 +6088,17 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
   function figureToMd(fig, ctx) {
     ctx = normalizeCtx(ctx);
-    try { const imgs = Array.from(fig.querySelectorAll('img')).map(img => md(img, ctx).trim()).filter(Boolean), capEl = fig.querySelector('figcaption'), cap = capEl ? mdInline(capEl, ctx).trim() : '';
-      let out = imgs.length ? imgs.join('\n\n') : ''; if (cap) out += (out ? '\n\n' : '') + `${getEmphasisMarker()}${cap}${getEmphasisMarker()}`;
+    try {
+      const capEl = fig.querySelector('figcaption');
+      const cap = capEl ? mdInline(capEl, ctx).trim() : '';
+      let mainContent = '';
+      for (const child of Array.from(fig.childNodes)) {
+        if (child.nodeType === 1 && child.tagName === 'FIGCAPTION') continue;
+        mainContent = smartConcat(mainContent, md(child, ctx));
+      }
+      mainContent = mainContent.trim();
+      let out = mainContent;
+      if (cap) out += (out ? '\n\n' : '') + `${getEmphasisMarker()}${cap}${getEmphasisMarker()}`;
       return out ? `\n\n${out}\n\n` : '';
     } catch (e) { console.warn('[mdltx] figureToMd error:', e); return ''; }
   }
@@ -6254,7 +6288,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         if (el.tagName === 'MATH') { out = processMathML(el) || ''; if (out) { const key = makePlaceholder('MATH', nonce, id++); map[key] = out; const sp = document.createElement('span'); sp.textContent = key; el.replaceWith(sp); } return; }
         let tex0 = extractTex(el); if (!tex0) return;
         const block = isDisplayMath(el, tex0); let tex = (block && S.get('stripCommonIndentInBlockMath')) ? stripCommonIndent(tex0) : tex0;
-        const key = makePlaceholder('MATH', nonce, id++); map[key] = block ? `\n\n$$\n${tex}\n$$\n\n` : `$${tex}$`;
+        const key = makePlaceholder('MATH', nonce, id++); map[key] = wrapMath(tex, block);
         const sp = document.createElement('span'); sp.textContent = key; el.replaceWith(sp);
       });
     } catch (e) { console.warn('[mdltx] replaceMathWithPlaceholders error:', e); }
@@ -6456,18 +6490,19 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
       // 抓取前準備（臨時展開第三方腳本折疊的內容）
       const restoreActions = prepareForCapture(scope);
+      let hiddenTagged = [], iframeTagged = [], formatTagged = [], codeBlockTagged = [], mjTagged = [];
 
       try {
-        const hiddenTagged = annotateHidden(scope), iframeTagged = annotateIframes(scope), formatTagged = annotateFormatBoundaries(scope), codeBlockTagged = annotateCodeBlockLanguages(scope);
+        hiddenTagged = annotateHidden(scope);
+        iframeTagged = annotateIframes(scope);
+        formatTagged = annotateFormatBoundaries(scope);
+        codeBlockTagged = annotateCodeBlockLanguages(scope);
         await waitForMathJax(scope);
-        const mjTagged = annotateMathJax(scope);
+        mjTagged = annotateMathJax(scope);
         let root, actualMode = mode;
         if (mode === 'selection' && rng) { const box = document.createElement('div'); box.appendChild(rng.cloneContents()); root = box; }
         else if (mode === 'article') { const art = findArticleRoot(); if (!art || art === document.body || isArticleTooSmall(art)) { root = document.body.cloneNode(true); actualMode = 'page'; } else root = art.cloneNode(true); }
         else root = document.body.cloneNode(true);
-        cleanupAnnotations(mjTagged, 'data-mdltx-tex'); cleanupAnnotations(mjTagged, 'data-mdltx-display');
-        cleanupAnnotations(hiddenTagged, 'data-mdltx-hidden'); cleanupAnnotations(iframeTagged, 'data-mdltx-iframe-md');
-        cleanupAnnotations(formatTagged, 'data-mdltx-block'); cleanupAnnotations(codeBlockTagged, 'data-mdltx-lang');
         cleanupWikipediaUiNoise(root);
         // 清理第三方 UI 元素
         cleanupThirdPartyUI(root);
@@ -6496,6 +6531,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         return { root, actualMode };
       } finally {
         // 恢復第三方腳本的原狀
+        cleanupAnnotations(mjTagged, 'data-mdltx-tex');
+        cleanupAnnotations(mjTagged, 'data-mdltx-display');
+        cleanupAnnotations(hiddenTagged, 'data-mdltx-hidden');
+        cleanupAnnotations(iframeTagged, 'data-mdltx-iframe-md');
+        cleanupAnnotations(formatTagged, 'data-mdltx-block');
+        cleanupAnnotations(codeBlockTagged, 'data-mdltx-lang');
         restoreAfterCapture(restoreActions);
       }
     } catch (e) { console.error('[mdltx] makeRoot error:', e); throw e; }
