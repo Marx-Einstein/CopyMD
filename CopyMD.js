@@ -3,7 +3,7 @@
 // @name:zh-TW   複製為 Markdown + LaTeX
 // @name:zh-CN   复制为 Markdown + LaTeX
 // @namespace    mdltx.copy.self
-// @version      3.2.4
+// @version      3.2.9
 // @description  Copy selection/article/page as Markdown, preserving LaTeX from KaTeX/MathJax/MathML. Enhanced code block language detection for AI chat platforms. Self-contained with modern UI.
 // @description:zh-TW  將選取範圍／文章／整頁複製為 Markdown，完整保留 KaTeX/MathJax/MathML 數學公式。增強 AI 聊天平台的程式碼區塊語言偵測。獨立運作，相容 Trusted Types。
 // @description:zh-CN  将选取范围／文章／整页复制为 Markdown，完整保留 KaTeX/MathJax/MathML 数学公式。增强 AI 聊天平台的代码区块语言检测。独立运作，相容 Trusted Types。
@@ -80,6 +80,10 @@
     previewChromeLayout: 'stacked',
     previewChromeAutoHide: false,
     previewChromeAutoHideDelay: 1200,
+    previewShowHeader: true,
+    previewShowToolbar: true,
+    previewShowFooter: true,
+    previewShowRendererHint: true,
     previewToolbarStyle: 'icon-text',
     previewToolbarSize: 'md',
     previewToolbarHiddenButtons: '',
@@ -99,7 +103,7 @@
     assetsFolderTemplate: '{slug}_assets',
     batchDownloadUrls: '',
 
-    settingsVersion: 10,
+    settingsVersion: 12,
   };
 
   const SETTING_TYPES = {
@@ -153,6 +157,10 @@
     previewChromeLayout: 'string',
     previewChromeAutoHide: 'boolean',
     previewChromeAutoHideDelay: 'number',
+    previewShowHeader: 'boolean',
+    previewShowToolbar: 'boolean',
+    previewShowFooter: 'boolean',
+    previewShowRendererHint: 'boolean',
     previewToolbarStyle: 'string',
     previewToolbarSize: 'string',
     previewToolbarHiddenButtons: 'string',
@@ -175,7 +183,9 @@
   const S = {
     get(k) {
       try {
-        const raw = GM_getValue(k, DEFAULTS[k]), type = SETTING_TYPES[k], def = DEFAULTS[k];
+        const stored = GM_getValue(k);
+        const raw = stored === undefined ? DEFAULTS[k] : stored;
+        const type = SETTING_TYPES[k], def = DEFAULTS[k];
         if (type === 'boolean') return raw === true || raw === 'true' || raw === 1 || raw === '1' ? true : raw === false || raw === 'false' || raw === 0 || raw === '0' ? false : def;
         if (type === 'number') { const n = Number(raw); return isNaN(n) ? def : n; }
         if (type === 'string') return raw == null ? def : String(raw);
@@ -200,6 +210,8 @@
         [8, ['frontmatterCanonical', 'frontmatterPublished', 'frontmatterUpdated', 'frontmatterSite', 'previewRenderer', 'articleExtractionMode', 'downloadAssets', 'assetsFolderTemplate', 'batchDownloadUrls']],
         [9, ['previewSyncScroll']],
         [10, ['previewChromeLayout', 'previewChromeAutoHide', 'previewChromeAutoHideDelay', 'previewToolbarStyle', 'previewToolbarSize', 'previewToolbarHiddenButtons', 'previewShowMoreButton']],
+        [11, ['previewShowHeader', 'previewShowToolbar', 'previewShowFooter']],
+        [12, ['previewShowRendererHint']],
       ];
       for (const [ver, keys] of migrations) {
         if (cur < ver) for (const k of keys) if (GM_getValue(k) === undefined) GM_setValue(k, DEFAULTS[k]);
@@ -322,6 +334,7 @@
       previewRendererFull: '完整 Markdown（若可用）',
       previewRendererFallback: '完整渲染器不可用，已回退至簡化渲染',
       previewRendererHint: '預覽為簡化渲染，實際輸出以目標 Markdown 引擎為準',
+      previewRendererHintToggle: '顯示預覽提示',
       previewTitle: 'Markdown 預覽',
       previewCopyBtn: '複製',
       previewDownloadBtn: '下載',
@@ -335,11 +348,17 @@
       previewAlwaysShow: '複製/下載前總是預覽',
       previewSplitView: '並列模式',
       previewSyncScroll: '同步捲動',
+      previewSyncScrollOn: '同步捲動：開',
+      previewSyncScrollOff: '同步捲動：關',
       previewChromeLayout: '介面配置',
       previewChromeLayoutStacked: '分離（預設）',
       previewChromeLayoutMerged: '合併',
-      previewChromeAutoHide: '自動隱藏工具列',
-      previewChromeAutoHideDelay: '自動隱藏延遲 (ms)',
+      previewChromeSections: '介面區塊顯示',
+      previewShowHeader: '顯示標題列',
+      previewShowToolbar: '顯示工具列',
+      previewShowFooter: '顯示狀態列',
+      previewChromeAutoHide: '自動縮小工具列',
+      previewChromeAutoHideDelay: '自動縮小延遲 (ms)',
       previewToolbarStyle: '工具列顯示方式',
       previewToolbarStyleIcon: '只顯示圖示',
       previewToolbarStyleText: '只顯示文字',
@@ -519,6 +538,7 @@
       previewRendererFull: '完整 Markdown（如可用）',
       previewRendererFallback: '完整渲染器不可用，已回退至简化渲染',
       previewRendererHint: '预览为简化渲染，实际输出以目标 Markdown 引擎为准',
+      previewRendererHintToggle: '显示预览提示',
       previewTitle: 'Markdown 预览',
       previewCopyBtn: '复制',
       previewDownloadBtn: '下载',
@@ -531,11 +551,17 @@
       previewAlwaysShow: '复制/下载前总是预览',
       previewSplitView: '并列模式',
       previewSyncScroll: '同步滚动',
+      previewSyncScrollOn: '同步滚动：开',
+      previewSyncScrollOff: '同步滚动：关',
       previewChromeLayout: '界面布局',
       previewChromeLayoutStacked: '分离（默认）',
       previewChromeLayoutMerged: '合并',
-      previewChromeAutoHide: '自动隐藏工具栏',
-      previewChromeAutoHideDelay: '自动隐藏延迟 (ms)',
+      previewChromeSections: '界面区块显示',
+      previewShowHeader: '显示标题栏',
+      previewShowToolbar: '显示工具栏',
+      previewShowFooter: '显示状态栏',
+      previewChromeAutoHide: '自动缩小工具栏',
+      previewChromeAutoHideDelay: '自动缩小延迟 (ms)',
       previewToolbarStyle: '工具栏显示方式',
       previewToolbarStyleIcon: '仅图标',
       previewToolbarStyleText: '仅文字',
@@ -713,6 +739,7 @@
       previewRendererFull: 'Full Markdown (if available)',
       previewRendererFallback: 'Full renderer unavailable; fell back to simplified preview',
       previewRendererHint: 'Preview is simplified; actual output depends on your Markdown renderer',
+      previewRendererHintToggle: 'Show preview note',
       previewTitle: 'Markdown Preview',
       previewCopyBtn: 'Copy',
       previewDownloadBtn: 'Download',
@@ -725,11 +752,17 @@
       previewAlwaysShow: 'Always preview before copy/download',
       previewSplitView: 'Split View',
       previewSyncScroll: 'Sync Scroll',
+      previewSyncScrollOn: 'Sync Scroll: On',
+      previewSyncScrollOff: 'Sync Scroll: Off',
       previewChromeLayout: 'Layout',
       previewChromeLayoutStacked: 'Stacked (default)',
       previewChromeLayoutMerged: 'Merged',
-      previewChromeAutoHide: 'Auto-hide chrome',
-      previewChromeAutoHideDelay: 'Auto-hide delay (ms)',
+      previewChromeSections: 'Chrome sections',
+      previewShowHeader: 'Show title bar',
+      previewShowToolbar: 'Show toolbar',
+      previewShowFooter: 'Show status bar',
+      previewChromeAutoHide: 'Auto-compact chrome',
+      previewChromeAutoHideDelay: 'Auto-compact delay (ms)',
       previewToolbarStyle: 'Toolbar display',
       previewToolbarStyleIcon: 'Icons only',
       previewToolbarStyleText: 'Text only',
@@ -905,6 +938,7 @@
     minus: 'M5 12h14',
     undo: 'M9 14H4v-4M4 10a7 7 0 0 1 12-4l2 2',
     redo: 'M15 14h5v-4M20 10a7 7 0 0 0-12-4l-2 2',
+    sync: 'M21 11a8 8 0 0 0-13.66-5.65L5 8V3h5L7.9 5.1A6 6 0 1 1 6 11H3a8 8 0 1 0 18 0z',
     more: 'M12 6h.01M12 12h.01M12 18h.01',
     xCircle: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6',
     upload: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12',
@@ -1022,38 +1056,44 @@
 .mdltx-toast-close:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
 .mdltx-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:var(--mdltx-overlay);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all 0.2s ease;-webkit-backdrop-filter:blur(var(--mdltx-overlay-blur));backdrop-filter:blur(var(--mdltx-overlay-blur))}
 .mdltx-modal-overlay.open{opacity:1;visibility:visible}
-.mdltx-modal{width:100%;max-width:660px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:var(--mdltx-radius-lg);box-shadow:0 24px 52px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease;border:1px solid var(--mdltx-border-subtle)}
+.mdltx-modal{width:100%;max-width:860px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:var(--mdltx-radius-lg);box-shadow:0 24px 52px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-modal-overlay.open .mdltx-modal{transform:scale(1)}
-.mdltx-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--mdltx-border-subtle);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
+.mdltx-modal-header{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;border-bottom:1px solid var(--mdltx-border-subtle);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
 .mdltx-root[data-theme="dark"] .mdltx-modal-header{background:linear-gradient(180deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
 .mdltx-modal-title{font-size:18px;font-weight:600;color:var(--mdltx-text);letter-spacing:0.2px}
 .mdltx-modal-close{width:32px;height:32px;padding:6px;border:none;background:none;cursor:pointer;border-radius:10px;color:var(--mdltx-text-secondary);transition:all 0.15s ease;display:flex;align-items:center;justify-content:center}
 .mdltx-modal-close svg{width:20px;height:20px}
 .mdltx-modal-close:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
-.mdltx-modal-body{flex:1;overflow-y:auto;padding:20px 24px;background:linear-gradient(var(--mdltx-bg) 33%,transparent) center top,linear-gradient(transparent,var(--mdltx-bg) 66%) center bottom,radial-gradient(farthest-side at 50% 0,rgba(0,0,0,0.08),transparent) center top,radial-gradient(farthest-side at 50% 100%,rgba(0,0,0,0.08),transparent) center bottom;background-repeat:no-repeat;background-size:100% 40px,100% 40px,100% 10px,100% 10px;background-attachment:local,local,scroll,scroll}
-.mdltx-modal-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 24px;border-top:1px solid var(--mdltx-border-subtle);flex-shrink:0;background:linear-gradient(0deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
+.mdltx-modal-body{flex:1;overflow-y:auto;padding:24px 28px;background:linear-gradient(var(--mdltx-bg) 33%,transparent) center top,linear-gradient(transparent,var(--mdltx-bg) 66%) center bottom,radial-gradient(farthest-side at 50% 0,rgba(0,0,0,0.08),transparent) center top,radial-gradient(farthest-side at 50% 100%,rgba(0,0,0,0.08),transparent) center bottom;background-repeat:no-repeat;background-size:100% 40px,100% 40px,100% 10px,100% 10px;background-attachment:local,local,scroll,scroll}
+.mdltx-modal-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 28px;border-top:1px solid var(--mdltx-border-subtle);flex-shrink:0;background:linear-gradient(0deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
 .mdltx-root[data-theme="dark"] .mdltx-modal-footer{background:linear-gradient(0deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
 .mdltx-modal-footer-hint{font-size:12px;color:var(--mdltx-text-secondary)}
 .mdltx-modal-footer-left,.mdltx-modal-footer-right{display:flex;gap:8px}
-.mdltx-mode-toggle{display:flex;background:var(--mdltx-bg-secondary);border-radius:var(--mdltx-radius-md);padding:4px;margin-bottom:20px;border:1px solid var(--mdltx-border-subtle)}
+.mdltx-mode-toggle{display:flex;background:var(--mdltx-bg-secondary);border-radius:var(--mdltx-radius-md);padding:4px;margin-bottom:22px;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-mode-toggle-btn{flex:1;padding:8px 16px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:600;cursor:pointer;border-radius:10px;transition:all 0.2s ease}
 .mdltx-mode-toggle-btn:hover{color:var(--mdltx-text)}
 .mdltx-mode-toggle-btn.active{background:var(--mdltx-bg-elevated);color:var(--mdltx-text);box-shadow:0 1px 3px var(--mdltx-shadow);transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
 .mdltx-mode-toggle-btn:focus-visible{outline:2px solid var(--mdltx-primary);outline-offset:-2px}
-.mdltx-section{margin-bottom:24px}
+.mdltx-section{margin-bottom:22px;padding:16px 16px 12px;border-radius:12px;border:1px solid var(--mdltx-border-subtle);background:var(--mdltx-bg-elevated)}
 .mdltx-section:last-child{margin-bottom:0}
 .mdltx-section.hidden{display:none}
-.mdltx-section-title{font-size:12px;font-weight:700;color:var(--mdltx-text-secondary);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--mdltx-border-subtle);display:flex;align-items:center;gap:8px}
+.mdltx-section-title{font-size:12px;font-weight:700;color:var(--mdltx-text-secondary);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--mdltx-border-subtle);display:flex;align-items:center;gap:8px}
 .mdltx-section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--mdltx-primary);border-radius:2px;flex-shrink:0}
 .mdltx-section-desc{margin:-4px 0 14px;font-size:12px;line-height:1.6;color:var(--mdltx-text-secondary)}
-.mdltx-field{margin-bottom:16px}
+.mdltx-field{margin-bottom:14px}
 .mdltx-field:last-child{margin-bottom:0}
 .mdltx-field.hidden{display:none}
-.mdltx-field-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.mdltx-field-row{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.mdltx-field-row .mdltx-select,.mdltx-field-row .mdltx-input{min-width:220px;max-width:320px;width:auto}
+.mdltx-field-row .mdltx-range{width:180px}
 .mdltx-field-hint{margin-top:6px;font-size:12px;color:var(--mdltx-text-secondary)}
-.mdltx-label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mdltx-text);cursor:pointer}
+.mdltx-field-hint.hidden{display:none}
+.mdltx-label{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--mdltx-text);cursor:pointer}
 .mdltx-label-text{flex:1}
-.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cursor:pointer}
+input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cursor:pointer}
+.mdltx-checkbox-label{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;border:1px solid var(--mdltx-border-subtle);background:var(--mdltx-bg);font-size:13px;color:var(--mdltx-text);cursor:pointer}
+.mdltx-checkbox-label:hover{border-color:var(--mdltx-border);background:var(--mdltx-bg-secondary)}
+.mdltx-checkbox-label .mdltx-checkbox{margin:0}
 .mdltx-select{padding:8px 12px;border:1px solid var(--mdltx-border);border-radius:var(--mdltx-radius-sm);background:var(--mdltx-bg-elevated);color:var(--mdltx-text);font-family:inherit;font-size:14px;cursor:pointer;min-width:180px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.25)}
 .mdltx-select:hover{border-color:var(--mdltx-border-subtle)}
 .mdltx-select:focus{outline:none;border-color:var(--mdltx-primary);box-shadow:var(--mdltx-focus-ring)}
@@ -1082,9 +1122,9 @@
 .mdltx-btn-danger:hover{background:var(--mdltx-error);color:#fff}
 .mdltx-btn-danger:focus-visible{outline:2px solid var(--mdltx-error);outline-offset:2px}
 .icon{display:inline-block;vertical-align:middle}
-.mdltx-conditional{margin-left:26px;padding-left:12px;border-left:2px solid var(--mdltx-border);margin-top:8px}
+.mdltx-conditional{margin-left:22px;padding-left:12px;border-left:2px solid var(--mdltx-border-subtle);margin-top:10px}
 .mdltx-conditional.hidden{display:none}
-.mdltx-toolbar-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin-top:8px}
+.mdltx-toolbar-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:10px}
 
 /* ═══ 元素選取模式 ═══ */
 .mdltx-picker-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483645;pointer-events:none}
@@ -1099,10 +1139,12 @@
 .mdltx-preview-chrome{display:flex;flex-direction:column;gap:0}
 .mdltx-preview-modal{width:min(98vw,1400px);max-width:1400px;height:94vh;max-height:calc(100vh - 20px);background:var(--mdltx-bg);border-radius:14px;box-shadow:0 24px 48px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-modal-overlay.open .mdltx-preview-modal{transform:scale(1)}
-.mdltx-preview-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--mdltx-border);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
+.mdltx-preview-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--mdltx-border);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
 .mdltx-root[data-theme="dark"] .mdltx-preview-header{background:linear-gradient(180deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
-.mdltx-preview-title{font-size:14px;font-weight:600;color:var(--mdltx-text);display:flex;align-items:center;gap:6px}
-.mdltx-preview-actions{display:flex;align-items:center;gap:8px}
+.mdltx-preview-title{font-size:14px;font-weight:600;color:var(--mdltx-text);display:flex;align-items:center;gap:6px;min-width:0}
+.mdltx-preview-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.mdltx-preview-footer-left{display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:nowrap}
+.mdltx-preview-stats{display:flex;gap:16px;font-size:12px;color:var(--mdltx-text-secondary);flex-wrap:nowrap;white-space:nowrap}
 .mdltx-preview-tabs{display:flex;background:var(--mdltx-bg-secondary);border-radius:8px;padding:3px;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-preview-tab{padding:6px 14px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all 0.15s ease;font-family:inherit;letter-spacing:0.2px}
 .mdltx-preview-tab:hover{color:var(--mdltx-text)}
@@ -1143,10 +1185,10 @@
 .mdltx-preview-rendered a{color:var(--mdltx-primary);text-decoration:none}
 .mdltx-preview-rendered a:hover{text-decoration:underline}
 .mdltx-preview-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--mdltx-border);flex-shrink:0}
-.mdltx-preview-footer-left{display:flex;align-items:center;gap:12px;min-width:0}
-.mdltx-preview-stats{display:flex;gap:16px;font-size:12px;color:var(--mdltx-text-secondary)}
 .mdltx-preview-stat{display:flex;align-items:center;gap:4px}
 .mdltx-preview-buttons{display:flex;gap:8px}
+.mdltx-preview-actions .mdltx-preview-buttons{gap:6px}
+.mdltx-preview-actions .mdltx-preview-buttons .mdltx-btn-primary,.mdltx-preview-actions .mdltx-preview-buttons .mdltx-btn-secondary{padding:6px 12px;font-size:12px;border-radius:8px}
 
 /* ═══ 增強預覽視窗 ═══ */
 .mdltx-preview-modal.fullscreen{max-width:100%;max-height:100%;width:100%;height:100%;border-radius:0}
@@ -1157,8 +1199,8 @@
 .mdltx-preview-modal.split-view .mdltx-preview-pane-header{padding:8px 12px;background:var(--mdltx-bg-secondary);font-size:12px;font-weight:600;color:var(--mdltx-text-secondary);border-bottom:1px solid var(--mdltx-border)}
 .mdltx-preview-modal.split-view .mdltx-preview-editor{border:none;flex:1;resize:none}
 .mdltx-preview-modal.split-view .mdltx-preview-rendered{flex:1;overflow:auto}
-.mdltx-preview-toolbar{display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--mdltx-border);background:var(--mdltx-bg-secondary);flex-wrap:wrap}
-.mdltx-preview-toolbar-group{display:flex;align-items:center;gap:2px;padding-right:8px;border-right:1px solid var(--mdltx-border);margin-right:8px}
+.mdltx-preview-toolbar{display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--mdltx-border-subtle);background:var(--mdltx-bg-secondary);flex-wrap:wrap}
+.mdltx-preview-toolbar-group{display:flex;align-items:center;gap:4px;padding-right:10px;border-right:1px solid var(--mdltx-border-subtle);margin-right:10px}
 .mdltx-preview-toolbar-group:last-child{border-right:none;margin-right:0;padding-right:0}
 .mdltx-preview-toolbar-group.hidden{display:none}
 .mdltx-toolbar-btn{width:28px;height:28px;padding:4px;border:none;background:none;color:var(--mdltx-text-secondary);cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all 0.15s ease}
@@ -1166,6 +1208,7 @@
 .mdltx-toolbar-btn:active{transform:scale(0.95)}
 .mdltx-toolbar-btn.active{background:var(--mdltx-primary);color:#fff}
 .mdltx-toolbar-btn svg{width:16px;height:16px}
+.mdltx-toolbar-btn:disabled,.mdltx-editor-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
 .mdltx-editor-btn{width:auto;height:auto;padding:6px 10px;gap:6px;border:1px solid transparent;border-radius:8px;background:var(--mdltx-bg);font-size:12px;font-weight:600;color:var(--mdltx-text-secondary)}
 .mdltx-editor-btn:hover{background:var(--mdltx-bg-elevated);border-color:var(--mdltx-border)}
 .mdltx-editor-btn.active{background:var(--mdltx-primary);color:#fff;border-color:transparent}
@@ -1173,7 +1216,7 @@
 .mdltx-editor-btn .mdltx-editor-btn-shortcut{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--mdltx-border);color:var(--mdltx-text-secondary);background:var(--mdltx-bg-secondary)}
 .mdltx-editor-btn.active .mdltx-editor-btn-shortcut{border-color:rgba(255,255,255,0.6);color:#fff;background:rgba(255,255,255,0.2)}
 .mdltx-preview-modal.wrap-off .mdltx-preview-editor{white-space:pre;overflow:auto}
-.mdltx-preview-view-toggle{display:flex;background:var(--mdltx-bg-secondary);border-radius:6px;padding:2px;margin-left:auto}
+.mdltx-preview-view-toggle{display:flex;background:var(--mdltx-bg-secondary);border-radius:8px;padding:2px;margin-left:auto}
 .mdltx-preview-view-btn{padding:4px 10px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:12px;cursor:pointer;border-radius:4px;transition:all 0.15s ease;display:flex;align-items:center;gap:4px}
 .mdltx-preview-view-btn:hover{color:var(--mdltx-text)}
 .mdltx-preview-view-btn.active{background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 1px 2px var(--mdltx-shadow)}
@@ -1194,13 +1237,21 @@
 .mdltx-preview-modal.toolbar-size-lg .mdltx-toolbar-btn{width:32px;height:32px}
 .mdltx-preview-modal.toolbar-size-lg .mdltx-editor-btn{font-size:13px;padding:8px 12px;border-radius:10px}
 .mdltx-preview-modal.toolbar-size-lg .mdltx-editor-btn .mdltx-editor-btn-shortcut{font-size:11px;padding:3px 6px}
-.mdltx-preview-modal.chrome-merged .mdltx-preview-header{border-bottom:none;padding:6px 10px}
-.mdltx-preview-modal.chrome-merged .mdltx-preview-header{flex-wrap:wrap;row-gap:4px}
-.mdltx-preview-modal.chrome-merged .mdltx-preview-toolbar{width:100%;order:2;border-bottom:none;padding:2px 0 4px;background:transparent}
-.mdltx-preview-modal.chrome-merged .mdltx-preview-footer{display:none}
+.mdltx-hidden{display:none !important}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-header{border-bottom:none;padding:10px 16px}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-header{flex-wrap:wrap;row-gap:6px}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-toolbar{width:100%;order:2;border-bottom:none;padding:4px 0 0;background:transparent}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-actions{gap:8px}
 .mdltx-preview-modal.chrome-merged .mdltx-preview-actions .mdltx-preview-footer-left{margin-left:8px}
-.mdltx-preview-modal.chrome-autohide .mdltx-preview-chrome{transition:opacity 0.2s ease,transform 0.2s ease}
-.mdltx-preview-modal.chrome-autohide.chrome-hidden .mdltx-preview-chrome{opacity:0;transform:translateY(-6px)}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-actions .mdltx-preview-view-toggle{order:1}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-actions .mdltx-preview-footer-left{order:2}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-actions .mdltx-preview-buttons{order:3}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-actions #preview-fullscreen-btn{order:4}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-actions .mdltx-modal-close{order:5}
+.mdltx-preview-modal.chrome-merged .mdltx-preview-actions .mdltx-preview-header-action{display:none}
+.mdltx-preview-modal.chrome-merged.chrome-footer-hidden .mdltx-preview-footer{display:none}
+.mdltx-preview-modal.chrome-autohide .mdltx-preview-chrome{transition:opacity 0.2s ease,transform 0.2s ease,max-height 0.2s ease}
+.mdltx-preview-modal.chrome-autohide.chrome-compact .mdltx-preview-chrome{opacity:0;transform:translateY(-8px);max-height:0;overflow:hidden;pointer-events:none}
 
 /* ═══ 元素選取工具欄增強 ═══ */
 .mdltx-picker-toolbar{gap:16px}
@@ -1971,9 +2022,11 @@
       this.mode = 'preview'; // 'preview' | 'edit' | 'split'
       this.isFullscreen = false;
       this.isWrapEnabled = true;
+      this.isSyncScrollEnabled = true;
       this._focusTrap = null;
       this._editorRef = null;
       this._wrapBtn = null;
+      this._syncScrollBtn = null;
       this._history = [];
       this._historyIndex = -1;
       this._historyMax = 200;
@@ -1991,6 +2044,7 @@
       this.options = options;
       this.mode = S.get('previewSplitView') ? 'split' : (S.get('previewDefaultMode') || 'preview');
       this.isFullscreen = false;
+      this.isSyncScrollEnabled = S.get('previewSyncScroll');
       this._history = [];
       this._historyIndex = -1;
       this._isApplyingHistory = false;
@@ -2114,8 +2168,8 @@
             ]),
           ]),
           // 快速操作
-          createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-copy-btn-header', title: t('previewCopyBtn') }, [createIcon('copy', 16)]),
-          createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-download-btn-header', title: t('previewDownloadBtn') }, [createIcon('download', 16)]),
+          createElement('button', { className: 'mdltx-toolbar-btn mdltx-preview-header-action', type: 'button', id: 'preview-copy-btn-header', title: t('previewCopyBtn') }, [createIcon('copy', 16)]),
+          createElement('button', { className: 'mdltx-toolbar-btn mdltx-preview-header-action', type: 'button', id: 'preview-download-btn-header', title: t('previewDownloadBtn') }, [createIcon('download', 16)]),
           // 全螢幕按鈕
           createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-fullscreen-btn', title: t('previewFullscreen') }, [createIcon('maximize', 18)]),
           // 關閉按鈕
@@ -2143,6 +2197,10 @@
         (() => {
           this._wrapBtn = this._createToolBtn('wrapText', t(this.isWrapEnabled ? 'toolWrapOn' : 'toolWrapOff'), () => this._toggleWrap(), { isToggle: true, pressed: this.isWrapEnabled, id: 'wrap' });
           return this._wrapBtn;
+        })(),
+        (() => {
+          this._syncScrollBtn = this._createToolBtn('sync', t(this.isSyncScrollEnabled ? 'previewSyncScrollOn' : 'previewSyncScrollOff'), () => this._toggleSyncScroll(), { isToggle: true, pressed: this.isSyncScrollEnabled, id: 'syncScroll' });
+          return this._syncScrollBtn;
         })(),
       ].filter(Boolean));
 
@@ -2186,6 +2244,7 @@
       this._chrome = chrome;
       this._applyToolbarAppearance();
       this._applyChromeLayout();
+      this._applyChromeVisibility();
       this._setupChromeAutoHide();
     }
 
@@ -2269,20 +2328,49 @@
       const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
       if (!modalEl || !this.modal) return;
       const merged = S.get('previewChromeLayout') === 'merged';
+      const showHeader = S.get('previewShowHeader');
+      const showFooter = S.get('previewShowFooter');
       modalEl.classList.toggle('chrome-merged', merged);
       const footer = this.modal.querySelector('.mdltx-preview-footer');
       const footerLeft = footer?.querySelector('.mdltx-preview-footer-left');
+      const footerButtons = footer?.querySelector('.mdltx-preview-buttons');
       const headerActions = this.modal.querySelector('.mdltx-preview-actions');
       const header = this.modal.querySelector('.mdltx-preview-header');
       const toolbar = this.modal.querySelector('#mdltx-preview-toolbar');
-      if (!footer || !footerLeft || !headerActions) return;
+      if (!footer || !footerLeft || !headerActions || !footerButtons) return;
       if (merged) {
-        if (footerLeft.parentElement !== headerActions) headerActions.appendChild(footerLeft);
-        if (toolbar && header && toolbar.parentElement !== header) header.appendChild(toolbar);
+        if (showHeader) {
+          modalEl.classList.add('chrome-footer-hidden');
+          if (showFooter && footerLeft.parentElement !== headerActions) headerActions.appendChild(footerLeft);
+          if (showFooter && footerButtons.parentElement !== headerActions) headerActions.appendChild(footerButtons);
+          if (toolbar && header && toolbar.parentElement !== header) header.appendChild(toolbar);
+        } else {
+          modalEl.classList.toggle('chrome-footer-hidden', !showFooter);
+          if (footerLeft.parentElement !== footer) footer.insertBefore(footerLeft, footer.firstChild);
+          if (footerButtons.parentElement !== footer) footer.appendChild(footerButtons);
+          if (toolbar && this._chrome && toolbar.parentElement !== this._chrome) this._chrome.insertBefore(toolbar, footer);
+        }
       } else {
+        modalEl.classList.remove('chrome-footer-hidden');
         if (footerLeft.parentElement !== footer) footer.insertBefore(footerLeft, footer.firstChild);
+        if (footerButtons.parentElement !== footer) footer.appendChild(footerButtons);
         if (toolbar && this._chrome && toolbar.parentElement !== this._chrome) this._chrome.insertBefore(toolbar, footer);
       }
+    }
+
+    _applyChromeVisibility() {
+      const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
+      if (!modalEl || !this.modal) return;
+      const header = this.modal.querySelector('.mdltx-preview-header');
+      const toolbar = this.modal.querySelector('#mdltx-preview-toolbar');
+      const footer = this.modal.querySelector('.mdltx-preview-footer');
+      let showHeader = S.get('previewShowHeader');
+      let showToolbar = S.get('previewShowToolbar');
+      let showFooter = S.get('previewShowFooter');
+      if (!showHeader && !showToolbar && !showFooter) showHeader = true;
+      header?.classList.toggle('mdltx-hidden', !showHeader);
+      toolbar?.classList.toggle('mdltx-hidden', !showToolbar);
+      footer?.classList.toggle('mdltx-hidden', !showFooter);
     }
 
     _setupChromeAutoHide() {
@@ -2291,22 +2379,22 @@
       const enable = S.get('previewChromeAutoHide');
       modalEl.classList.toggle('chrome-autohide', enable);
       if (!enable) {
-        modalEl.classList.remove('chrome-hidden');
+        modalEl.classList.remove('chrome-compact');
         return;
       }
       const delay = Math.max(0, Number(S.get('previewChromeAutoHideDelay')) || 0);
       const show = () => {
         if (this._chromeAutoHideTimer) clearTimeout(this._chromeAutoHideTimer);
-        modalEl.classList.remove('chrome-hidden');
+        modalEl.classList.remove('chrome-compact');
       };
       const hide = () => {
         if (this._chromeAutoHideTimer) clearTimeout(this._chromeAutoHideTimer);
         this._chromeAutoHideTimer = setTimeout(() => {
-          modalEl.classList.add('chrome-hidden');
+          modalEl.classList.add('chrome-compact');
         }, delay);
       };
-      this._chrome.addEventListener('mouseenter', show);
-      this._chrome.addEventListener('mouseleave', hide);
+      modalEl.addEventListener('mousemove', show);
+      modalEl.addEventListener('mouseleave', hide);
       hide();
     }
 
@@ -2359,6 +2447,7 @@
         modalEl.classList.toggle('split-view', this.mode === 'split');
       }
       this._updateWrapButton();
+      this._updateSyncScrollButton();
       // 工具列顯示/隱藏
       const toolbar = this.modal?.querySelector('#mdltx-preview-toolbar');
       if (toolbar) {
@@ -2401,6 +2490,24 @@
       this._wrapBtn.classList.toggle('active', this.isWrapEnabled);
       this._wrapBtn.setAttribute('aria-pressed', String(this.isWrapEnabled));
       this._wrapBtn.title = label;
+    }
+
+    _toggleSyncScroll() {
+      this.isSyncScrollEnabled = !this.isSyncScrollEnabled;
+      S.set('previewSyncScroll', this.isSyncScrollEnabled);
+      this._updateSyncScrollButton();
+    }
+
+    _updateSyncScrollButton() {
+      if (!this._syncScrollBtn) return;
+      const label = t(this.isSyncScrollEnabled ? 'previewSyncScrollOn' : 'previewSyncScrollOff');
+      const labelEl = this._syncScrollBtn.querySelector('.mdltx-editor-btn-label');
+      if (labelEl) labelEl.textContent = label;
+      this._syncScrollBtn.classList.toggle('active', this.isSyncScrollEnabled);
+      this._syncScrollBtn.setAttribute('aria-pressed', String(this.isSyncScrollEnabled));
+      this._syncScrollBtn.title = label;
+      const disabled = this.mode !== 'split';
+      this._syncScrollBtn.disabled = disabled;
     }
 
     _updateView() {
@@ -2469,7 +2576,7 @@
         const renderedEl = previewPane.querySelector('.mdltx-preview-rendered');
 
         const syncScroll = (source, target) => {
-          if (!S.get('previewSyncScroll')) return;
+          if (!this.isSyncScrollEnabled) return;
           if (this._isSyncing || !source || !target) return;
           this._isSyncing = true;
           requestAnimationFrame(() => {
@@ -3834,6 +3941,7 @@
               { id: 'link', label: t('toolLink') },
               { id: 'hr', label: t('toolHr') },
               { id: 'wrap', label: t('toolWrapOn') },
+              { id: 'syncScroll', label: t('previewSyncScroll') },
             ];
             const chromeAutoHideCond = createElement('div', { className: `mdltx-conditional ${settings.previewChromeAutoHide ? '' : 'hidden'}`, id: 'preview-chrome-autohide-conditional' });
             chromeAutoHideCond.append(
@@ -3844,17 +3952,36 @@
                 createElement('span', { className: 'mdltx-label-text', textContent: t('previewToolbarButtons') })
               ]),
               createElement('div', { className: 'mdltx-toolbar-config' },
-                toolbarButtonDefs.map(def => createElement('label', { className: 'mdltx-checkbox' }, [
-                  createElement('input', { type: 'checkbox', id: `setting-previewToolbarButton-${def.id}`, checked: !hiddenToolbarButtons.has(def.id) }),
+                toolbarButtonDefs.map(def => createElement('label', { className: 'mdltx-checkbox-label' }, [
+                  createElement('input', { type: 'checkbox', className: 'mdltx-checkbox', id: `setting-previewToolbarButton-${def.id}`, checked: !hiddenToolbarButtons.has(def.id) }),
                   createElement('span', { textContent: def.label })
                 ]))
               )
+            ]);
+            const chromeSectionsField = createElement('div', { className: 'mdltx-field' }, [
+              createElement('div', { className: 'mdltx-field-row' }, [
+                createElement('span', { className: 'mdltx-label-text', textContent: t('previewChromeSections') })
+              ]),
+              createElement('div', { className: 'mdltx-toolbar-config' }, [
+                createElement('label', { className: 'mdltx-checkbox-label' }, [
+                  createElement('input', { type: 'checkbox', className: 'mdltx-checkbox', id: 'setting-previewShowHeader', checked: settings.previewShowHeader }),
+                  createElement('span', { textContent: t('previewShowHeader') })
+                ]),
+                createElement('label', { className: 'mdltx-checkbox-label' }, [
+                  createElement('input', { type: 'checkbox', className: 'mdltx-checkbox', id: 'setting-previewShowToolbar', checked: settings.previewShowToolbar }),
+                  createElement('span', { textContent: t('previewShowToolbar') })
+                ]),
+                createElement('label', { className: 'mdltx-checkbox-label' }, [
+                  createElement('input', { type: 'checkbox', className: 'mdltx-checkbox', id: 'setting-previewShowFooter', checked: settings.previewShowFooter }),
+                  createElement('span', { textContent: t('previewShowFooter') })
+                ])
+              ])
             ]);
             previewCond.append(
               // 新增：總是預覽選項
               mkCheck('setting-previewAlwaysShow', t('previewAlwaysShow'), settings.previewAlwaysShow),
               mkCheck('setting-previewSplitView', t('previewSplitView'), settings.previewSplitView),
-              mkCheck('setting-previewSyncScroll', t('previewSyncScroll'), settings.previewSyncScroll),
+              chromeSectionsField,
               mkSelect('setting-previewChromeLayout', t('previewChromeLayout'), [
                 { value: 'stacked', label: t('previewChromeLayoutStacked') },
                 { value: 'merged', label: t('previewChromeLayoutMerged') }
@@ -3893,7 +4020,8 @@
               ], settings.previewSplitView ? 'split' : settings.previewDefaultMode),
               mkRange('setting-previewMaxHeight', t('previewMaxHeight'), settings.previewMaxHeight, 30, 90, 5, v => `${v}vh`),
               mkNum('setting-previewFontSize', t('previewFontSize'), settings.previewFontSize, 10, 24, 1),
-              createElement('div', { className: 'mdltx-field-hint', textContent: t('previewRendererHint') })
+              mkCheck('setting-previewShowRendererHint', t('previewRendererHintToggle'), settings.previewShowRendererHint),
+              createElement('div', { className: `mdltx-field-hint ${settings.previewShowRendererHint ? '' : 'hidden'}`, id: 'preview-renderer-hint', textContent: t('previewRendererHint') })
             );
             return previewCond;
           })()
@@ -3982,7 +4110,7 @@
       const origOpacity = originalSettings.buttonOpacity, origSize = originalSettings.buttonSize, origTheme = getEffectiveTheme();
       let tempHotkey = { ctrl: originalSettings.hotkeyCtrl, alt: originalSettings.hotkeyAlt, shift: originalSettings.hotkeyShift, key: originalSettings.hotkeyKey };
       let currentMode = originalSettings.settingsMode;
-      const toolbarButtonIds = ['undo', 'redo', 'bold', 'italic', 'code', 'codeBlock', 'heading', 'list', 'quote', 'link', 'hr', 'wrap'];
+      const toolbarButtonIds = ['undo', 'redo', 'bold', 'italic', 'code', 'codeBlock', 'heading', 'list', 'quote', 'link', 'hr', 'wrap', 'syncScroll'];
       const gv = id => overlay.querySelector(`#${id}`);
 
       const stopRec = () => {
@@ -4113,10 +4241,13 @@
           previewEnabled: gv('setting-previewEnabled')?.checked,
           previewAlwaysShow: gv('setting-previewAlwaysShow')?.checked,
           previewSplitView: gv('setting-previewSplitView')?.checked,
-          previewSyncScroll: gv('setting-previewSyncScroll')?.checked,
+          previewShowHeader: gv('setting-previewShowHeader')?.checked,
+          previewShowToolbar: gv('setting-previewShowToolbar')?.checked,
+          previewShowFooter: gv('setting-previewShowFooter')?.checked,
           previewChromeLayout: gv('setting-previewChromeLayout')?.value,
           previewChromeAutoHide: gv('setting-previewChromeAutoHide')?.checked,
           previewChromeAutoHideDelay: valNum(gv('setting-previewChromeAutoHideDelay')?.value, 0, 5000, 1200),
+          previewShowRendererHint: gv('setting-previewShowRendererHint')?.checked,
           previewToolbarStyle: gv('setting-previewToolbarStyle')?.value,
           previewToolbarSize: gv('setting-previewToolbarSize')?.value,
           previewToolbarHiddenButtons: hiddenToolbarButtons,
@@ -4162,6 +4293,12 @@
       bindRangePreview('setting-buttonHiddenOpacity', v => `${Math.round(v * 100)}%`);
       bindRangePreview('setting-buttonSize', v => `${v}px`, v => { if (this.button) this.button.style.setProperty('--mdltx-btn-size', `${v}px`); });
       bindRangePreview('setting-previewMaxHeight', v => `${v}vh`);
+
+      const rendererHintCb = gv('setting-previewShowRendererHint');
+      const rendererHint = gv('preview-renderer-hint');
+      if (rendererHintCb && rendererHint) {
+        rendererHintCb.addEventListener('change', () => rendererHint.classList.toggle('hidden', !rendererHintCb.checked));
+      }
 
       const themeSelect = gv('setting-theme');
       if (themeSelect) themeSelect.addEventListener('change', () => { this.root.setAttribute('data-theme', themeSelect.value === 'auto' ? getEffectiveTheme() : themeSelect.value); });
