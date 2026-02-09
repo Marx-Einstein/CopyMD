@@ -18,6 +18,8 @@
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_download
+// @grant        GM_openInTab
 // ==/UserScript==
 
 (() => {
@@ -54,6 +56,10 @@
     frontmatterDescription: false,
     frontmatterAuthor: false,
     frontmatterTags: false,
+    frontmatterCanonical: false,
+    frontmatterPublished: false,
+    frontmatterUpdated: false,
+    frontmatterSite: false,
     frontmatterCustom: '',
 
     // ═══ 元素選取模式設定 ═══
@@ -69,6 +75,7 @@
     previewFontSize: 14,
     previewAlwaysShow: false,
     previewSplitView: false,
+    previewRenderer: 'simple',
 
     // ═══ 第三方腳本兼容性 ═══
     thirdPartyCompatibility: true,
@@ -76,7 +83,15 @@
     customExcludeSelectors: '',
     customIgnoreHiddenSelectors: '',
 
-    settingsVersion: 7,
+    // ═══ 文章抽取設定 ═══
+    articleExtractionMode: 'heuristic',
+
+    // ═══ 下載資產設定 ═══
+    downloadAssets: false,
+    assetsFolderTemplate: '{slug}_assets',
+    batchDownloadUrls: '',
+
+    settingsVersion: 8,
   };
 
   const SETTING_TYPES = {
@@ -106,6 +121,10 @@
     frontmatterDescription: 'boolean',
     frontmatterAuthor: 'boolean',
     frontmatterTags: 'boolean',
+    frontmatterCanonical: 'boolean',
+    frontmatterPublished: 'boolean',
+    frontmatterUpdated: 'boolean',
+    frontmatterSite: 'boolean',
     frontmatterCustom: 'string',
 
     // Element Picker
@@ -121,12 +140,18 @@
     previewFontSize: 'number',
     previewAlwaysShow: 'boolean',
     previewSplitView: 'boolean',
+    previewRenderer: 'string',
 
     // Third-party compatibility
     thirdPartyCompatibility: 'boolean',
     ignoreCollapsedCodeBlocks: 'boolean',
     customExcludeSelectors: 'string',
     customIgnoreHiddenSelectors: 'string',
+
+    articleExtractionMode: 'string',
+    downloadAssets: 'boolean',
+    assetsFolderTemplate: 'string',
+    batchDownloadUrls: 'string',
 
     settingsVersion: 'number',
   };
@@ -156,6 +181,7 @@
         [5, ['enableContentBasedLangDetection', 'lmArenaEnhancedDetection', 'aiChatPlatformDetection']],
         [6, ['downloadFrontmatter', 'frontmatterTitle', 'frontmatterDate', 'frontmatterUrl', 'frontmatterDescription', 'frontmatterAuthor', 'frontmatterTags', 'frontmatterCustom', 'elementPickerEnabled', 'elementPickerHotkey', 'buttonDoubleClickAction', 'previewEnabled', 'previewHotkey', 'previewDefaultMode', 'previewMaxHeight', 'previewFontSize', 'thirdPartyCompatibility', 'ignoreCollapsedCodeBlocks', 'customExcludeSelectors', 'customIgnoreHiddenSelectors']],
         [7, ['diagnosticLogging']],
+        [8, ['frontmatterCanonical', 'frontmatterPublished', 'frontmatterUpdated', 'frontmatterSite', 'previewRenderer', 'articleExtractionMode', 'downloadAssets', 'assetsFolderTemplate', 'batchDownloadUrls']],
       ];
       for (const [ver, keys] of migrations) {
         if (cur < ver) for (const k of keys) if (GM_getValue(k) === undefined) GM_setValue(k, DEFAULTS[k]);
@@ -220,8 +246,17 @@
       frontmatterDescription: '描述',
       frontmatterAuthor: '作者',
       frontmatterTags: '標籤',
+      frontmatterCanonical: 'Canonical URL',
+      frontmatterPublished: '發布日期',
+      frontmatterUpdated: '更新日期',
+      frontmatterSite: '站名',
       frontmatterCustom: '自訂欄位',
       frontmatterCustomHint: '每行一個，格式：key: value',
+
+      articleExtractionMode: '文章抽取模式',
+      articleExtractionHeuristic: 'Heuristic（預設）',
+      articleExtractionReadability: 'Readability（可選）',
+      articleExtractionAuto: '自動（非 AI 聊天平台優先 Readability）',
 
       // 元素選取
       elementPickerSettings: '元素選取設定',
@@ -245,6 +280,11 @@
       previewModeEdit: '編輯',
       previewMaxHeight: '最大高度 (vh)',
       previewFontSize: '字體大小',
+      previewRenderer: '預覽渲染器',
+      previewRendererSimple: '簡化渲染（預設）',
+      previewRendererFull: '完整 Markdown（若可用）',
+      previewRendererFallback: '完整渲染器不可用，已回退至簡化渲染',
+      previewRendererHint: '預覽為簡化渲染，實際輸出以目標 Markdown 引擎為準',
       previewTitle: 'Markdown 預覽',
       previewCopyBtn: '複製',
       previewDownloadBtn: '下載',
@@ -287,6 +327,12 @@
       downloadSettings: '下載設定',
       downloadFilenameTemplate: '檔名模板',
       downloadFilenameHint: '可用變數：{title} {date} {time} {timestamp} {host} {path} {slug}',
+      downloadAssets: '下載圖片資產',
+      assetsFolderTemplate: '資產資料夾模板',
+      assetsFolderHint: '可用變數：{title} {date} {time} {timestamp} {host} {path} {slug}',
+      batchDownloadUrls: '批次下載 URL（每行一個）',
+      batchDownloadStart: '啟動批次下載',
+      batchDownloadHint: '會開啟新分頁並自動下載（受瀏覽器限制）',
       hiddenScanMaxElements: '隱藏元素掃描上限',
       hiddenUntilFoundVisible: '將 hidden="until-found" 視為可見',
       unknownEmptyTagStrategy: '未知空標籤策略',
@@ -359,8 +405,16 @@
       frontmatterDescription: '描述',
       frontmatterAuthor: '作者',
       frontmatterTags: '标签',
+      frontmatterCanonical: 'Canonical URL',
+      frontmatterPublished: '发布日期',
+      frontmatterUpdated: '更新日期',
+      frontmatterSite: '站点名称',
       frontmatterCustom: '自定义字段',
       frontmatterCustomHint: '每行一个，格式：key: value',
+      articleExtractionMode: '文章提取模式',
+      articleExtractionHeuristic: 'Heuristic（默认）',
+      articleExtractionReadability: 'Readability（可选）',
+      articleExtractionAuto: '自动（非 AI 聊天平台优先 Readability）',
       elementPickerSettings: '元素选取设置',
       elementPickerEnabled: '启用元素选取功能',
       elementPickerHotkey: '元素选取快捷键',
@@ -380,6 +434,11 @@
       previewModeEdit: '编辑',
       previewMaxHeight: '最大高度 (vh)',
       previewFontSize: '字体大小',
+      previewRenderer: '预览渲染器',
+      previewRendererSimple: '简化渲染（默认）',
+      previewRendererFull: '完整 Markdown（如可用）',
+      previewRendererFallback: '完整渲染器不可用，已回退至简化渲染',
+      previewRendererHint: '预览为简化渲染，实际输出以目标 Markdown 引擎为准',
       previewTitle: 'Markdown 预览',
       previewCopyBtn: '复制',
       previewDownloadBtn: '下载',
@@ -419,6 +478,12 @@
       downloadSettings: '下载设置',
       downloadFilenameTemplate: '文件名模板',
       downloadFilenameHint: '可用变量：{title} {date} {time} {timestamp} {host} {path} {slug}',
+      downloadAssets: '下载图片资源',
+      assetsFolderTemplate: '资源文件夹模板',
+      assetsFolderHint: '可用变量：{title} {date} {time} {timestamp} {host} {path} {slug}',
+      batchDownloadUrls: '批量下载 URL（每行一个）',
+      batchDownloadStart: '启动批量下载',
+      batchDownloadHint: '会打开新标签页并自动下载（受浏览器限制）',
       hiddenScanMaxElements: '隐藏元素扫描上限',
       hiddenUntilFoundVisible: '将 hidden="until-found" 视为可见',
       unknownEmptyTagStrategy: '未知空标签策略',
@@ -491,8 +556,16 @@
       frontmatterDescription: 'Description',
       frontmatterAuthor: 'Author',
       frontmatterTags: 'Tags',
+      frontmatterCanonical: 'Canonical URL',
+      frontmatterPublished: 'Published Date',
+      frontmatterUpdated: 'Updated Date',
+      frontmatterSite: 'Site Name',
       frontmatterCustom: 'Custom Fields',
       frontmatterCustomHint: 'One per line, format: key: value',
+      articleExtractionMode: 'Article Extraction Mode',
+      articleExtractionHeuristic: 'Heuristic (default)',
+      articleExtractionReadability: 'Readability (optional)',
+      articleExtractionAuto: 'Auto (prefer Readability on non-AI chat sites)',
       elementPickerSettings: 'Element Picker Settings',
       elementPickerEnabled: 'Enable Element Picker',
       elementPickerHotkey: 'Element Picker Hotkey',
@@ -512,6 +585,11 @@
       previewModeEdit: 'Edit',
       previewMaxHeight: 'Max Height (vh)',
       previewFontSize: 'Font Size',
+      previewRenderer: 'Preview Renderer',
+      previewRendererSimple: 'Simplified (default)',
+      previewRendererFull: 'Full Markdown (if available)',
+      previewRendererFallback: 'Full renderer unavailable; fell back to simplified preview',
+      previewRendererHint: 'Preview is simplified; actual output depends on your Markdown renderer',
       previewTitle: 'Markdown Preview',
       previewCopyBtn: 'Copy',
       previewDownloadBtn: 'Download',
@@ -551,6 +629,12 @@
       downloadSettings: 'Download Settings',
       downloadFilenameTemplate: 'Filename Template',
       downloadFilenameHint: 'Available variables: {title} {date} {time} {timestamp} {host} {path} {slug}',
+      downloadAssets: 'Download image assets',
+      assetsFolderTemplate: 'Assets folder template',
+      assetsFolderHint: 'Available variables: {title} {date} {time} {timestamp} {host} {path} {slug}',
+      batchDownloadUrls: 'Batch download URLs (one per line)',
+      batchDownloadStart: 'Start batch download',
+      batchDownloadHint: 'Opens new tabs and auto-downloads (browser limits apply)',
       hiddenScanMaxElements: 'Max hidden elements to scan',
       hiddenUntilFoundVisible: 'Treat hidden="until-found" as visible',
       unknownEmptyTagStrategy: 'Unknown empty tag strategy',
@@ -726,14 +810,14 @@
   // ─────────────────────────────────────────────────────────────
 
   const STYLES = `
-:host{all:initial;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.5}
+:host{all:initial;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 .mdltx-root{--mdltx-primary:#2563eb;--mdltx-primary-hover:#1d4ed8;--mdltx-success:#16a34a;--mdltx-error:#dc2626;--mdltx-warning:#d97706;--mdltx-focus-ring:0 0 0 3px rgba(37,99,235,0.4);--mdltx-radius-sm:8px;--mdltx-radius-md:12px;--mdltx-radius-lg:16px;--mdltx-surface:rgba(255,255,255,0.7);--mdltx-border-subtle:rgba(0,0,0,0.06);--mdltx-overlay-blur:6px}
 .mdltx-root[data-theme="light"]{--mdltx-bg:#fff;--mdltx-bg-secondary:#f3f4f6;--mdltx-bg-tertiary:#e5e7eb;--mdltx-bg-elevated:#fefefe;--mdltx-text:#1f2937;--mdltx-text-secondary:#6b7280;--mdltx-border:#d1d5db;--mdltx-border-subtle:rgba(0,0,0,0.08);--mdltx-shadow:rgba(15,23,42,0.12);--mdltx-shadow-lg:rgba(15,23,42,0.2);--mdltx-overlay:rgba(15,23,42,0.48)}
 .mdltx-root[data-theme="dark"]{--mdltx-bg:#1f2937;--mdltx-bg-secondary:#374151;--mdltx-bg-tertiary:#4b5563;--mdltx-bg-elevated:#273244;--mdltx-text:#f9fafb;--mdltx-text-secondary:#9ca3af;--mdltx-border:#4b5563;--mdltx-border-subtle:rgba(255,255,255,0.08);--mdltx-shadow:rgba(0,0,0,0.35);--mdltx-shadow-lg:rgba(0,0,0,0.5);--mdltx-overlay:rgba(0,0,0,0.7)}
 .mdltx-root{color:var(--mdltx-text)}.mdltx-root *{box-sizing:border-box;margin:0;padding:0}
 @media(prefers-reduced-motion:reduce){.mdltx-root *,.mdltx-root *::before,.mdltx-root *::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}.mdltx-btn:hover:not(.dragging):not(.processing){transform:none!important}.mdltx-toast.show{transform:translateX(-50%) translateY(0)!important}.mdltx-menu.open{transform:scale(1) translateY(0)!important}.mdltx-modal-overlay.open .mdltx-modal,.mdltx-modal-overlay.open .mdltx-preview-modal{transform:scale(1)!important}}
 .mdltx-root button:focus-visible,.mdltx-root .mdltx-menu-item:focus-visible,.mdltx-root .mdltx-select:focus-visible,.mdltx-root .mdltx-input:focus-visible,.mdltx-root .mdltx-checkbox:focus-visible,.mdltx-root .mdltx-range:focus-visible{outline:2px solid var(--mdltx-primary);outline-offset:2px}
-.mdltx-btn{position:fixed;z-index:2147483647;display:flex;align-items:center;justify-content:center;width:var(--mdltx-btn-size,42px);height:var(--mdltx-btn-size,42px);padding:0;border-radius:50%;border:1px solid var(--mdltx-border);background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.75));color:var(--mdltx-text);box-shadow:0 6px 16px var(--mdltx-shadow);cursor:pointer;user-select:none;touch-action:none;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease,color 0.2s ease,opacity 0.3s ease;font-family:inherit;opacity:var(--mdltx-btn-opacity,0.85);will-change:transform,opacity}
+.mdltx-btn{position:fixed;z-index:2147483647;display:flex;align-items:center;justify-content:center;width:var(--mdltx-btn-size,42px);height:var(--mdltx-btn-size,42px);padding:0;border-radius:50%;border:1px solid var(--mdltx-border);background:linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.74));color:var(--mdltx-text);box-shadow:0 6px 16px var(--mdltx-shadow);cursor:pointer;user-select:none;touch-action:none;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease,color 0.2s ease,opacity 0.3s ease;font-family:inherit;opacity:var(--mdltx-btn-opacity,0.85);will-change:transform,opacity}
 .mdltx-root[data-theme="dark"] .mdltx-btn{background:linear-gradient(180deg,rgba(55,65,81,0.95),rgba(31,41,55,0.9))}
 .mdltx-btn:hover:not(.dragging):not(.processing){transform:translateY(-2px) scale(1.05);box-shadow:0 10px 24px var(--mdltx-shadow-lg);opacity:var(--mdltx-btn-hover-opacity,1)!important}
 .mdltx-btn:focus-visible{outline:3px solid var(--mdltx-primary);outline-offset:2px;box-shadow:0 0 0 4px rgba(37,99,235,0.18)}
@@ -748,14 +832,14 @@
 .mdltx-btn-spinner{width:50%;height:50%;border:2px solid var(--mdltx-border);border-top-color:var(--mdltx-primary);border-radius:50%;animation:mdltx-spin 0.8s linear infinite}
 @keyframes mdltx-spin{to{transform:rotate(360deg)}}
 .mdltx-sensor{position:fixed;z-index:2147483646;background:transparent;pointer-events:auto;border-radius:50%}
-.mdltx-tooltip{position:fixed;z-index:2147483648;background:var(--mdltx-bg-elevated);color:var(--mdltx-text);border:1px solid var(--mdltx-border-subtle);padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.5;box-shadow:0 8px 20px var(--mdltx-shadow-lg);max-width:260px;opacity:0;visibility:hidden;transition:opacity 0.15s ease,visibility 0.15s ease;pointer-events:none;white-space:pre-line}
+.mdltx-tooltip{position:fixed;z-index:2147483648;background:var(--mdltx-bg-elevated);color:var(--mdltx-text);border:1px solid var(--mdltx-border-subtle);padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.5;box-shadow:0 8px 20px var(--mdltx-shadow-lg);max-width:260px;opacity:0;visibility:hidden;transition:opacity 0.15s ease,visibility 0.15s ease;pointer-events:none;white-space:pre-line;-webkit-backdrop-filter:saturate(140%) blur(8px);backdrop-filter:saturate(140%) blur(8px)}
 .mdltx-tooltip.show{opacity:1;visibility:visible}
 .mdltx-tooltip-hotkey{display:block;margin-top:6px;padding-top:6px;border-top:1px solid var(--mdltx-border);color:var(--mdltx-text-secondary);font-size:11px}
-.mdltx-menu{position:fixed;z-index:2147483647;min-width:220px;padding:6px;background:var(--mdltx-bg-elevated);border:1px solid var(--mdltx-border-subtle);border-radius:14px;box-shadow:0 14px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transform:scale(0.95) translateY(-10px);transform-origin:top;transition:opacity 0.2s cubic-bezier(0,0,0.2,1),visibility 0.2s cubic-bezier(0,0,0.2,1),transform 0.2s cubic-bezier(0,0,0.2,1)}
+.mdltx-menu{position:fixed;z-index:2147483647;min-width:220px;padding:6px;background:var(--mdltx-bg-elevated);border:1px solid var(--mdltx-border-subtle);border-radius:14px;box-shadow:0 14px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transform:scale(0.95) translateY(-10px);transform-origin:top;transition:opacity 0.2s cubic-bezier(0,0,0.2,1),visibility 0.2s cubic-bezier(0,0,0.2,1),transform 0.2s cubic-bezier(0,0,0.2,1);-webkit-backdrop-filter:saturate(140%) blur(8px);backdrop-filter:saturate(140%) blur(8px)}
 .mdltx-menu.open{opacity:1;visibility:visible;transform:scale(1) translateY(0)}
 .mdltx-menu.from-bottom{transform-origin:bottom;transform:scale(0.95) translateY(10px)}
 .mdltx-menu.from-bottom.open{transform:scale(1) translateY(0)}
-.mdltx-menu-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s ease,transform 0.15s ease;color:var(--mdltx-text);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-size:14px}
+.mdltx-menu-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s ease,transform 0.15s ease,color 0.15s ease;color:var(--mdltx-text);border:none;background:none;width:100%;text-align:left;font-family:inherit;font-size:14px}
 .mdltx-menu-item:hover:not(:disabled){background:var(--mdltx-bg-secondary);transform:translateX(2px)}
 .mdltx-menu-item:hover:not(:disabled) .mdltx-menu-item-icon{color:var(--mdltx-primary)}
 .mdltx-menu-item:focus-visible{background:var(--mdltx-bg-secondary);outline:none}
@@ -768,7 +852,7 @@
 .mdltx-menu-item-hint{font-size:12px;color:var(--mdltx-text-secondary);margin-left:auto}
 .mdltx-menu-divider{height:1px;background:var(--mdltx-border);margin:6px 0}
 .mdltx-menu-hint{padding:6px 12px;font-size:11px;color:var(--mdltx-text-secondary)}
-.mdltx-toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(100px);z-index:2147483647;display:flex;align-items:flex-start;gap:12px;padding:14px 18px;min-width:280px;max-width:min(520px,90vw);border-radius:14px;background:var(--mdltx-bg-elevated);border:1px solid var(--mdltx-border-subtle);box-shadow:0 12px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+.mdltx-toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(100px);z-index:2147483647;display:flex;align-items:flex-start;gap:12px;padding:14px 18px;min-width:280px;max-width:min(520px,90vw);border-radius:14px;background:var(--mdltx-bg-elevated);border:1px solid var(--mdltx-border-subtle);box-shadow:0 12px 32px var(--mdltx-shadow-lg);opacity:0;visibility:hidden;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);-webkit-backdrop-filter:saturate(140%) blur(8px);backdrop-filter:saturate(140%) blur(8px)}
 .mdltx-toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1)}
 .mdltx-toast.success{border-left:4px solid var(--mdltx-success)}
 .mdltx-toast.error{border-left:4px solid var(--mdltx-error)}
@@ -790,7 +874,7 @@
 .mdltx-modal-overlay.open .mdltx-modal{transform:scale(1)}
 .mdltx-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--mdltx-border-subtle);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
 .mdltx-root[data-theme="dark"] .mdltx-modal-header{background:linear-gradient(180deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
-.mdltx-modal-title{font-size:18px;font-weight:600;color:var(--mdltx-text)}
+.mdltx-modal-title{font-size:18px;font-weight:600;color:var(--mdltx-text);letter-spacing:0.2px}
 .mdltx-modal-close{width:32px;height:32px;padding:6px;border:none;background:none;cursor:pointer;border-radius:10px;color:var(--mdltx-text-secondary);transition:all 0.15s ease;display:flex;align-items:center;justify-content:center}
 .mdltx-modal-close svg{width:20px;height:20px}
 .mdltx-modal-close:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
@@ -858,21 +942,24 @@
 .mdltx-picker-toolbar kbd{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 6px;background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);border-radius:4px;font-size:11px;font-weight:500;color:var(--mdltx-text)}
 
 /* ═══ 預覽編輯視窗 ═══ */
-.mdltx-preview-modal{width:100%;max-width:900px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:16px;box-shadow:0 24px 48px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease}
+.mdltx-preview-modal{width:100%;max-width:900px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:16px;box-shadow:0 24px 48px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-modal-overlay.open .mdltx-preview-modal{transform:scale(1)}
-.mdltx-preview-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--mdltx-border);flex-shrink:0}
+.mdltx-preview-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--mdltx-border);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
+.mdltx-root[data-theme="dark"] .mdltx-preview-header{background:linear-gradient(180deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
 .mdltx-preview-title{font-size:16px;font-weight:600;color:var(--mdltx-text);display:flex;align-items:center;gap:8px}
 .mdltx-preview-actions{display:flex;align-items:center;gap:8px}
-.mdltx-preview-tabs{display:flex;background:var(--mdltx-bg-secondary);border-radius:8px;padding:3px}
-.mdltx-preview-tab{padding:6px 14px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all 0.15s ease;font-family:inherit}
+.mdltx-preview-tabs{display:flex;background:var(--mdltx-bg-secondary);border-radius:8px;padding:3px;border:1px solid var(--mdltx-border-subtle)}
+.mdltx-preview-tab{padding:6px 14px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all 0.15s ease;font-family:inherit;letter-spacing:0.2px}
 .mdltx-preview-tab:hover{color:var(--mdltx-text)}
 .mdltx-preview-tab.active{background:var(--mdltx-bg);color:var(--mdltx-text);box-shadow:0 1px 3px var(--mdltx-shadow)}
 .mdltx-preview-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.mdltx-preview-hint{padding:10px 20px;font-size:12px;color:var(--mdltx-text-secondary);background:var(--mdltx-bg-secondary);border-bottom:1px solid var(--mdltx-border)}
+.mdltx-preview-hint.hidden{display:none}
 .mdltx-preview-content{flex:1;overflow:auto;padding:0}
 .mdltx-preview-editor{width:100%;height:100%;border:none;resize:none;padding:16px 20px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6;color:var(--mdltx-text);background:var(--mdltx-bg);outline:none;transition:box-shadow 0.15s ease}
 .mdltx-preview-editor:focus{box-shadow:inset 0 0 0 2px rgba(37,99,235,0.15)}
 .mdltx-preview-rendered{padding:16px 20px;font-size:14px;line-height:1.7;color:var(--mdltx-text)}
-.mdltx-preview-rendered pre{background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);border-radius:8px;padding:12px 16px;overflow-x:auto;margin:12px 0}
+.mdltx-preview-rendered pre{background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);border-radius:8px;padding:12px 16px;overflow-x:auto;margin:12px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,0.2)}
 .mdltx-preview-rendered code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}
 .mdltx-preview-rendered p{margin:8px 0}
 .mdltx-preview-rendered h1,.mdltx-preview-rendered h2,.mdltx-preview-rendered h3{margin:16px 0 8px;font-weight:600}
@@ -979,6 +1066,18 @@
     return String(name || fallback).replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 100) || fallback;
   }
 
+  function sanitizePathSegment(seg) {
+    return String(seg || '').replace(/[\\:*?"<>|]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 100);
+  }
+
+  function sanitizePath(path) {
+    return String(path || '')
+      .split('/')
+      .map(sanitizePathSegment)
+      .filter(Boolean)
+      .join('/');
+  }
+
   function getFilenameTokens() {
     const title = sanitizeFilename(document.title || 'untitled');
     const now = new Date();
@@ -992,6 +1091,14 @@
     return { title, date, time, timestamp, host, path, slug };
   }
 
+  function applyTemplate(template, tokens) {
+    let out = String(template || '');
+    for (const [key, value] of Object.entries(tokens)) {
+      out = out.split(`{${key}}`).join(value);
+    }
+    return out;
+  }
+
   function generateFilename() {
     const tokens = getFilenameTokens();
     const template = S.get('downloadFilenameTemplate') || '{title}_{date}';
@@ -1003,6 +1110,86 @@
     return (filename || tokens.title || 'document') + '.md';
   }
 
+  function buildAssetsFolder(tokens) {
+    const template = S.get('assetsFolderTemplate') || '{slug}_assets';
+    const raw = applyTemplate(template, tokens);
+    const sanitized = sanitizePath(raw);
+    return sanitized || sanitizePath(`${tokens.slug}_assets`);
+  }
+
+  function extractMarkdownImageUrls(markdown) {
+    const urls = new Set();
+    try {
+      markdown.replace(/!\[[^\]]*]\(([^)]+)\)/g, (_, url) => { if (url) urls.add(url.trim()); return ''; });
+      markdown.replace(/<img[^>]+src=["']([^"']+)["'][^>]*>/gi, (_, url) => { if (url) urls.add(url.trim()); return ''; });
+    } catch {}
+    return Array.from(urls);
+  }
+
+  function normalizeAssetUrl(rawUrl, baseUri) {
+    if (!rawUrl) return '';
+    const trimmed = rawUrl.replace(/^<|>$/g, '').trim().split(/\s+/)[0];
+    if (/^data:/i.test(trimmed)) return '';
+    try {
+      const url = new URL(trimmed, baseUri || document.baseURI);
+      if (!/^https?:/i.test(url.protocol)) return '';
+      return url.href;
+    } catch {
+      return '';
+    }
+  }
+
+  function buildAssetFilename(url, index) {
+    try {
+      const u = new URL(url);
+      const last = u.pathname.split('/').filter(Boolean).pop() || `asset_${index}`;
+      const clean = sanitizeFilename(last) || `asset_${index}`;
+      if (/\.[a-z0-9]{1,6}$/i.test(clean)) return clean;
+      return `${clean}.bin`;
+    } catch {
+      return `asset_${index}.bin`;
+    }
+  }
+
+  function rewriteMarkdownAssets(markdown, replacements) {
+    let out = markdown;
+    for (const [original, replacement] of replacements) {
+      if (!original || !replacement) continue;
+      const escaped = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      out = out.replace(new RegExp(escaped, 'g'), replacement);
+    }
+    return out;
+  }
+
+  function downloadBlobAsFile(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = createElement('a', { href: url, download: filename, style: { display: 'none' } });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async function downloadAssetsForMarkdown(markdown, tokens) {
+    if (!S.get('downloadAssets')) return { markdown, assets: [] };
+    const rawUrls = extractMarkdownImageUrls(markdown);
+    if (!rawUrls.length) return { markdown, assets: [] };
+    const folder = buildAssetsFolder(tokens);
+    const replacements = [];
+    const assets = [];
+    let index = 1;
+    for (const raw of rawUrls) {
+      const normalized = normalizeAssetUrl(raw, document.baseURI);
+      if (!normalized) continue;
+      const fileName = buildAssetFilename(normalized, index++);
+      const target = folder ? `${folder}/${fileName}` : fileName;
+      replacements.push([raw, target]);
+      assets.push({ url: normalized, filename: target });
+    }
+    const updated = rewriteMarkdownAssets(markdown, replacements);
+    return { markdown: updated, assets };
+  }
+
   function downloadAsFile(content, filename) {
     const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' }), url = URL.createObjectURL(blob);
     const a = createElement('a', { href: url, download: filename, style: { display: 'none' } });
@@ -1011,6 +1198,47 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     return filename;
+  }
+
+  async function triggerAssetDownloads(assets) {
+    if (!assets?.length) return;
+    const canGMDownload = typeof GM_download === 'function';
+    for (const asset of assets) {
+      if (!asset?.url || !asset?.filename) continue;
+      if (canGMDownload) {
+        try {
+          GM_download({ url: asset.url, name: asset.filename, onerror: () => {}, ontimeout: () => {} });
+          continue;
+        } catch {}
+      }
+      try {
+        const res = await fetch(asset.url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        downloadBlobAsFile(blob, asset.filename);
+      } catch (e) {
+        console.warn('[mdltx] Asset download failed:', asset.url, e);
+      }
+    }
+  }
+
+  function startBatchDownload(urls) {
+    const list = (urls || '').split('\n').map(u => u.trim()).filter(Boolean);
+    if (!list.length) return 0;
+    const openTab = url => {
+      try {
+        if (typeof GM_openInTab === 'function') GM_openInTab(url, { active: false, insert: true, setParent: true });
+        else window.open(url, '_blank', 'noopener');
+      } catch { window.open(url, '_blank', 'noopener'); }
+    };
+    list.forEach((u, idx) => {
+      try {
+        const parsed = new URL(u, location.href);
+        parsed.searchParams.set('mdltx_autodownload', '1');
+        setTimeout(() => openTab(parsed.toString()), idx * 400);
+      } catch { setTimeout(() => openTab(u), idx * 400); }
+    });
+    return list.length;
   }
 
   /**
@@ -1105,9 +1333,61 @@
   /**
    * 生成 YAML Frontmatter
    */
+  function getMetaContent(selector) {
+    try { return document.querySelector(selector)?.getAttribute('content') || ''; } catch { return ''; }
+  }
+
+  function extractJsonLdMetadata() {
+    try {
+      const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
+      const candidates = [];
+      const collect = obj => {
+        if (!obj) return;
+        if (Array.isArray(obj)) { obj.forEach(collect); return; }
+        if (obj['@graph']) { collect(obj['@graph']); return; }
+        candidates.push(obj);
+      };
+      for (const s of scripts) {
+        try { collect(JSON.parse(s.textContent || '')); } catch {}
+      }
+      const isArticleType = type => {
+        if (!type) return false;
+        const types = Array.isArray(type) ? type : [type];
+        return types.some(t => /Article|NewsArticle|BlogPosting|Report|ScholarlyArticle/i.test(String(t)));
+      };
+      const pick = candidates.find(c => isArticleType(c['@type'])) ||
+                   candidates.find(c => c.headline || c.name) ||
+                   candidates[0];
+      if (!pick) return {};
+      const author = (() => {
+        const a = pick.author;
+        if (!a) return '';
+        if (typeof a === 'string') return a;
+        if (Array.isArray(a)) return a.map(x => x?.name || x).filter(Boolean).join(', ');
+        return a?.name || '';
+      })();
+      const keywords = (() => {
+        const k = pick.keywords;
+        if (!k) return [];
+        if (Array.isArray(k)) return k.map(x => String(x).trim()).filter(Boolean);
+        return String(k).split(',').map(x => x.trim()).filter(Boolean);
+      })();
+      return {
+        headline: pick.headline || pick.name || '',
+        description: pick.description || '',
+        published: pick.datePublished || '',
+        updated: pick.dateModified || pick.dateUpdated || '',
+        author,
+        keywords,
+        site: pick.publisher?.name || '',
+      };
+    } catch { return {}; }
+  }
+
   function generateFrontmatter() {
     if (!S.get('downloadFrontmatter')) return '';
 
+    const jsonLd = extractJsonLdMetadata();
     const lines = ['---'];
 
     if (S.get('frontmatterTitle')) {
@@ -1124,23 +1404,53 @@
     }
 
     if (S.get('frontmatterDescription')) {
-      const desc = document.querySelector('meta[name="description"]')?.getAttribute('content') ||
-                   document.querySelector('meta[property="og:description"]')?.getAttribute('content') || '';
+      const desc = getMetaContent('meta[name="description"]') ||
+                   getMetaContent('meta[property="og:description"]') ||
+                   jsonLd.description || '';
       if (desc) lines.push(`description: "${desc.replace(/"/g, '\\"').replace(/\n/g, ' ').slice(0, 300)}"`);
     }
 
     if (S.get('frontmatterAuthor')) {
-      const author = document.querySelector('meta[name="author"]')?.getAttribute('content') ||
-                     document.querySelector('meta[property="article:author"]')?.getAttribute('content') || '';
+      const author = getMetaContent('meta[name="author"]') ||
+                     getMetaContent('meta[property="article:author"]') ||
+                     jsonLd.author || '';
       if (author) lines.push(`author: "${author.replace(/"/g, '\\"')}"`);
     }
 
     if (S.get('frontmatterTags')) {
-      const keywords = document.querySelector('meta[name="keywords"]')?.getAttribute('content') || '';
+      const keywords = getMetaContent('meta[name="keywords"]') || '';
       if (keywords) {
         const tags = keywords.split(',').map(t => t.trim()).filter(Boolean).slice(0, 10);
         if (tags.length) lines.push(`tags: [${tags.map(t => `"${t.replace(/"/g, '\\"')}"`).join(', ')}]`);
+      } else if (jsonLd.keywords?.length) {
+        const tags = jsonLd.keywords.slice(0, 10).map(t => t.replace(/"/g, '\\"'));
+        if (tags.length) lines.push(`tags: [${tags.map(t => `"${t}"`).join(', ')}]`);
       }
+    }
+
+    if (S.get('frontmatterCanonical')) {
+      const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href') ||
+                        getMetaContent('meta[property="og:url"]') || '';
+      if (canonical) lines.push(`canonical: "${canonical.replace(/"/g, '\\"')}"`);
+    }
+
+    if (S.get('frontmatterPublished')) {
+      const published = getMetaContent('meta[property="article:published_time"]') ||
+                        getMetaContent('meta[name="article:published_time"]') ||
+                        jsonLd.published || '';
+      if (published) lines.push(`published: "${published.replace(/"/g, '\\"')}"`);
+    }
+
+    if (S.get('frontmatterUpdated')) {
+      const updated = getMetaContent('meta[property="og:updated_time"]') ||
+                      getMetaContent('meta[name="article:modified_time"]') ||
+                      jsonLd.updated || '';
+      if (updated) lines.push(`updated: "${updated.replace(/"/g, '\\"')}"`);
+    }
+
+    if (S.get('frontmatterSite')) {
+      const site = getMetaContent('meta[property="og:site_name"]') || jsonLd.site || '';
+      if (site) lines.push(`site: "${site.replace(/"/g, '\\"')}"`);
     }
 
     lines.push(`source: "${location.hostname}"`);
@@ -1625,6 +1935,7 @@
 
       // 內容區
       const body = createElement('div', { className: 'mdltx-preview-body' }, [
+        createElement('div', { className: 'mdltx-preview-hint', id: 'mdltx-preview-hint' }),
         createElement('div', { className: 'mdltx-preview-content', id: 'mdltx-preview-content' }),
       ]);
 
@@ -1715,6 +2026,7 @@
       container.style.maxHeight = '';
       container.style.overflow = '';
       this._updateViewState();
+      this._updatePreviewHint();
 
       const maxH = `${S.get('previewMaxHeight')}vh`;
       const fontSize = `${S.get('previewFontSize')}px`;
@@ -1763,6 +2075,7 @@
           createElement('div', { className: 'mdltx-preview-rendered', id: 'mdltx-preview-rendered' }),
         ]);
         safeSetInnerHTML(previewPane.querySelector('.mdltx-preview-rendered'), this._renderMarkdown(this.content));
+        this._updatePreviewHint();
 
         container.style.maxHeight = maxH;
         container.append(editPane, previewPane);
@@ -1795,6 +2108,7 @@
         const rendered = createElement('div', { className: 'mdltx-preview-rendered', id: 'mdltx-preview-rendered' });
         safeSetInnerHTML(rendered, this._renderMarkdown(this.content));
         this._bindMathCopyHandlers(rendered);
+        this._updatePreviewHint();
 
         rendered.style.maxHeight = maxH;
         container.appendChild(rendered);
@@ -1807,6 +2121,21 @@
       if (rendered) {
         safeSetInnerHTML(rendered, this._renderMarkdown(this.content));
         this._bindMathCopyHandlers(rendered);
+        this._updatePreviewHint();
+      }
+    }
+
+    _updatePreviewHint() {
+      const hint = this.modal?.querySelector('#mdltx-preview-hint');
+      if (!hint) return;
+      const mode = S.get('previewRenderer');
+      const fallback = this._previewRendererFallback;
+      if (mode === 'full') {
+        hint.textContent = fallback ? t('previewRendererFallback') : '';
+        hint.classList.toggle('hidden', !fallback);
+      } else {
+        hint.textContent = t('previewRendererHint');
+        hint.classList.remove('hidden');
       }
     }
 
@@ -1996,6 +2325,45 @@
     }
 
     _renderMarkdown(md) {
+      this._previewRendererFallback = false;
+      if (S.get('previewRenderer') === 'full') {
+        const external = this._getExternalRenderer();
+        if (external) {
+          const html = external(md);
+          return this._sanitizeRenderedHtml(html);
+        }
+        this._previewRendererFallback = true;
+      }
+      return this._renderMarkdownSimple(md);
+    }
+
+    _getExternalRenderer() {
+      if (this._cachedExternalRenderer) return this._cachedExternalRenderer;
+      if (window.marked) {
+        const fn = typeof window.marked.parse === 'function' ? window.marked.parse : (typeof window.marked === 'function' ? window.marked : null);
+        if (fn) { this._cachedExternalRenderer = md => fn(md); return this._cachedExternalRenderer; }
+      }
+      if (window.markdownit) {
+        try {
+          const mdIt = window.markdownit({ html: false, linkify: true, breaks: false });
+          this._cachedExternalRenderer = md => mdIt.render(md);
+          return this._cachedExternalRenderer;
+        } catch {}
+      }
+      return null;
+    }
+
+    _sanitizeRenderedHtml(html) {
+      try {
+        const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+        doc.querySelectorAll('script,iframe,object,embed,style,link,meta').forEach(el => el.remove());
+        return doc.body.innerHTML;
+      } catch {
+        return String(html || '');
+      }
+    }
+
+    _renderMarkdownSimple(md) {
       const escapeHtml = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       const escapeHtmlAttr = s => String(s)
         .replace(/&/g,'&amp;')
@@ -2278,8 +2646,11 @@
           content = frontmatter + this.content;
         }
 
+        const tokens = getFilenameTokens();
         const filename = generateFilename();
-        downloadAsFile(content, filename);
+        const assetResult = await downloadAssetsForMarkdown(content, tokens);
+        downloadAsFile(assetResult.markdown, filename);
+        await triggerAssetDownloads(assetResult.assets);
         this.ui.showToast('success', t('previewDownloadSuccess'), filename);
         this.close(true);
       } catch (e) { this.ui.showToast('error', t('toastError'), e.message); }
@@ -2773,6 +3144,11 @@
         mkSection(t('hotkeySettings'), false, mkCheck('setting-hotkeyEnabled', t('enableHotkey'), settings.hotkeyEnabled), hotkeyField),
         mkSection(t('conversionSettings'), false,
           mkSelect('setting-noSelectionMode', t('noSelectionMode'), [{ value: 'page', label: t('modePage') }, { value: 'article', label: t('modeArticle') }], settings.noSelectionMode),
+          mkSelect('setting-articleExtractionMode', t('articleExtractionMode'), [
+            { value: 'heuristic', label: t('articleExtractionHeuristic') },
+            { value: 'readability', label: t('articleExtractionReadability') },
+            { value: 'auto', label: t('articleExtractionAuto') }
+          ], settings.articleExtractionMode),
           mkCheck('setting-absoluteUrls', t('absoluteUrls'), settings.absoluteUrls),
           mkCheck('setting-ignoreNav', t('ignoreNav'), settings.ignoreNav, true),
           mkCheck('setting-waitMathJax', t('waitMathJax'), settings.waitMathJax),
@@ -2828,6 +3204,10 @@
               mkCheck('setting-frontmatterDescription', t('frontmatterDescription'), settings.frontmatterDescription),
               mkCheck('setting-frontmatterAuthor', t('frontmatterAuthor'), settings.frontmatterAuthor),
               mkCheck('setting-frontmatterTags', t('frontmatterTags'), settings.frontmatterTags),
+              mkCheck('setting-frontmatterCanonical', t('frontmatterCanonical'), settings.frontmatterCanonical),
+              mkCheck('setting-frontmatterPublished', t('frontmatterPublished'), settings.frontmatterPublished),
+              mkCheck('setting-frontmatterUpdated', t('frontmatterUpdated'), settings.frontmatterUpdated),
+              mkCheck('setting-frontmatterSite', t('frontmatterSite'), settings.frontmatterSite),
               createElement('div', { className: 'mdltx-field' }, [
                 createElement('div', { className: 'mdltx-field-row' }, [
                   createElement('span', { className: 'mdltx-label-text', textContent: t('frontmatterCustom') }),
@@ -2852,6 +3232,39 @@
               })
             ]),
             createElement('div', { className: 'mdltx-field-hint', textContent: t('downloadFilenameHint') })
+          ]),
+          mkCheck('setting-downloadAssets', t('downloadAssets'), settings.downloadAssets, true),
+          (() => {
+            const assetsCond = createElement('div', { className: `mdltx-conditional ${settings.downloadAssets ? '' : 'hidden'}`, id: 'assets-conditional' });
+            assetsCond.append(
+              createElement('div', { className: 'mdltx-field' }, [
+                createElement('div', { className: 'mdltx-field-row' }, [
+                  createElement('span', { className: 'mdltx-label-text', textContent: t('assetsFolderTemplate') }),
+                  createElement('input', {
+                    type: 'text', className: 'mdltx-input', id: 'setting-assetsFolderTemplate',
+                    value: settings.assetsFolderTemplate, style: { width: '100%', maxWidth: '280px' },
+                    placeholder: '{slug}_assets'
+                  })
+                ]),
+                createElement('div', { className: 'mdltx-field-hint', textContent: t('assetsFolderHint') })
+              ])
+            );
+            return assetsCond;
+          })(),
+          createElement('div', { className: 'mdltx-field' }, [
+            createElement('div', { className: 'mdltx-field-row' }, [
+              createElement('span', { className: 'mdltx-label-text', textContent: t('batchDownloadUrls') })
+            ]),
+            createElement('textarea', {
+              className: 'mdltx-input', id: 'setting-batchDownloadUrls',
+              rows: '3', style: { width: '100%', minHeight: '60px', fontFamily: 'monospace' },
+              placeholder: 'https://example.com/one\nhttps://example.com/two',
+              value: settings.batchDownloadUrls || ''
+            }),
+            createElement('div', { className: 'mdltx-field-row', style: { marginTop: '6px', justifyContent: 'space-between' } }, [
+              createElement('span', { className: 'mdltx-field-hint', textContent: t('batchDownloadHint') }),
+              createElement('button', { className: 'mdltx-btn-secondary', type: 'button', id: 'batch-download-start', textContent: t('batchDownloadStart') })
+            ])
           ])
         ),
 
@@ -2889,6 +3302,10 @@
               // 新增：總是預覽選項
               mkCheck('setting-previewAlwaysShow', t('previewAlwaysShow'), settings.previewAlwaysShow),
               mkCheck('setting-previewSplitView', t('previewSplitView'), settings.previewSplitView),
+              mkSelect('setting-previewRenderer', t('previewRenderer'), [
+                { value: 'simple', label: t('previewRendererSimple') },
+                { value: 'full', label: t('previewRendererFull') }
+              ], settings.previewRenderer),
               createElement('div', { className: 'mdltx-field' }, [
                 createElement('div', { className: 'mdltx-field-row' }, [
                   createElement('span', { className: 'mdltx-label-text', textContent: t('previewHotkey') }),
@@ -2904,7 +3321,8 @@
                 { value: 'split', label: t('previewSplitView') }
               ], settings.previewSplitView ? 'split' : settings.previewDefaultMode),
               mkRange('setting-previewMaxHeight', t('previewMaxHeight'), settings.previewMaxHeight, 30, 90, 5, v => `${v}vh`),
-              mkNum('setting-previewFontSize', t('previewFontSize'), settings.previewFontSize, 10, 24, 1)
+              mkNum('setting-previewFontSize', t('previewFontSize'), settings.previewFontSize, 10, 24, 1),
+              createElement('div', { className: 'mdltx-field-hint', textContent: t('previewRendererHint') })
             );
             return previewCond;
           })()
@@ -3056,6 +3474,7 @@
           hotkeyEnabled: gv('setting-hotkeyEnabled')?.checked,
           hotkeyCtrl: tempHotkey.ctrl, hotkeyAlt: tempHotkey.alt, hotkeyShift: tempHotkey.shift, hotkeyKey: tempHotkey.key,
           noSelectionMode: gv('setting-noSelectionMode')?.value,
+          articleExtractionMode: gv('setting-articleExtractionMode')?.value,
           absoluteUrls: gv('setting-absoluteUrls')?.checked, ignoreNav: gv('setting-ignoreNav')?.checked,
           waitMathJax: gv('setting-waitMathJax')?.checked, stripCommonIndentInBlockMath: gv('setting-stripIndent')?.checked,
           escapeMarkdownChars: gv('setting-escapeMarkdownChars')?.checked,
@@ -3088,8 +3507,15 @@
           frontmatterDescription: gv('setting-frontmatterDescription')?.checked,
           frontmatterAuthor: gv('setting-frontmatterAuthor')?.checked,
           frontmatterTags: gv('setting-frontmatterTags')?.checked,
+          frontmatterCanonical: gv('setting-frontmatterCanonical')?.checked,
+          frontmatterPublished: gv('setting-frontmatterPublished')?.checked,
+          frontmatterUpdated: gv('setting-frontmatterUpdated')?.checked,
+          frontmatterSite: gv('setting-frontmatterSite')?.checked,
           frontmatterCustom: gv('setting-frontmatterCustom')?.value || '',
           downloadFilenameTemplate: gv('setting-downloadFilenameTemplate')?.value || '{title}_{date}',
+          downloadAssets: gv('setting-downloadAssets')?.checked,
+          assetsFolderTemplate: gv('setting-assetsFolderTemplate')?.value || '{slug}_assets',
+          batchDownloadUrls: gv('setting-batchDownloadUrls')?.value || '',
 
           // 元素選取
           elementPickerEnabled: gv('setting-elementPickerEnabled')?.checked,
@@ -3115,6 +3541,7 @@
           previewDefaultMode: gv('setting-previewDefaultMode')?.value,
           previewMaxHeight: valNum(gv('setting-previewMaxHeight')?.value, 30, 90, 70),
           previewFontSize: valNum(gv('setting-previewFontSize')?.value, 10, 24, 14),
+          previewRenderer: gv('setting-previewRenderer')?.value,
 
         };
         for (const [k, v] of Object.entries(vals)) if (v !== undefined) S.set(k, v);
@@ -3172,6 +3599,7 @@
       // ═══ 條件區塊 toggle 綁定 ═══
       const conditionalBindings = [
         ['setting-downloadFrontmatter',      'frontmatter-conditional'],
+        ['setting-downloadAssets',           'assets-conditional'],
         ['setting-elementPickerEnabled',     'picker-conditional'],
         ['setting-previewEnabled',           'preview-conditional'],
         ['setting-thirdPartyCompatibility',  'thirdparty-conditional'],
@@ -3212,6 +3640,11 @@
 
       gv('settings-reset')?.addEventListener('click', () => { if (confirm(t('confirmReset'))) { S.resetAll(); close(false); this.refresh(); this.showToast('success', t('toastSettingsReset'), t('settingsResetDone')); } });
       gv('settings-save')?.addEventListener('click', saveSettings);
+      gv('batch-download-start')?.addEventListener('click', () => {
+        const count = startBatchDownload(gv('setting-batchDownloadUrls')?.value || '');
+        if (count > 0) this.showToast('success', t('toastGenericSuccess'), `${count}`);
+        else this.showToast('error', t('toastError'), t('batchDownloadUrls'));
+      });
 
       // ═══ 匯出設定 ═══
       gv('settings-export')?.addEventListener('click', async () => {
@@ -3487,11 +3920,14 @@
         const mode = hasSelection() ? 'selection' : decideModeNoSelection();
         const result = await generateMarkdown(mode);
         const filename = generateFilename();
+        const tokens = getFilenameTokens();
         const frontmatter = generateFrontmatter();
         const content = frontmatter + result.markdown;
-        downloadAsFile(content, filename);
+        const assetResult = await downloadAssetsForMarkdown(content, tokens);
+        downloadAsFile(assetResult.markdown, filename);
+        await triggerAssetDownloads(assetResult.assets);
         this.setButtonState('downloaded');
-        this.showToast('success', t('toastDownloadSuccess'), t('toastDownloadDetail', { filename, count: content.length }));
+        this.showToast('success', t('toastDownloadSuccess'), t('toastDownloadDetail', { filename, count: assetResult.markdown.length }));
       } catch (e) {
         console.error('[mdltx] download error:', e);
         this.setButtonState('error');
@@ -4005,10 +4441,28 @@
   // ─────────────────────────────────────────────────────────────
 
   function getPageMathJax() { try { return (typeof unsafeWindow !== 'undefined' && unsafeWindow.MathJax) || window.MathJax || null; } catch { return window.MathJax || null; } }
+  function isMathJaxV2(mj) { return !!(mj && mj.Hub && !mj.startup); }
+  function getMathJaxVersion(mj) { try { return mj?.version || (isMathJaxV2(mj) ? '2' : '3'); } catch { return isMathJaxV2(mj) ? '2' : '3'; } }
 
   function getMathItemsWithin(scope) {
     try {
-      const doc = getPageMathJax()?.startup?.document; if (!doc) return [];
+      const MJ = getPageMathJax();
+      if (!MJ) return [];
+      if (isMathJaxV2(MJ)) {
+        const allJax = typeof MJ.Hub?.getAllJax === 'function' ? MJ.Hub.getAllJax() : [];
+        return allJax.map(jax => {
+          const source = jax?.SourceElement?.();
+          let root = null;
+          if (source?.nextSibling && source.nextSibling.nodeType === 1) root = source.nextSibling;
+          if (!root && source?.previousSibling && source.previousSibling.nodeType === 1) root = source.previousSibling;
+          if (!root && source?.parentNode?.nodeType === 1) root = source.parentNode;
+          return {
+            typesetRoot: root,
+            math: jax?.originalText || jax?.TeX || jax?.SourceElement?.()?.textContent || ''
+          };
+        }).filter(it => it.typesetRoot);
+      }
+      const doc = MJ.startup?.document; if (!doc) return [];
       return typeof doc.getMathItemsWithin === 'function' ? (doc.getMathItemsWithin(scope || document.body) || []) : (Array.isArray(doc.math) ? doc.math : []);
     } catch { return []; }
   }
@@ -4017,6 +4471,16 @@
     if (!S.get('waitMathJax')) return;
     const MJ = getPageMathJax(); if (!MJ) return;
     try {
+      if (isMathJaxV2(MJ)) {
+        diagLog('MathJax detected', { version: getMathJaxVersion(MJ) });
+        await new Promise(resolve => {
+          try {
+            MJ.Hub.Queue(() => resolve());
+          } catch { resolve(); }
+          setTimeout(resolve, 1500);
+        });
+        return;
+      }
       for (let i = 0; i < 10; i++) {
         try { if (MJ.startup?.promise) await MJ.startup.promise; } catch {}
         try { if (typeof MJ.typesetPromise === 'function') { try { await MJ.typesetPromise(scope ? [scope] : undefined); } catch { await MJ.typesetPromise(); } } } catch {}
@@ -4030,6 +4494,8 @@
   function annotateMathJax(scope) {
     const added = [];
     try {
+      const mj = getPageMathJax();
+      if (mj) diagLog('MathJax detected', { version: getMathJaxVersion(mj) });
       for (const it of getMathItemsWithin(scope)) {
         const root = it?.typesetRoot; if (!root?.setAttribute) continue;
         if (scope && scope !== document.body && !scope.contains?.(root)) continue;
@@ -4082,6 +4548,100 @@
     } catch { return tex; }
   }
 
+  const MATHML_HANDLERS = {
+    msup: (node, collect, txt, ch) => ch.length >= 2 ? `{${collect(ch[0])}}^{${collect(ch[1])}}` : txt(),
+    msub: (node, collect, txt, ch) => ch.length >= 2 ? `{${collect(ch[0])}}_{${collect(ch[1])}}` : txt(),
+    msubsup: (node, collect, txt, ch) => ch.length >= 3 ? `{${collect(ch[0])}}_{${collect(ch[1])}}^{${collect(ch[2])}}` : txt(),
+    mfrac: (node, collect, txt, ch) => ch.length >= 2 ? `\\frac{${collect(ch[0])}}{${collect(ch[1])}}` : txt(),
+    msqrt: (node, collect, txt, ch) => `\\sqrt{${ch.map(collect).join('')}}`,
+    mroot: (node, collect, txt, ch) => ch.length >= 2 ? `\\sqrt[${collect(ch[1])}]{${collect(ch[0])}}` : txt(),
+    mover: (node, collect, txt, ch) => {
+      if (ch.length < 2) return txt();
+      const base = collect(ch[0]), over = collect(ch[1]);
+      if (over === '→' || over === '\\to' || over === '⟶' || over === '⃗') return `\\vec{${base}}`;
+      if (over === '¯' || over === '−' || over === '-' || over === '‾' || over === '̄') return `\\overline{${base}}`;
+      if (over === '^' || over === '̂' || over === '∧' || over === 'ˆ') return `\\hat{${base}}`;
+      if (over === '~' || over === '̃' || over === '˜') return `\\tilde{${base}}`;
+      if (over === '˙' || over === '.') return `\\dot{${base}}`;
+      if (over === '¨' || over === '..') return `\\ddot{${base}}`;
+      if (over === '⏞') return `\\overbrace{${base}}`;
+      if (over === '⌢') return `\\widehat{${base}}`;
+      return `\\overset{${over}}{${base}}`;
+    },
+    munder: (node, collect, txt, ch) => {
+      if (ch.length < 2) return txt();
+      const base = collect(ch[0]), under = collect(ch[1]);
+      if (under === '_' || under === '̲' || under === '‾') return `\\underline{${base}}`;
+      if (under === '⏟') return `\\underbrace{${base}}`;
+      return `\\underset{${under}}{${base}}`;
+    },
+    munderover: (node, collect, txt, ch) => {
+      if (ch.length < 3) return txt();
+      const base = collect(ch[0]), under = collect(ch[1]), over = collect(ch[2]), baseText = txt().trim();
+      if (['∑', '∏', '∫', '⋃', '⋂', 'lim', '\\sum', '\\prod', '\\int'].includes(baseText) || ['∑', '∏', '∫', '⋃', '⋂'].includes(base)) return `${collect(ch[0])}_{${under}}^{${over}}`;
+      return `\\underset{${under}}{\\overset{${over}}{${base}}}`;
+    },
+    mo: (node, collect, txt) => {
+      const t = txt();
+      if (MATHML_OP_MAP[t]) return MATHML_OP_MAP[t];
+      if (t === '(' || t === ')' || t === '[' || t === ']') return t;
+      if (t === '{') return '\\{'; if (t === '}') return '\\}'; if (t === '|') return '|';
+      return t;
+    },
+    mi: (node, collect, txt) => {
+      const t = txt();
+      if (t.length === 1 && /[a-zA-Z]/.test(t)) return t;
+      if (/^(sin|cos|tan|cot|sec|csc|log|ln|exp|lim|max|min|sup|inf|det|dim|ker|im|arg|deg|gcd|lcm|mod|Pr|arcsin|arccos|arctan|sinh|cosh|tanh|coth|sech|csch|arsinh|arcosh|artanh)$/i.test(t)) return `\\${t.toLowerCase()}`;
+      return MATHML_OP_MAP[t] ?? t;
+    },
+    mn: (node, collect, txt) => txt(),
+    mtext: (node, collect, txt) => { const t = txt(); return t.trim() ? `\\text{${t}}` : t; },
+    mspace: () => '\\,',
+    mphantom: (node, collect, txt, ch) => `\\phantom{${ch.map(collect).join('')}}`,
+    mrow: (node, collect, txt, ch) => ch.map(collect).join(''),
+    math: (node, collect, txt, ch) => ch.map(collect).join(''),
+    semantics: (node, collect, txt, ch) => ch.map(collect).join(''),
+    mstyle: (node, collect, txt, ch) => ch.map(collect).join(''),
+    mpadded: (node, collect, txt, ch) => ch.map(collect).join(''),
+    mtable: (node, collect) => {
+      const rows = Array.from(node.querySelectorAll(':scope > mtr'));
+      const content = rows.map(mtr => Array.from(mtr.querySelectorAll(':scope > mtd')).map(collect).join(' & ')).join(' \\\\ ');
+      return `\\begin{matrix} ${content} \\end{matrix}`;
+    },
+    mfenced: (node, collect, txt, ch) => {
+      const open = node.getAttribute('open') || '(', close = node.getAttribute('close') || ')', sep = node.getAttribute('separators') || ',';
+      const inner = ch.map(collect).join(` ${sep.trim()} `);
+      const leftMap = { '(': '(', '[': '[', '{': '\\{', '|': '|', '‖': '\\|', '⟨': '\\langle', '〈': '\\langle', '': '' };
+      const rightMap = { ')': ')', ']': ']', '}': '\\}', '|': '|', '‖': '\\|', '⟩': '\\rangle', '〉': '\\rangle', '': '' };
+      const l = leftMap[open] ?? open, r = rightMap[close] ?? close;
+      if (l || r) return `\\left${l || '.'}${inner}\\right${r || '.'}`;
+      return inner;
+    },
+    menclose: (node, collect, txt, ch) => {
+      const notation = node.getAttribute('notation') || 'box', inner = ch.map(collect).join('');
+      if (notation.includes('box') || notation.includes('roundedbox')) return `\\boxed{${inner}}`;
+      if (notation.includes('circle')) return `\\circled{${inner}}`;
+      if (notation.includes('updiagonalstrike') || notation.includes('downdiagonalstrike')) return `\\cancel{${inner}}`;
+      if (notation.includes('horizontalstrike')) return `\\hcancel{${inner}}`;
+      if (notation.includes('radical')) return `\\sqrt{${inner}}`;
+      return inner;
+    },
+    annotation: () => '',
+    'annotation-xml': () => '',
+    none: () => '',
+    mprescripts: () => '',
+    mmultiscripts: (node, collect, txt, ch) => {
+      let result = ch.length > 0 ? collect(ch[0]) : '', i = 1;
+      while (i < ch.length && ch[i].tagName?.toLowerCase() !== 'mprescripts') {
+        const sub = ch[i] ? collect(ch[i]) : '', sup = ch[i + 1] ? collect(ch[i + 1]) : '';
+        if (sub && sub !== 'none') result += `_{${sub}}`;
+        if (sup && sup !== 'none') result += `^{${sup}}`;
+        i += 2;
+      }
+      return result;
+    }
+  };
+
   function processMathML(mathEl) {
     try {
       const existingTex = extractTex(mathEl);
@@ -4095,93 +4655,9 @@
         if (node.nodeType === 3) return (node.nodeValue || '').trim();
         if (node.nodeType !== 1) return '';
         const tag = node.tagName?.toLowerCase() || '', ch = getChildren(node), txt = () => (node.textContent || '').trim();
-        switch (tag) {
-          case 'msup': return ch.length >= 2 ? `{${collect(ch[0])}}^{${collect(ch[1])}}` : txt();
-          case 'msub': return ch.length >= 2 ? `{${collect(ch[0])}}_{${collect(ch[1])}}` : txt();
-          case 'msubsup': return ch.length >= 3 ? `{${collect(ch[0])}}_{${collect(ch[1])}}^{${collect(ch[2])}}` : txt();
-          case 'mfrac': return ch.length >= 2 ? `\\frac{${collect(ch[0])}}{${collect(ch[1])}}` : txt();
-          case 'msqrt': return `\\sqrt{${ch.map(collect).join('')}}`;
-          case 'mroot': return ch.length >= 2 ? `\\sqrt[${collect(ch[1])}]{${collect(ch[0])}}` : txt();
-          case 'mover': {
-            if (ch.length < 2) return txt();
-            const base = collect(ch[0]), over = collect(ch[1]);
-            if (over === '→' || over === '\\to' || over === '⟶' || over === '⃗') return `\\vec{${base}}`;
-            if (over === '¯' || over === '−' || over === '-' || over === '‾' || over === '̄') return `\\overline{${base}}`;
-            if (over === '^' || over === '̂' || over === '∧' || over === 'ˆ') return `\\hat{${base}}`;
-            if (over === '~' || over === '̃' || over === '˜') return `\\tilde{${base}}`;
-            if (over === '˙' || over === '.') return `\\dot{${base}}`;
-            if (over === '¨' || over === '..') return `\\ddot{${base}}`;
-            if (over === '⏞') return `\\overbrace{${base}}`;
-            if (over === '⌢') return `\\widehat{${base}}`;
-            return `\\overset{${over}}{${base}}`;
-          }
-          case 'munder': {
-            if (ch.length < 2) return txt();
-            const base = collect(ch[0]), under = collect(ch[1]);
-            if (under === '_' || under === '̲' || under === '‾') return `\\underline{${base}}`;
-            if (under === '⏟') return `\\underbrace{${base}}`;
-            return `\\underset{${under}}{${base}}`;
-          }
-          case 'munderover': {
-            if (ch.length < 3) return txt();
-            const base = collect(ch[0]), under = collect(ch[1]), over = collect(ch[2]), baseText = txt().trim();
-            if (['∑', '∏', '∫', '⋃', '⋂', 'lim', '\\sum', '\\prod', '\\int'].includes(baseText) || ['∑', '∏', '∫', '⋃', '⋂'].includes(base)) return `${collect(ch[0])}_{${under}}^{${over}}`;
-            return `\\underset{${under}}{\\overset{${over}}{${base}}}`;
-          }
-          case 'mo': {
-            const t = txt();
-            if (MATHML_OP_MAP[t]) return MATHML_OP_MAP[t];
-            if (t === '(' || t === ')' || t === '[' || t === ']') return t;
-            if (t === '{') return '\\{'; if (t === '}') return '\\}'; if (t === '|') return '|';
-            return t;
-          }
-          case 'mi': {
-            const t = txt();
-            if (t.length === 1 && /[a-zA-Z]/.test(t)) return t;
-            if (/^(sin|cos|tan|cot|sec|csc|log|ln|exp|lim|max|min|sup|inf|det|dim|ker|im|arg|deg|gcd|lcm|mod|Pr|arcsin|arccos|arctan|sinh|cosh|tanh|coth|sech|csch|arsinh|arcosh|artanh)$/i.test(t)) return `\\${t.toLowerCase()}`;
-            return MATHML_OP_MAP[t] ?? t;
-          }
-          case 'mn': return txt();
-          case 'mtext': { const t = txt(); return t.trim() ? `\\text{${t}}` : t; }
-          case 'mspace': return '\\,';
-          case 'mphantom': return `\\phantom{${ch.map(collect).join('')}}`;
-          case 'mrow': case 'math': case 'semantics': case 'mstyle': case 'mpadded': return ch.map(collect).join('');
-          case 'mtable': {
-            const rows = Array.from(node.querySelectorAll(':scope > mtr'));
-            const content = rows.map(mtr => Array.from(mtr.querySelectorAll(':scope > mtd')).map(collect).join(' & ')).join(' \\\\ ');
-            return `\\begin{matrix} ${content} \\end{matrix}`;
-          }
-          case 'mfenced': {
-            const open = node.getAttribute('open') || '(', close = node.getAttribute('close') || ')', sep = node.getAttribute('separators') || ',';
-            const inner = ch.map(collect).join(` ${sep.trim()} `);
-            const leftMap = { '(': '(', '[': '[', '{': '\\{', '|': '|', '‖': '\\|', '⟨': '\\langle', '〈': '\\langle', '': '' };
-            const rightMap = { ')': ')', ']': ']', '}': '\\}', '|': '|', '‖': '\\|', '⟩': '\\rangle', '〉': '\\rangle', '': '' };
-            const l = leftMap[open] ?? open, r = rightMap[close] ?? close;
-            if (l || r) return `\\left${l || '.'}${inner}\\right${r || '.'}`;
-            return inner;
-          }
-          case 'menclose': {
-            const notation = node.getAttribute('notation') || 'box', inner = ch.map(collect).join('');
-            if (notation.includes('box') || notation.includes('roundedbox')) return `\\boxed{${inner}}`;
-            if (notation.includes('circle')) return `\\circled{${inner}}`;
-            if (notation.includes('updiagonalstrike') || notation.includes('downdiagonalstrike')) return `\\cancel{${inner}}`;
-            if (notation.includes('horizontalstrike')) return `\\hcancel{${inner}}`;
-            if (notation.includes('radical')) return `\\sqrt{${inner}}`;
-            return inner;
-          }
-          case 'annotation': case 'annotation-xml': case 'none': case 'mprescripts': return '';
-          case 'mmultiscripts': {
-            let result = ch.length > 0 ? collect(ch[0]) : '', i = 1;
-            while (i < ch.length && ch[i].tagName?.toLowerCase() !== 'mprescripts') {
-              const sub = ch[i] ? collect(ch[i]) : '', sup = ch[i + 1] ? collect(ch[i + 1]) : '';
-              if (sub && sub !== 'none') result += `_{${sub}}`;
-              if (sup && sup !== 'none') result += `^{${sup}}`;
-              i += 2;
-            }
-            return result;
-          }
-          default: return ch.length ? ch.map(collect).join('') : txt();
-        }
+        const handler = MATHML_HANDLERS[tag];
+        if (handler) return handler(node, collect, txt, ch);
+        return ch.length ? ch.map(collect).join('') : txt();
       };
       const content = collect(mathEl).trim(); if (!content) return '';
       return mathEl.getAttribute('display') === 'block' ? `\n\n$$\n${content}\n$$\n\n` : `$${content}$`;
@@ -5001,7 +5477,27 @@
   function hasSelection() { return getSelection().hasSelection; }
   function getSelectionRange() { return getSelection().range; }
 
-  function findArticleRoot() {
+  function findArticleRootReadability() {
+    try {
+      const mode = S.get('articleExtractionMode');
+      if (mode === 'heuristic') return null;
+      if (mode === 'auto' && isAIChatPlatform()) return null;
+      const ReadabilityCtor = (typeof unsafeWindow !== 'undefined' && unsafeWindow.Readability) || window.Readability;
+      if (!ReadabilityCtor) return null;
+      const docClone = document.cloneNode(true);
+      const reader = new ReadabilityCtor(docClone);
+      const article = reader.parse();
+      if (!article?.content) return null;
+      const container = document.createElement('div');
+      container.setAttribute('data-mdltx-readability', '1');
+      container.innerHTML = article.content;
+      if (getVisibleTextLength(container) < 200) return null;
+      diagLog('Readability extraction', { title: article.title || '', length: (article.textContent || '').length });
+      return container;
+    } catch (e) { diagLog('Readability extraction failed', { error: e?.message || String(e) }); return null; }
+  }
+
+  function findArticleRootHeuristic() {
     const candidates = [];
     try {
       const startedAt = performance?.now?.() || Date.now();
@@ -5081,6 +5577,12 @@
       diagLog('Article root scan', { candidates: candidates.length, shortlisted: quickScored.length, bestScore, elapsedMs: Math.round(elapsed) });
       return best || document.body;
     } catch { return document.body; }
+  }
+
+  function findArticleRoot() {
+    const readabilityRoot = findArticleRootReadability();
+    if (readabilityRoot) return readabilityRoot;
+    return findArticleRootHeuristic();
   }
 
   function isArticleTooSmall(el) {
@@ -5231,7 +5733,20 @@
       GM_registerMenuCommand('📋 ' + t('copySelection'), async () => { try { if (ui) await ui.handleCopy('selection'); else await copyMarkdown('selection'); } catch (e) { console.error('[mdltx] Menu command error:', e); } });
       GM_registerMenuCommand('📰 ' + t('copyArticle'), async () => { try { if (ui) await ui.handleCopy('article'); else await copyMarkdown('article'); } catch (e) { console.error('[mdltx] Menu command error:', e); } });
       GM_registerMenuCommand('🌐 ' + t('copyPage'), async () => { try { if (ui) await ui.handleCopy('page'); else await copyMarkdown('page'); } catch (e) { console.error('[mdltx] Menu command error:', e); } });
-      GM_registerMenuCommand('💾 ' + t('downloadMd'), async () => { try { if (ui) await ui.handleDownload(); else { const mode = hasSelection() ? 'selection' : decideModeNoSelection(); const result = await generateMarkdown(mode); downloadAsFile(result.markdown, generateFilename()); } } catch (e) { console.error('[mdltx] Menu command error:', e); } });
+      GM_registerMenuCommand('💾 ' + t('downloadMd'), async () => {
+        try {
+          if (ui) await ui.handleDownload();
+          else {
+            const mode = hasSelection() ? 'selection' : decideModeNoSelection();
+            const result = await generateMarkdown(mode);
+            const tokens = getFilenameTokens();
+            const filename = generateFilename();
+            const assetResult = await downloadAssetsForMarkdown(result.markdown, tokens);
+            downloadAsFile(assetResult.markdown, filename);
+            await triggerAssetDownloads(assetResult.assets);
+          }
+        } catch (e) { console.error('[mdltx] Menu command error:', e); }
+      });
       GM_registerMenuCommand('⚙️ ' + t('settings'), () => { try { if (ui) ui.showSettings(); } catch (e) { console.error('[mdltx] Menu command error:', e); } });
 
       // 新增：元素選取
@@ -5259,6 +5774,25 @@
       ui.init();
       installHotkey();
       installMenu();
+      try {
+        const params = new URLSearchParams(location.search);
+        if (params.get('mdltx_autodownload') === '1') {
+          setTimeout(async () => {
+            try {
+              if (ui) await ui.handleDownload();
+              else {
+                const mode = hasSelection() ? 'selection' : decideModeNoSelection();
+                const result = await generateMarkdown(mode);
+                const tokens = getFilenameTokens();
+                const filename = generateFilename();
+                const assetResult = await downloadAssetsForMarkdown(result.markdown, tokens);
+                downloadAsFile(assetResult.markdown, filename);
+                await triggerAssetDownloads(assetResult.assets);
+              }
+            } catch (e) { console.error('[mdltx] Auto-download failed:', e); }
+          }, 1500);
+        }
+      } catch {}
       console.log('[mdltx] Copy MD + LaTeX v3.2.4 initialized.');
     } catch (e) { console.error('[mdltx] Initialization failed:', e); }
   }
