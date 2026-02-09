@@ -200,25 +200,42 @@
       processing: '處理中...', copied: '已複製！', downloaded: '已下載！', failed: '失敗',
       settingsTitle: 'MD+LaTeX 複製工具設定',
       settingsModeLabel: '設定模式', settingsModeSimple: '簡易', settingsModeAdvanced: '進階',
-      generalSettings: '一般設定', showButton: '顯示浮動按鈕', buttonPosition: '按鈕位置', bottomRight: '右下角', bottomLeft: '左下角', topRight: '右上角', topLeft: '左上角',
+      generalSettings: '一般設定',
+      generalSettingsDesc: '控制浮動按鈕的位置、外觀與介面語言，影響日常操作體驗。',
+      showButton: '顯示浮動按鈕', buttonPosition: '按鈕位置', bottomRight: '右下角', bottomLeft: '左下角', topRight: '右上角', topLeft: '左上角',
       buttonOpacity: '按鈕不透明度', buttonHoverOpacity: '懸停時不透明度', buttonSize: '按鈕大小',
       buttonAutoHide: '自動隱藏按鈕', buttonAutoHideDelay: '離開後隱藏延遲 (ms)', buttonHiddenOpacity: '隱藏時不透明度',
       buttonClickAction: '左鍵點擊動作', clickActionAuto: '自動（有選取複製選取，否則依預設）', clickActionSelection: '複製選取內容', clickActionArticle: '智慧擷取文章', clickActionPage: '複製整個頁面', clickActionDownload: '下載為 .md 檔案',
       theme: '主題', themeAuto: '自動', themeLight: '淺色', themeDark: '深色', language: '語言', langAuto: '自動',
-      hotkeySettings: '快捷鍵設定', enableHotkey: '啟用快捷鍵', hotkeyCombo: '快捷鍵組合', pressKey: '按下按鍵...',
-      conversionSettings: '轉換設定', noSelectionMode: '無選取時預設模式', modePage: '整個頁面', modeArticle: '智慧文章', absoluteUrls: '使用絕對網址', ignoreNav: '忽略導覽/頁首/頁尾/側邊欄', waitMathJax: '等待 MathJax 渲染', stripIndent: '移除區塊數學的共同縮排', escapeMarkdownChars: '逸出 Markdown 特殊字元', extractShadowDOM: '擷取 Shadow DOM 內容', extractIframes: '擷取 iframe 內容（同源）',
-      markdownFormat: 'Markdown 格式', listMarker: '清單符號', emphasisMarker: '斜體符號', strongMarker: '粗體符號', horizontalRule: '水平線符號',
-      captureSettings: '擷取時機設定', waitBeforeCapture: '抽取前等待時間 (ms)', waitDomIdle: 'DOM 穩定後等待 (ms)',
-      visibilitySettings: '可見性設定', visibilityMode: '隱藏元素判斷策略', visibilityLoose: '寬鬆（display/visibility/hidden）', visibilityStrict: '嚴格（含 opacity/content-visibility/offscreen）', visibilityDom: 'DOM 優先（僅 hidden 屬性）', strictOffscreen: '啟用螢幕外元素偵測', offscreenMargin: '螢幕外邊界距離 (px)',
-      formatSettings: '格式處理設定', strongEmBlockStrategy: '粗體/斜體跨區塊策略', strategySplit: '拆段（推薦）', strategyHtml: 'HTML 標籤', strategyStrip: '移除格式', complexTableStrategy: '複雜表格策略', strategyList: '轉為清單', strategyTableHtml: 'HTML 表格', detailsStrategy: 'Details 元素策略', detailsPreserve: '保留完整內容', detailsStrictVisual: '僅保留 summary', mergeAdjacentCodeSpans: '合併相鄰程式碼區段',
+      hotkeySettings: '快捷鍵設定',
+      hotkeySettingsDesc: '設定快速複製的鍵盤操作，提升頻繁使用時的效率。',
+      enableHotkey: '啟用快捷鍵', hotkeyCombo: '快捷鍵組合', pressKey: '按下按鍵...',
+      conversionSettings: '轉換設定',
+      conversionSettingsDesc: '控制內容擷取與數學公式處理方式，影響輸出精準度。',
+      noSelectionMode: '無選取時預設模式', modePage: '整個頁面', modeArticle: '智慧文章', absoluteUrls: '使用絕對網址', ignoreNav: '忽略導覽/頁首/頁尾/側邊欄', waitMathJax: '等待 MathJax 渲染', stripIndent: '移除區塊數學的共同縮排', escapeMarkdownChars: '逸出 Markdown 特殊字元', extractShadowDOM: '擷取 Shadow DOM 內容', extractIframes: '擷取 iframe 內容（同源）',
+      markdownFormat: 'Markdown 格式',
+      markdownFormatDesc: '調整 Markdown 輸出偏好，符合你的寫作格式。',
+      listMarker: '清單符號', emphasisMarker: '斜體符號', strongMarker: '粗體符號', horizontalRule: '水平線符號',
+      captureSettings: '擷取時機設定',
+      captureSettingsDesc: '控制擷取前的等待節奏，適合動態載入頁面。',
+      waitBeforeCapture: '抽取前等待時間 (ms)', waitDomIdle: 'DOM 穩定後等待 (ms)',
+      visibilitySettings: '可見性設定',
+      visibilitySettingsDesc: '決定如何忽略隱藏內容，提升輸出純淨度。',
+      visibilityMode: '隱藏元素判斷策略', visibilityLoose: '寬鬆（display/visibility/hidden）', visibilityStrict: '嚴格（含 opacity/content-visibility/offscreen）', visibilityDom: 'DOM 優先（僅 hidden 屬性）', strictOffscreen: '啟用螢幕外元素偵測', offscreenMargin: '螢幕外邊界距離 (px)',
+      formatSettings: '格式處理設定',
+      formatSettingsDesc: '處理較複雜的排版情境，避免輸出失真。',
+      strongEmBlockStrategy: '粗體/斜體跨區塊策略', strategySplit: '拆段（推薦）', strategyHtml: 'HTML 標籤', strategyStrip: '移除格式', complexTableStrategy: '複雜表格策略', strategyList: '轉為清單', strategyTableHtml: 'HTML 表格', detailsStrategy: 'Details 元素策略', detailsPreserve: '保留完整內容', detailsStrictVisual: '僅保留 summary', mergeAdjacentCodeSpans: '合併相鄰程式碼區段',
       codeBlockSettings: '程式碼區塊設定',
+      codeBlockSettingsDesc: '在不同 AI 平台與編輯器中維持程式碼格式正確。',
       enableContentBasedLangDetection: '啟用內容推斷語言',
       enableContentBasedLangDetectionTooltip: '根據程式碼內容特徵自動推斷語言',
       lmArenaEnhancedDetection: 'LMArena 增強偵測',
       lmArenaEnhancedDetectionTooltip: '針對 LMArena.ai 的程式碼區塊結構進行特殊處理',
       aiChatPlatformDetection: 'AI 聊天平台增強偵測',
       aiChatPlatformDetectionTooltip: '針對 Claude、Grok、ChatGPT 等平台的程式碼區塊進行特殊處理',
-      advancedSettings: '進階設定', articleMinChars: '文章最少字元數', articleMinRatio: '文章最小比例', toastDuration: 'Toast 顯示時間 (ms)',
+      advancedSettings: '進階設定',
+      advancedSettingsDesc: '進一步調整抽取與診斷細節，適合進階使用者。',
+      articleMinChars: '文章最少字元數', articleMinRatio: '文章最小比例', toastDuration: 'Toast 顯示時間 (ms)',
       diagnosticLogging: '啟用診斷紀錄',
       diagnosticLoggingHint: '僅在需要偵錯時開啟，可能增加主控台輸出',
       resetSettings: '重設為預設值', saveSettings: '儲存設定', cancel: '取消', close: '關閉',
@@ -260,6 +277,7 @@
 
       // 元素選取
       elementPickerSettings: '元素選取設定',
+      elementPickerSettingsDesc: '針對指定區塊進行精準複製，避免多餘內容。',
       elementPickerEnabled: '啟用元素選取功能',
       elementPickerHotkey: '元素選取快捷鍵',
       buttonDoubleClickAction: '按鈕雙擊動作',
@@ -273,6 +291,7 @@
 
       // 預覽編輯
       previewSettings: '預覽編輯設定',
+      previewSettingsDesc: '先預覽再輸出，確保 Markdown 呈現符合期待。',
       previewEnabled: '啟用預覽編輯功能',
       previewHotkey: '預覽快捷鍵',
       previewDefaultMode: '預設模式',
@@ -303,6 +322,9 @@
       toolBold: '粗體',
       toolItalic: '斜體',
       toolCode: '程式碼',
+      toolCodeBlock: '程式碼區塊',
+      toolWrapOn: '自動換行：開',
+      toolWrapOff: '自動換行：關',
       toolLink: '連結',
       toolHeading: '標題',
       toolList: '列表',
@@ -313,6 +335,7 @@
 
       // 第三方兼容性
       thirdPartySettings: '第三方腳本兼容性',
+      thirdPartySettingsDesc: '遇到特殊網站時提供相容調整的入口。',
       thirdPartyCompatibility: '啟用第三方腳本兼容模式',
       thirdPartyCompatibilityTooltip: '自動處理其他油猴腳本可能造成的干擾',
       ignoreCollapsedCodeBlocks: '忽略折疊的程式碼區塊',
@@ -325,6 +348,7 @@
       thirdPartyNone: '未偵測到已知的第三方腳本',
 
       downloadSettings: '下載設定',
+      downloadSettingsDesc: '管理檔名、Frontmatter 與資產下載的行為。',
       downloadFilenameTemplate: '檔名模板',
       downloadFilenameHint: '可用變數：{title} {date} {time} {timestamp} {host} {path} {slug}',
       downloadAssets: '下載圖片資產',
@@ -362,25 +386,42 @@
       processing: '处理中...', copied: '已复制！', downloaded: '已下载！', failed: '失败',
       settingsTitle: 'MD+LaTeX 复制工具设置',
       settingsModeLabel: '设置模式', settingsModeSimple: '简易', settingsModeAdvanced: '高级',
-      generalSettings: '常规设置', showButton: '显示浮动按钮', buttonPosition: '按钮位置', bottomRight: '右下角', bottomLeft: '左下角', topRight: '右上角', topLeft: '左上角',
+      generalSettings: '常规设置',
+      generalSettingsDesc: '控制浮动按钮的位置、外观与界面语言，影响日常操作体验。',
+      showButton: '显示浮动按钮', buttonPosition: '按钮位置', bottomRight: '右下角', bottomLeft: '左下角', topRight: '右上角', topLeft: '左上角',
       buttonOpacity: '按钮不透明度', buttonHoverOpacity: '悬停时不透明度', buttonSize: '按钮大小',
       buttonAutoHide: '自动隐藏按钮', buttonAutoHideDelay: '离开后隐藏延迟 (ms)', buttonHiddenOpacity: '隐藏时不透明度',
       buttonClickAction: '左键点击动作', clickActionAuto: '自动（有选中复制选中，否则依默认）', clickActionSelection: '复制选中内容', clickActionArticle: '智能提取文章', clickActionPage: '复制整个页面', clickActionDownload: '下载为 .md 文件',
       theme: '主题', themeAuto: '自动', themeLight: '浅色', themeDark: '深色', language: '语言', langAuto: '自动',
-      hotkeySettings: '快捷键设置', enableHotkey: '启用快捷键', hotkeyCombo: '快捷键组合', pressKey: '按下按键...',
-      conversionSettings: '转换设置', noSelectionMode: '无选中时默认模式', modePage: '整个页面', modeArticle: '智能文章', absoluteUrls: '使用绝对网址', ignoreNav: '忽略导航/页眉/页脚/侧边栏', waitMathJax: '等待 MathJax 渲染', stripIndent: '移除块级数学的公共缩进', escapeMarkdownChars: '转义 Markdown 特殊字符', extractShadowDOM: '提取 Shadow DOM 内容', extractIframes: '提取 iframe 内容（同源）',
-      markdownFormat: 'Markdown 格式', listMarker: '列表符号', emphasisMarker: '斜体符号', strongMarker: '粗体符号', horizontalRule: '水平线符号',
-      captureSettings: '抓取时机设置', waitBeforeCapture: '抓取前等待时间 (ms)', waitDomIdle: 'DOM 稳定后等待 (ms)',
-      visibilitySettings: '可见性设置', visibilityMode: '隐藏元素判断策略', visibilityLoose: '宽松（display/visibility/hidden）', visibilityStrict: '严格（含 opacity/content-visibility/offscreen）', visibilityDom: 'DOM 优先（仅 hidden 属性）', strictOffscreen: '启用屏幕外元素检测', offscreenMargin: '屏幕外边界距离 (px)',
-      formatSettings: '格式处理设置', strongEmBlockStrategy: '粗体/斜体跨区块策略', strategySplit: '拆段（推荐）', strategyHtml: 'HTML 标签', strategyStrip: '移除格式', complexTableStrategy: '复杂表格策略', strategyList: '转为列表', strategyTableHtml: 'HTML 表格', detailsStrategy: 'Details 元素策略', detailsPreserve: '保留完整内容', detailsStrictVisual: '仅保留 summary', mergeAdjacentCodeSpans: '合并相邻代码区段',
+      hotkeySettings: '快捷键设置',
+      hotkeySettingsDesc: '设置快速复制的键盘操作，提升频繁使用时的效率。',
+      enableHotkey: '启用快捷键', hotkeyCombo: '快捷键组合', pressKey: '按下按键...',
+      conversionSettings: '转换设置',
+      conversionSettingsDesc: '控制内容提取与数学公式处理方式，影响输出准确度。',
+      noSelectionMode: '无选中时默认模式', modePage: '整个页面', modeArticle: '智能文章', absoluteUrls: '使用绝对网址', ignoreNav: '忽略导航/页眉/页脚/侧边栏', waitMathJax: '等待 MathJax 渲染', stripIndent: '移除块级数学的公共缩进', escapeMarkdownChars: '转义 Markdown 特殊字符', extractShadowDOM: '提取 Shadow DOM 内容', extractIframes: '提取 iframe 内容（同源）',
+      markdownFormat: 'Markdown 格式',
+      markdownFormatDesc: '调整 Markdown 输出偏好，符合你的写作格式。',
+      listMarker: '列表符号', emphasisMarker: '斜体符号', strongMarker: '粗体符号', horizontalRule: '水平线符号',
+      captureSettings: '抓取时机设置',
+      captureSettingsDesc: '控制提取前的等待节奏，适合动态加载页面。',
+      waitBeforeCapture: '抓取前等待时间 (ms)', waitDomIdle: 'DOM 稳定后等待 (ms)',
+      visibilitySettings: '可见性设置',
+      visibilitySettingsDesc: '决定如何忽略隐藏内容，提升输出纯净度。',
+      visibilityMode: '隐藏元素判断策略', visibilityLoose: '宽松（display/visibility/hidden）', visibilityStrict: '严格（含 opacity/content-visibility/offscreen）', visibilityDom: 'DOM 优先（仅 hidden 属性）', strictOffscreen: '启用屏幕外元素检测', offscreenMargin: '屏幕外边界距离 (px)',
+      formatSettings: '格式处理设置',
+      formatSettingsDesc: '处理较复杂的排版情境，避免输出失真。',
+      strongEmBlockStrategy: '粗体/斜体跨区块策略', strategySplit: '拆段（推荐）', strategyHtml: 'HTML 标签', strategyStrip: '移除格式', complexTableStrategy: '复杂表格策略', strategyList: '转为列表', strategyTableHtml: 'HTML 表格', detailsStrategy: 'Details 元素策略', detailsPreserve: '保留完整内容', detailsStrictVisual: '仅保留 summary', mergeAdjacentCodeSpans: '合并相邻代码区段',
       codeBlockSettings: '代码区块设置',
+      codeBlockSettingsDesc: '在不同 AI 平台与编辑器中保持代码格式正确。',
       enableContentBasedLangDetection: '启用内容推断语言',
       enableContentBasedLangDetectionTooltip: '根据代码内容特征自动推断语言',
       lmArenaEnhancedDetection: 'LMArena 增强检测',
       lmArenaEnhancedDetectionTooltip: '针对 LMArena.ai 的代码区块结构进行特殊处理',
       aiChatPlatformDetection: 'AI 聊天平台增强检测',
       aiChatPlatformDetectionTooltip: '针对 Claude、Grok、ChatGPT 等平台的代码区块进行特殊处理',
-      advancedSettings: '高级设置', articleMinChars: '文章最少字符数', articleMinRatio: '文章最小比例', toastDuration: 'Toast 显示时间 (ms)',
+      advancedSettings: '高级设置',
+      advancedSettingsDesc: '进一步调整提取与诊断细节，适合高级用户。',
+      articleMinChars: '文章最少字符数', articleMinRatio: '文章最小比例', toastDuration: 'Toast 显示时间 (ms)',
       diagnosticLogging: '启用诊断记录',
       diagnosticLoggingHint: '仅在需要调试时开启，可能增加控制台输出',
       resetSettings: '重置为默认值', saveSettings: '保存设置', cancel: '取消', close: '关闭',
@@ -416,6 +457,7 @@
       articleExtractionReadability: 'Readability（可选）',
       articleExtractionAuto: '自动（非 AI 聊天平台优先 Readability）',
       elementPickerSettings: '元素选取设置',
+      elementPickerSettingsDesc: '针对指定区块进行精准复制，避免多余内容。',
       elementPickerEnabled: '启用元素选取功能',
       elementPickerHotkey: '元素选取快捷键',
       buttonDoubleClickAction: '按钮双击动作',
@@ -427,6 +469,7 @@
       pickerCopied: '已复制选取元素',
       modeElement: '元素',
       previewSettings: '预览编辑设置',
+      previewSettingsDesc: '先预览再输出，确保 Markdown 呈现符合期待。',
       previewEnabled: '启用预览编辑功能',
       previewHotkey: '预览快捷键',
       previewDefaultMode: '默认模式',
@@ -456,6 +499,9 @@
       toolBold: '粗体',
       toolItalic: '斜体',
       toolCode: '代码',
+      toolCodeBlock: '代码区块',
+      toolWrapOn: '自动换行：开',
+      toolWrapOff: '自动换行：关',
       toolLink: '链接',
       toolHeading: '标题',
       toolList: '列表',
@@ -464,6 +510,7 @@
       pickerExit: '退出选取',
       pickerExitHint: '点击退出或按 ESC',
       thirdPartySettings: '第三方脚本兼容性',
+      thirdPartySettingsDesc: '遇到特殊网站时提供兼容调整入口。',
       thirdPartyCompatibility: '启用第三方脚本兼容模式',
       thirdPartyCompatibilityTooltip: '自动处理其他油猴脚本可能造成的干扰',
       ignoreCollapsedCodeBlocks: '忽略折叠的代码区块',
@@ -476,6 +523,7 @@
       thirdPartyNone: '未检测到已知的第三方脚本',
 
       downloadSettings: '下载设置',
+      downloadSettingsDesc: '管理文件名、Frontmatter 与资源下载行为。',
       downloadFilenameTemplate: '文件名模板',
       downloadFilenameHint: '可用变量：{title} {date} {time} {timestamp} {host} {path} {slug}',
       downloadAssets: '下载图片资源',
@@ -513,25 +561,42 @@
       processing: 'Processing...', copied: 'Copied!', downloaded: 'Downloaded!', failed: 'Failed',
       settingsTitle: 'MD+LaTeX Copy Tool Settings',
       settingsModeLabel: 'Settings Mode', settingsModeSimple: 'Simple', settingsModeAdvanced: 'Advanced',
-      generalSettings: 'General Settings', showButton: 'Show Floating Button', buttonPosition: 'Button Position', bottomRight: 'Bottom Right', bottomLeft: 'Bottom Left', topRight: 'Top Right', topLeft: 'Top Left',
+      generalSettings: 'General Settings',
+      generalSettingsDesc: 'Control button placement, appearance, and language for everyday use.',
+      showButton: 'Show Floating Button', buttonPosition: 'Button Position', bottomRight: 'Bottom Right', bottomLeft: 'Bottom Left', topRight: 'Top Right', topLeft: 'Top Left',
       buttonOpacity: 'Button Opacity', buttonHoverOpacity: 'Hover Opacity', buttonSize: 'Button Size',
       buttonAutoHide: 'Auto-hide Button', buttonAutoHideDelay: 'Hide Delay After Leave (ms)', buttonHiddenOpacity: 'Hidden Opacity',
       buttonClickAction: 'Left-click Action', clickActionAuto: 'Auto (copy selection if any, else default)', clickActionSelection: 'Copy Selection', clickActionArticle: 'Smart Article', clickActionPage: 'Copy Entire Page', clickActionDownload: 'Download as .md',
       theme: 'Theme', themeAuto: 'Auto', themeLight: 'Light', themeDark: 'Dark', language: 'Language', langAuto: 'Auto',
-      hotkeySettings: 'Hotkey Settings', enableHotkey: 'Enable Hotkey', hotkeyCombo: 'Hotkey Combination', pressKey: 'Press a key...',
-      conversionSettings: 'Conversion Settings', noSelectionMode: 'Default Mode (No Selection)', modePage: 'Entire Page', modeArticle: 'Smart Article', absoluteUrls: 'Use Absolute URLs', ignoreNav: 'Ignore Nav/Header/Footer/Aside', waitMathJax: 'Wait for MathJax', stripIndent: 'Strip Common Indent in Block Math', escapeMarkdownChars: 'Escape Markdown special characters', extractShadowDOM: 'Extract Shadow DOM content', extractIframes: 'Extract iframe content (same-origin)',
-      markdownFormat: 'Markdown Format', listMarker: 'List Marker', emphasisMarker: 'Emphasis Marker', strongMarker: 'Strong Marker', horizontalRule: 'Horizontal Rule',
-      captureSettings: 'Capture Timing Settings', waitBeforeCapture: 'Wait before capture (ms)', waitDomIdle: 'Wait after DOM idle (ms)',
-      visibilitySettings: 'Visibility Settings', visibilityMode: 'Hidden Element Strategy', visibilityLoose: 'Loose (display/visibility/hidden)', visibilityStrict: 'Strict (incl. opacity/content-visibility/offscreen)', visibilityDom: 'DOM Only (hidden attribute only)', strictOffscreen: 'Enable offscreen element detection', offscreenMargin: 'Offscreen margin (px)',
-      formatSettings: 'Format Processing Settings', strongEmBlockStrategy: 'Bold/Italic Block Strategy', strategySplit: 'Split (recommended)', strategyHtml: 'HTML Tags', strategyStrip: 'Strip formatting', complexTableStrategy: 'Complex Table Strategy', strategyList: 'Convert to list', strategyTableHtml: 'HTML table', detailsStrategy: 'Details Element Strategy', detailsPreserve: 'Preserve full content', detailsStrictVisual: 'Keep summary only', mergeAdjacentCodeSpans: 'Merge adjacent code spans',
+      hotkeySettings: 'Hotkey Settings',
+      hotkeySettingsDesc: 'Set up quick copy shortcuts for faster daily workflows.',
+      enableHotkey: 'Enable Hotkey', hotkeyCombo: 'Hotkey Combination', pressKey: 'Press a key...',
+      conversionSettings: 'Conversion Settings',
+      conversionSettingsDesc: 'Control extraction and math handling to improve output accuracy.',
+      noSelectionMode: 'Default Mode (No Selection)', modePage: 'Entire Page', modeArticle: 'Smart Article', absoluteUrls: 'Use Absolute URLs', ignoreNav: 'Ignore Nav/Header/Footer/Aside', waitMathJax: 'Wait for MathJax', stripIndent: 'Strip Common Indent in Block Math', escapeMarkdownChars: 'Escape Markdown special characters', extractShadowDOM: 'Extract Shadow DOM content', extractIframes: 'Extract iframe content (same-origin)',
+      markdownFormat: 'Markdown Format',
+      markdownFormatDesc: 'Adjust Markdown output preferences to match your writing style.',
+      listMarker: 'List Marker', emphasisMarker: 'Emphasis Marker', strongMarker: 'Strong Marker', horizontalRule: 'Horizontal Rule',
+      captureSettings: 'Capture Timing Settings',
+      captureSettingsDesc: 'Tune capture timing for dynamic, late-loading pages.',
+      waitBeforeCapture: 'Wait before capture (ms)', waitDomIdle: 'Wait after DOM idle (ms)',
+      visibilitySettings: 'Visibility Settings',
+      visibilitySettingsDesc: 'Decide how hidden content should be filtered from output.',
+      visibilityMode: 'Hidden Element Strategy', visibilityLoose: 'Loose (display/visibility/hidden)', visibilityStrict: 'Strict (incl. opacity/content-visibility/offscreen)', visibilityDom: 'DOM Only (hidden attribute only)', strictOffscreen: 'Enable offscreen element detection', offscreenMargin: 'Offscreen margin (px)',
+      formatSettings: 'Format Processing Settings',
+      formatSettingsDesc: 'Handle complex layout cases to avoid distorted output.',
+      strongEmBlockStrategy: 'Bold/Italic Block Strategy', strategySplit: 'Split (recommended)', strategyHtml: 'HTML Tags', strategyStrip: 'Strip formatting', complexTableStrategy: 'Complex Table Strategy', strategyList: 'Convert to list', strategyTableHtml: 'HTML table', detailsStrategy: 'Details Element Strategy', detailsPreserve: 'Preserve full content', detailsStrictVisual: 'Keep summary only', mergeAdjacentCodeSpans: 'Merge adjacent code spans',
       codeBlockSettings: 'Code Block Settings',
+      codeBlockSettingsDesc: 'Keep code formatting consistent across AI platforms.',
       enableContentBasedLangDetection: 'Enable content-based language inference',
       enableContentBasedLangDetectionTooltip: 'Automatically infer language from code content patterns',
       lmArenaEnhancedDetection: 'LMArena enhanced detection',
       lmArenaEnhancedDetectionTooltip: 'Special handling for LMArena.ai code block structures',
       aiChatPlatformDetection: 'AI chat platform detection',
       aiChatPlatformDetectionTooltip: 'Special handling for Claude, Grok, ChatGPT and other AI chat platforms',
-      advancedSettings: 'Advanced Settings', articleMinChars: 'Article Minimum Characters', articleMinRatio: 'Article Minimum Ratio', toastDuration: 'Toast Duration (ms)',
+      advancedSettings: 'Advanced Settings',
+      advancedSettingsDesc: 'Fine-tune extraction and diagnostics for power users.',
+      articleMinChars: 'Article Minimum Characters', articleMinRatio: 'Article Minimum Ratio', toastDuration: 'Toast Duration (ms)',
       diagnosticLogging: 'Enable Diagnostic Logging',
       diagnosticLoggingHint: 'Enable only for debugging; may increase console output',
       resetSettings: 'Reset to Defaults', saveSettings: 'Save Settings', cancel: 'Cancel', close: 'Close',
@@ -567,6 +632,7 @@
       articleExtractionReadability: 'Readability (optional)',
       articleExtractionAuto: 'Auto (prefer Readability on non-AI chat sites)',
       elementPickerSettings: 'Element Picker Settings',
+      elementPickerSettingsDesc: 'Target specific blocks for precise copying.',
       elementPickerEnabled: 'Enable Element Picker',
       elementPickerHotkey: 'Element Picker Hotkey',
       buttonDoubleClickAction: 'Button Double-click Action',
@@ -578,6 +644,7 @@
       pickerCopied: 'Selected element copied',
       modeElement: 'Element',
       previewSettings: 'Preview & Edit Settings',
+      previewSettingsDesc: 'Preview output before exporting to confirm formatting.',
       previewEnabled: 'Enable Preview & Edit',
       previewHotkey: 'Preview Hotkey',
       previewDefaultMode: 'Default Mode',
@@ -607,6 +674,9 @@
       toolBold: 'Bold',
       toolItalic: 'Italic',
       toolCode: 'Code',
+      toolCodeBlock: 'Code Block',
+      toolWrapOn: 'Wrap: On',
+      toolWrapOff: 'Wrap: Off',
       toolLink: 'Link',
       toolHeading: 'Heading',
       toolList: 'List',
@@ -615,6 +685,7 @@
       pickerExit: 'Exit Picker',
       pickerExitHint: 'Click to exit or press ESC',
       thirdPartySettings: 'Third-Party Compatibility',
+      thirdPartySettingsDesc: 'Compatibility tweaks for problematic sites or scripts.',
       thirdPartyCompatibility: 'Enable third-party script compatibility',
       thirdPartyCompatibilityTooltip: 'Handle interference from other userscripts',
       ignoreCollapsedCodeBlocks: 'Ignore collapsed code blocks',
@@ -627,6 +698,7 @@
       thirdPartyNone: 'No known third-party scripts detected',
 
       downloadSettings: 'Download Settings',
+      downloadSettingsDesc: 'Manage filenames, Frontmatter, and asset downloads.',
       downloadFilenameTemplate: 'Filename Template',
       downloadFilenameHint: 'Available variables: {title} {date} {time} {timestamp} {host} {path} {slug}',
       downloadAssets: 'Download image assets',
@@ -749,6 +821,8 @@
     bold: 'M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6zM6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z',
     italic: 'M19 4h-9m4 16H5m9-16l-4 16',
     code: 'M16 18l6-6-6-6M8 6l-6 6 6 6',
+    codeBlock: 'M4 5h16v14H4zM7 9h10M7 12h10M7 15h6',
+    wrapText: 'M4 6h12a3 3 0 0 1 0 6H8m0 0l-3-3m3 3l-3 3M4 18h8',
     link: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71',
     heading: 'M6 4v16M18 4v16M6 12h12',
     list: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
@@ -893,6 +967,7 @@
 .mdltx-section.hidden{display:none}
 .mdltx-section-title{font-size:12px;font-weight:700;color:var(--mdltx-text-secondary);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--mdltx-border-subtle);display:flex;align-items:center;gap:8px}
 .mdltx-section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--mdltx-primary);border-radius:2px;flex-shrink:0}
+.mdltx-section-desc{margin:-4px 0 14px;font-size:12px;line-height:1.6;color:var(--mdltx-text-secondary)}
 .mdltx-field{margin-bottom:16px}
 .mdltx-field:last-child{margin-bottom:0}
 .mdltx-field.hidden{display:none}
@@ -1009,6 +1084,13 @@
 .mdltx-toolbar-btn:active{transform:scale(0.95)}
 .mdltx-toolbar-btn.active{background:var(--mdltx-primary);color:#fff}
 .mdltx-toolbar-btn svg{width:16px;height:16px}
+.mdltx-editor-btn{width:auto;height:auto;padding:6px 10px;gap:6px;border:1px solid transparent;border-radius:8px;background:var(--mdltx-bg);font-size:12px;font-weight:600;color:var(--mdltx-text-secondary)}
+.mdltx-editor-btn:hover{background:var(--mdltx-bg-elevated);border-color:var(--mdltx-border)}
+.mdltx-editor-btn.active{background:var(--mdltx-primary);color:#fff;border-color:transparent}
+.mdltx-editor-btn .mdltx-editor-btn-label{white-space:nowrap}
+.mdltx-editor-btn .mdltx-editor-btn-shortcut{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--mdltx-border);color:var(--mdltx-text-secondary);background:var(--mdltx-bg-secondary)}
+.mdltx-editor-btn.active .mdltx-editor-btn-shortcut{border-color:rgba(255,255,255,0.6);color:#fff;background:rgba(255,255,255,0.2)}
+.mdltx-preview-modal.wrap-off .mdltx-preview-editor{white-space:pre;overflow:auto}
 .mdltx-preview-view-toggle{display:flex;background:var(--mdltx-bg-secondary);border-radius:6px;padding:2px;margin-left:auto}
 .mdltx-preview-view-btn{padding:4px 10px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:12px;cursor:pointer;border-radius:4px;transition:all 0.15s ease;display:flex;align-items:center;gap:4px}
 .mdltx-preview-view-btn:hover{color:var(--mdltx-text)}
@@ -1783,8 +1865,10 @@
       this.content = '';
       this.mode = 'preview'; // 'preview' | 'edit' | 'split'
       this.isFullscreen = false;
+      this.isWrapEnabled = true;
       this._focusTrap = null;
       this._editorRef = null;
+      this._wrapBtn = null;
     }
 
     async show(markdown, options = {}) {
@@ -1793,6 +1877,7 @@
       this.options = options;
       this.mode = S.get('previewSplitView') ? 'split' : (S.get('previewDefaultMode') || 'preview');
       this.isFullscreen = false;
+      this.ui.lockScroll();
       this._createModal();
 
       // 更新標題顯示
@@ -1879,6 +1964,7 @@
       if (this._focusTrap) { this._focusTrap.deactivate(); this._focusTrap = null; }
       this.modal.classList.remove('open');
       this._originalContent = undefined;
+      this.ui.unlockScroll();
       setTimeout(() => { this.modal?.remove(); this.modal = null; }, 200);
     }
 
@@ -1908,6 +1994,9 @@
               createIcon('eye', 14), document.createTextNode(' ' + t('previewModePreview'))
             ]),
           ]),
+          // 快速操作
+          createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-copy-btn-header', title: t('previewCopyBtn') }, [createIcon('copy', 16)]),
+          createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-download-btn-header', title: t('previewDownloadBtn') }, [createIcon('download', 16)]),
           // 全螢幕按鈕
           createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-fullscreen-btn', title: t('previewFullscreen') }, [createIcon('maximize', 18)]),
           // 關閉按鈕
@@ -1918,9 +2007,10 @@
       // 編輯工具列
       const toolbar = createElement('div', { className: 'mdltx-preview-toolbar', id: 'mdltx-preview-toolbar' }, [
         createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
-          this._createToolBtn('bold', t('toolBold'), () => this._insertFormat('**', '**')),
-          this._createToolBtn('italic', t('toolItalic'), () => this._insertFormat('*', '*')),
-          this._createToolBtn('code', t('toolCode'), () => this._insertFormat('`', '`')),
+          this._createToolBtn('bold', t('toolBold'), () => this._insertFormat('**', '**'), { shortcut: '⌘/Ctrl+B' }),
+          this._createToolBtn('italic', t('toolItalic'), () => this._insertFormat('*', '*'), { shortcut: '⌘/Ctrl+I' }),
+          this._createToolBtn('code', t('toolCode'), () => this._insertFormat('`', '`'), { shortcut: '⌘/Ctrl+`' }),
+          this._createToolBtn('codeBlock', t('toolCodeBlock'), () => this._insertCodeBlock()),
         ]),
         createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
           this._createToolBtn('heading', t('toolHeading'), () => this._insertPrefix('## ')),
@@ -1928,8 +2018,12 @@
           this._createToolBtn('quote', t('toolQuote'), () => this._insertPrefix('> ')),
         ]),
         createElement('div', { className: 'mdltx-preview-toolbar-group' }, [
-          this._createToolBtn('link', t('toolLink'), () => this._insertFormat('[', '](url)')),
+          this._createToolBtn('link', t('toolLink'), () => this._insertFormat('[', '](url)'), { shortcut: '⌘/Ctrl+K' }),
           this._createToolBtn('minus', t('toolHr'), () => this._insertBlock('\n\n---\n\n')),
+          (() => {
+            this._wrapBtn = this._createToolBtn('wrapText', t(this.isWrapEnabled ? 'toolWrapOn' : 'toolWrapOff'), () => this._toggleWrap(), { isToggle: true, pressed: this.isWrapEnabled });
+            return this._wrapBtn;
+          })(),
         ]),
       ]);
 
@@ -1958,8 +2052,21 @@
       this.modal = overlay;
     }
 
-    _createToolBtn(icon, title, onClick) {
-      const btn = createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', title }, [createIcon(icon, 16)]);
+    _createToolBtn(icon, title, onClick, options = {}) {
+      const shortcut = options.shortcut || '';
+      const isToggle = options.isToggle || false;
+      const pressed = options.pressed || false;
+      const attrs = {
+        className: `mdltx-toolbar-btn mdltx-editor-btn${pressed ? ' active' : ''}`,
+        type: 'button',
+        title: shortcut ? `${title} (${shortcut})` : title,
+      };
+      if (isToggle) attrs['aria-pressed'] = String(pressed);
+      const btn = createElement('button', attrs, [
+        createIcon(icon, 16),
+        createElement('span', { className: 'mdltx-editor-btn-label', textContent: title }),
+        ...(shortcut ? [createElement('span', { className: 'mdltx-editor-btn-shortcut', textContent: shortcut })] : [])
+      ]);
       btn.addEventListener('click', onClick);
       return btn;
     }
@@ -1987,7 +2094,9 @@
 
       // 複製/下載
       this.modal.querySelector('#preview-copy-btn')?.addEventListener('click', () => this._handleCopy());
+      this.modal.querySelector('#preview-copy-btn-header')?.addEventListener('click', () => this._handleCopy());
       this.modal.querySelector('#preview-download-btn')?.addEventListener('click', () => this._handleDownload());
+      this.modal.querySelector('#preview-download-btn-header')?.addEventListener('click', () => this._handleDownload());
     }
 
     _updateViewState() {
@@ -1998,6 +2107,7 @@
       if (modalEl) {
         modalEl.classList.toggle('split-view', this.mode === 'split');
       }
+      this._updateWrapButton();
       // 工具列顯示/隱藏
       const toolbar = this.modal?.querySelector('#mdltx-preview-toolbar');
       if (toolbar) {
@@ -2019,6 +2129,29 @@
       }
     }
 
+    _applyWrapState(textarea) {
+      const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
+      if (modalEl) modalEl.classList.toggle('wrap-off', !this.isWrapEnabled);
+      if (textarea) textarea.wrap = this.isWrapEnabled ? 'soft' : 'off';
+      this._updateWrapButton();
+    }
+
+    _toggleWrap() {
+      this.isWrapEnabled = !this.isWrapEnabled;
+      if (this._editorRef) this._applyWrapState(this._editorRef);
+      else this._updateWrapButton();
+    }
+
+    _updateWrapButton() {
+      if (!this._wrapBtn) return;
+      const label = t(this.isWrapEnabled ? 'toolWrapOn' : 'toolWrapOff');
+      const labelEl = this._wrapBtn.querySelector('.mdltx-editor-btn-label');
+      if (labelEl) labelEl.textContent = label;
+      this._wrapBtn.classList.toggle('active', this.isWrapEnabled);
+      this._wrapBtn.setAttribute('aria-pressed', String(this.isWrapEnabled));
+      this._wrapBtn.title = label;
+    }
+
     _updateView() {
       const container = this.modal?.querySelector('#mdltx-preview-content');
       if (!container) return;
@@ -2036,6 +2169,7 @@
         textarea.value = this.content;
         textarea.style.fontSize = fontSize;
         textarea.style.minHeight = maxH;
+        this._applyWrapState(textarea);
         textarea.addEventListener('input', () => { this.content = textarea.value; this._updateStats(); });
         container.appendChild(textarea);
         this._editorRef = textarea;
@@ -2056,6 +2190,7 @@
         const textarea = createElement('textarea', { className: 'mdltx-preview-editor', id: 'mdltx-preview-editor', spellcheck: 'false' });
         textarea.value = this.content;
         textarea.style.fontSize = fontSize;
+        this._applyWrapState(textarea);
         textarea.addEventListener('input', () => {
           this.content = textarea.value;
           this._updateStats();
@@ -2302,6 +2437,31 @@
         editor.focus();
         editor.setSelectionRange(newPos, newPos);
         this._scrollToCursor(editor, newPos);
+      });
+
+      this._updateStats();
+      if (this.mode === 'split') this._updatePreviewPane();
+    }
+
+    _insertCodeBlock() {
+      const editor = this._editorRef;
+      if (!editor) return;
+
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      const selected = this.content.substring(start, end);
+      const block = `\n\n\`\`\`\n${selected}\n\`\`\`\n\n`;
+
+      this.content = this.content.substring(0, start) + block + this.content.substring(end);
+      editor.value = this.content;
+
+      const blockStart = start + 6;
+      const blockEnd = blockStart + selected.length;
+
+      requestAnimationFrame(() => {
+        editor.focus();
+        editor.setSelectionRange(blockStart, blockEnd);
+        this._scrollToCursor(editor, blockStart);
       });
 
       this._updateStats();
@@ -2697,6 +2857,7 @@
       this._clickTimer = null;
       this._buttonWidth = 0; this._buttonHeight = 0;
       this._focusTrap = null; this._prevBodyOverflow = '';
+      this._scrollLock = null; this._scrollLockCount = 0;
       this._tm = new TimeoutManager();
       this._autoHideTimeoutId = null; this._isButtonHidden = false; this._isMouseOverButton = false;
       this._tooltipShowTimeoutId = null;
@@ -2727,6 +2888,50 @@
     _setupSelectionListener() {
       this._handlers.selChange = () => { if (this.menuOpen) this._updateMenuSelState(); };
       document.addEventListener('selectionchange', this._handlers.selChange);
+    }
+
+    lockScroll() {
+      this._scrollLockCount += 1;
+      if (this._scrollLockCount > 1) return;
+      const docEl = document.documentElement;
+      const body = document.body;
+      this._scrollLock = {
+        scrollX: window.scrollX || window.pageXOffset || 0,
+        scrollY: window.scrollY || window.pageYOffset || 0,
+        body: {
+          overflow: body.style.overflow,
+          position: body.style.position,
+          top: body.style.top,
+          left: body.style.left,
+          width: body.style.width,
+        },
+        doc: {
+          overflow: docEl.style.overflow,
+        },
+      };
+      docEl.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      body.style.position = 'fixed';
+      body.style.top = `-${this._scrollLock.scrollY}px`;
+      body.style.left = `-${this._scrollLock.scrollX}px`;
+      body.style.width = '100%';
+    }
+
+    unlockScroll() {
+      if (this._scrollLockCount === 0) return;
+      this._scrollLockCount -= 1;
+      if (this._scrollLockCount > 0) return;
+      if (!this._scrollLock) return;
+      const docEl = document.documentElement;
+      const body = document.body;
+      body.style.overflow = this._scrollLock.body.overflow;
+      body.style.position = this._scrollLock.body.position;
+      body.style.top = this._scrollLock.body.top;
+      body.style.left = this._scrollLock.body.left;
+      body.style.width = this._scrollLock.body.width;
+      docEl.style.overflow = this._scrollLock.doc.overflow;
+      window.scrollTo(this._scrollLock.scrollX, this._scrollLock.scrollY);
+      this._scrollLock = null;
     }
 
     _startAutoHideTimer() {
@@ -3042,8 +3247,7 @@
     showSettings() {
       this.hideMenu(false);
       if (this.modal) { this.modal.remove(); this.modal = null; }
-      this._prevBodyOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
+      this.lockScroll();
       const settings = S.getAll(), isAdvanced = settings.settingsMode === 'advanced';
 
       const mkCheck = (id, label, checked, advanced = false) => {
@@ -3093,7 +3297,12 @@
       };
 
       const mkSection = (title, advanced = false, ...fields) => {
-        const section = createElement('div', { className: `mdltx-section${advanced ? ' hidden' : ''}` }, [createElement('div', { className: 'mdltx-section-title', textContent: title }), ...fields]);
+        let desc = '';
+        if (typeof fields[0] === 'string') desc = fields.shift();
+        const sectionChildren = [createElement('div', { className: 'mdltx-section-title', textContent: title })];
+        if (desc) sectionChildren.push(createElement('div', { className: 'mdltx-section-desc', textContent: desc }));
+        sectionChildren.push(...fields);
+        const section = createElement('div', { className: `mdltx-section${advanced ? ' hidden' : ''}` }, sectionChildren);
         if (advanced) section.setAttribute('data-advanced', '1');
         return section;
       };
@@ -3129,7 +3338,7 @@
 
       const body = createElement('div', { className: 'mdltx-modal-body' }, [
         modeToggle,
-        mkSection(t('generalSettings'), false,
+        mkSection(t('generalSettings'), false, t('generalSettingsDesc'),
           mkCheck('setting-showButton', t('showButton'), settings.showButton),
           mkSelect('setting-buttonPosition', t('buttonPosition'), [{ value: 'bottom-right', label: t('bottomRight') }, { value: 'bottom-left', label: t('bottomLeft') }, { value: 'top-right', label: t('topRight') }, { value: 'top-left', label: t('topLeft') }], settings.buttonPosition),
           mkRange('setting-buttonSize', t('buttonSize'), settings.buttonSize, 28, 64, 2, v => `${v}px`),
@@ -3141,8 +3350,8 @@
           mkSelect('setting-theme', t('theme'), [{ value: 'auto', label: t('themeAuto') }, { value: 'light', label: t('themeLight') }, { value: 'dark', label: t('themeDark') }], settings.theme),
           mkSelect('setting-language', t('language'), [{ value: 'auto', label: t('langAuto') }, { value: 'zh-TW', label: '繁體中文' }, { value: 'zh-CN', label: '简体中文' }, { value: 'en', label: 'English' }], settings.language)
         ),
-        mkSection(t('hotkeySettings'), false, mkCheck('setting-hotkeyEnabled', t('enableHotkey'), settings.hotkeyEnabled), hotkeyField),
-        mkSection(t('conversionSettings'), false,
+        mkSection(t('hotkeySettings'), false, t('hotkeySettingsDesc'), mkCheck('setting-hotkeyEnabled', t('enableHotkey'), settings.hotkeyEnabled), hotkeyField),
+        mkSection(t('conversionSettings'), false, t('conversionSettingsDesc'),
           mkSelect('setting-noSelectionMode', t('noSelectionMode'), [{ value: 'page', label: t('modePage') }, { value: 'article', label: t('modeArticle') }], settings.noSelectionMode),
           mkSelect('setting-articleExtractionMode', t('articleExtractionMode'), [
             { value: 'heuristic', label: t('articleExtractionHeuristic') },
@@ -3157,43 +3366,43 @@
           mkCheck('setting-extractShadowDOM', t('extractShadowDOM'), settings.extractShadowDOM, true),
           mkCheck('setting-extractIframes', t('extractIframes'), settings.extractIframes, true)
         ),
-        mkSection(t('markdownFormat'), true,
+        mkSection(t('markdownFormat'), true, t('markdownFormatDesc'),
           mkSelect('setting-listMarker', t('listMarker'), [{ value: '-', label: '- (dash)' }, { value: '*', label: '* (asterisk)' }, { value: '+', label: '+ (plus)' }], settings.listMarker),
           mkSelect('setting-emphasisMarker', t('emphasisMarker'), [{ value: '*', label: '*text*' }, { value: '_', label: '_text_' }], settings.emphasisMarker),
           mkSelect('setting-strongMarker', t('strongMarker'), [{ value: '**', label: '**text**' }, { value: '__', label: '__text__' }], settings.strongMarker),
           mkSelect('setting-horizontalRule', t('horizontalRule'), [{ value: '---', label: '---' }, { value: '***', label: '***' }, { value: '___', label: '___' }], settings.horizontalRule)
         ),
-        mkSection(t('codeBlockSettings'), true,
+        mkSection(t('codeBlockSettings'), true, t('codeBlockSettingsDesc'),
           (() => { const f = mkCheck('setting-enableContentBasedLangDetection', t('enableContentBasedLangDetection'), settings.enableContentBasedLangDetection, true); f.querySelector('label')?.setAttribute('title', t('enableContentBasedLangDetectionTooltip')); return f; })(),
           (() => { const f = mkCheck('setting-lmArenaEnhancedDetection', t('lmArenaEnhancedDetection'), settings.lmArenaEnhancedDetection, true); f.querySelector('label')?.setAttribute('title', t('lmArenaEnhancedDetectionTooltip')); return f; })(),
           (() => { const f = mkCheck('setting-aiChatPlatformDetection', t('aiChatPlatformDetection'), settings.aiChatPlatformDetection, true); f.querySelector('label')?.setAttribute('title', t('aiChatPlatformDetectionTooltip')); return f; })()
         ),
-        mkSection(t('captureSettings'), true,
+        mkSection(t('captureSettings'), true, t('captureSettingsDesc'),
           mkNum('setting-waitBeforeCaptureMs', t('waitBeforeCapture'), settings.waitBeforeCaptureMs, 0, 30000, 100),
           mkNum('setting-waitDomIdleMs', t('waitDomIdle'), settings.waitDomIdleMs, 0, 5000, 100)
         ),
-        mkSection(t('formatSettings'), true,
+        mkSection(t('formatSettings'), true, t('formatSettingsDesc'),
           mkSelect('setting-strongEmBlockStrategy', t('strongEmBlockStrategy'), [{ value: 'split', label: t('strategySplit') }, { value: 'html', label: t('strategyHtml') }, { value: 'strip', label: t('strategyStrip') }], settings.strongEmBlockStrategy),
           mkSelect('setting-complexTableStrategy', t('complexTableStrategy'), [{ value: 'list', label: t('strategyList') }, { value: 'html', label: t('strategyTableHtml') }], settings.complexTableStrategy),
           mkSelect('setting-detailsStrategy', t('detailsStrategy'), [{ value: 'preserve', label: t('detailsPreserve') }, { value: 'strict-visual', label: t('detailsStrictVisual') }], settings.detailsStrategy),
           mkSelect('setting-unknownEmptyTagStrategy', t('unknownEmptyTagStrategy'), [{ value: 'literal', label: 'Literal (<tag>)' }, { value: 'drop', label: 'Drop' }], settings.unknownEmptyTagStrategy),
           mkCheck('setting-mergeAdjacentCodeSpans', t('mergeAdjacentCodeSpans'), settings.mergeAdjacentCodeSpans)
         ),
-        mkSection(t('visibilitySettings'), true,
+        mkSection(t('visibilitySettings'), true, t('visibilitySettingsDesc'),
           mkSelect('setting-visibilityMode', t('visibilityMode'), [{ value: 'loose', label: t('visibilityLoose') }, { value: 'strict', label: t('visibilityStrict') }, { value: 'dom', label: t('visibilityDom') }], settings.visibilityMode),
           mkNum('setting-hiddenScanMaxElements', t('hiddenScanMaxElements'), settings.hiddenScanMaxElements, 100, 50000, 100),
           mkCheck('setting-hiddenUntilFoundVisible', t('hiddenUntilFoundVisible'), settings.hiddenUntilFoundVisible),
           mkCheck('setting-strictOffscreen', t('strictOffscreen'), settings.strictOffscreen),
           offscreenCond
         ),
-        mkSection(t('advancedSettings'), true,
+        mkSection(t('advancedSettings'), true, t('advancedSettingsDesc'),
           mkNum('setting-articleMinChars', t('articleMinChars'), settings.articleMinChars, 100, 10000, 50),
           mkNum('setting-articleMinRatio', t('articleMinRatio'), settings.articleMinRatio, 0.1, 1, 0.05),
           mkNum('setting-toastDuration', t('toastDuration'), settings.toastDuration, 500, 10000, 100),
           (() => { const f = mkCheck('setting-diagnosticLogging', t('diagnosticLogging'), settings.diagnosticLogging, true); f.querySelector('label')?.setAttribute('title', t('diagnosticLoggingHint')); return f; })()
         ),
         // ═══ 下載設定 ═══
-        mkSection(t('downloadSettings') || 'Download Settings', true,
+        mkSection(t('downloadSettings') || 'Download Settings', true, t('downloadSettingsDesc'),
           mkCheck('setting-downloadFrontmatter', t('downloadFrontmatter'), settings.downloadFrontmatter),
           (() => {
             const frontmatterCond = createElement('div', { className: `mdltx-conditional ${settings.downloadFrontmatter ? '' : 'hidden'}`, id: 'frontmatter-conditional' });
@@ -3269,7 +3478,7 @@
         ),
 
         // ═══ 元素選取設定 ═══
-        mkSection(t('elementPickerSettings'), true,
+        mkSection(t('elementPickerSettings'), true, t('elementPickerSettingsDesc'),
           mkCheck('setting-elementPickerEnabled', t('elementPickerEnabled'), settings.elementPickerEnabled),
           (() => {
             const pickerCond = createElement('div', { className: `mdltx-conditional ${settings.elementPickerEnabled ? '' : 'hidden'}`, id: 'picker-conditional' });
@@ -3294,7 +3503,7 @@
         ),
 
         // ═══ 預覽編輯設定 ═══
-        mkSection(t('previewSettings'), true,
+        mkSection(t('previewSettings'), true, t('previewSettingsDesc'),
           mkCheck('setting-previewEnabled', t('previewEnabled'), settings.previewEnabled),
           (() => {
             const previewCond = createElement('div', { className: `mdltx-conditional ${settings.previewEnabled ? '' : 'hidden'}`, id: 'preview-conditional' });
@@ -3329,7 +3538,7 @@
         ),
 
         // ═══ 第三方腳本兼容性 ═══
-        mkSection(t('thirdPartySettings'), true,
+        mkSection(t('thirdPartySettings'), true, t('thirdPartySettingsDesc'),
           mkCheck('setting-thirdPartyCompatibility', t('thirdPartyCompatibility'), settings.thirdPartyCompatibility),
           (() => {
             const thirdPartyCond = createElement('div', { className: `mdltx-conditional ${settings.thirdPartyCompatibility ? '' : 'hidden'}`, id: 'thirdparty-conditional' });
@@ -3400,7 +3609,8 @@
     closeSettings() {
       if (!this.modal) return;
       if (this._focusTrap) { this._focusTrap.deactivate(); this._focusTrap = null; }
-      document.body.style.overflow = this._prevBodyOverflow; this._prevBodyOverflow = '';
+      this.unlockScroll();
+      this._prevBodyOverflow = '';
       this.modal.classList.remove('open');
       this._tm.set(() => { if (this.modal?.parentNode) this.modal.remove(); this.modal = null; }, 200);
     }
@@ -4059,7 +4269,7 @@
       this._tm.clearAll();
       if (this._reinjectObserver) { this._reinjectObserver.disconnect(); this._reinjectObserver = null; }
       if (this._bodyObserver) { this._bodyObserver.disconnect(); this._bodyObserver = null; }
-      if (this._prevBodyOverflow !== undefined) document.body.style.overflow = this._prevBodyOverflow;
+      this.unlockScroll();
       if (this.host) { this.host.remove(); this.host = null; }
       this.shadow = this.root = this.button = this.sensor = this.tooltip = this.menu = this.toast = this.modal = null;
     }
