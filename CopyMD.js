@@ -199,7 +199,9 @@
 
   function migrateSettings() {
     try {
-      const cur = S.get('settingsVersion');
+      const rawVersion = GM_getValue('settingsVersion');
+      const parsedVersion = rawVersion === undefined || rawVersion === null ? 0 : Number(rawVersion);
+      const cur = Number.isFinite(parsedVersion) ? parsedVersion : 0;
       const migrations = [
         [2, ['strongEmBlockStrategy', 'complexTableStrategy', 'detailsStrategy', 'unknownEmptyTagStrategy', 'hiddenUntilFoundVisible', 'strictOffscreen']],
         [3, ['waitBeforeCaptureMs', 'waitDomIdleMs', 'mergeAdjacentCodeSpans', 'offscreenMargin']],
@@ -1297,6 +1299,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (key === 'className') el.className = value;
       else if (key === 'textContent') el.textContent = value;
       else if (key === 'value') el.value = value;
+      else if (key === 'checked') el.checked = !!value;
       else if (key.startsWith('on') && typeof value === 'function') el.addEventListener(key.slice(2).toLowerCase(), value);
       else if (key === 'style' && typeof value === 'object') Object.assign(el.style, value);
       else if (key === 'dataset' && typeof value === 'object') Object.assign(el.dataset, value);
@@ -1443,19 +1446,19 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
     return filename;
   }
 
   async function triggerAssetDownloads(assets) {
     if (!assets?.length) return;
     const canGMDownload = typeof GM_download === 'function';
-    for (const asset of assets) {
-      if (!asset?.url || !asset?.filename) continue;
+    const downloadAsset = async (asset) => {
+      if (!asset?.url || !asset?.filename) return;
       if (canGMDownload) {
         try {
           GM_download({ url: asset.url, name: asset.filename, onerror: () => {}, ontimeout: () => {} });
-          continue;
+          return;
         } catch {}
       }
       try {
@@ -1466,7 +1469,20 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       } catch (e) {
         console.warn('[mdltx] Asset download failed:', asset.url, e);
       }
+    };
+    const concurrency = 4;
+    const executing = [];
+    for (const asset of assets) {
+      const task = downloadAsset(asset).finally(() => {
+        const idx = executing.indexOf(task);
+        if (idx >= 0) executing.splice(idx, 1);
+      });
+      executing.push(task);
+      if (executing.length >= concurrency) {
+        await Promise.race(executing);
+      }
     }
+    await Promise.allSettled(executing);
   }
 
   function startBatchDownload(urls) {
@@ -1557,13 +1573,27 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         return { success: false, importedCount: 0, ignoredCount: 0, error: { type: 'invalid' } };
       }
       let importedCount = 0, ignoredCount = 0;
+      const coerceValue = (type, value) => {
+        if (type === 'boolean') {
+          if (value === true || value === 'true' || value === 1 || value === '1') return true;
+          if (value === false || value === 'false' || value === 0 || value === '0') return false;
+          return null;
+        }
+        if (type === 'number') {
+          const num = Number(value);
+          return Number.isFinite(num) ? num : null;
+        }
+        if (type === 'string') {
+          return value == null ? null : String(value);
+        }
+        return value ?? null;
+      };
       for (const [k, v] of Object.entries(parsed)) {
         if (k in DEFAULTS && k in SETTING_TYPES) {
           const type = SETTING_TYPES[k];
-          if (type === 'boolean' && typeof v === 'boolean') { S.set(k, v); importedCount++; }
-          else if (type === 'number' && typeof v === 'number' && !isNaN(v)) { S.set(k, v); importedCount++; }
-          else if (type === 'string' && typeof v === 'string') { S.set(k, v); importedCount++; }
-          else ignoredCount++;
+          const coerced = coerceValue(type, v);
+          if (coerced === null) ignoredCount++;
+          else { S.set(k, coerced); importedCount++; }
         } else {
           ignoredCount++;
         }
@@ -1646,10 +1676,11 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     if (!S.get('downloadFrontmatter')) return '';
 
     const jsonLd = extractJsonLdMetadata();
+    const escapeYamlValue = (value) => String(value ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ');
     const lines = ['---'];
 
     if (S.get('frontmatterTitle')) {
-      const title = (document.title || 'Untitled').replace(/"/g, '\\"').replace(/\n/g, ' ');
+      const title = escapeYamlValue(document.title || 'Untitled');
       lines.push(`title: "${title}"`);
     }
 
@@ -1665,23 +1696,23 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       const desc = getMetaContent('meta[name="description"]') ||
                    getMetaContent('meta[property="og:description"]') ||
                    jsonLd.description || '';
-      if (desc) lines.push(`description: "${desc.replace(/"/g, '\\"').replace(/\n/g, ' ').slice(0, 300)}"`);
+      if (desc) lines.push(`description: "${escapeYamlValue(desc).slice(0, 300)}"`);
     }
 
     if (S.get('frontmatterAuthor')) {
       const author = getMetaContent('meta[name="author"]') ||
                      getMetaContent('meta[property="article:author"]') ||
                      jsonLd.author || '';
-      if (author) lines.push(`author: "${author.replace(/"/g, '\\"')}"`);
+      if (author) lines.push(`author: "${escapeYamlValue(author)}"`);
     }
 
     if (S.get('frontmatterTags')) {
       const keywords = getMetaContent('meta[name="keywords"]') || '';
       if (keywords) {
         const tags = keywords.split(',').map(t => t.trim()).filter(Boolean).slice(0, 10);
-        if (tags.length) lines.push(`tags: [${tags.map(t => `"${t.replace(/"/g, '\\"')}"`).join(', ')}]`);
+        if (tags.length) lines.push(`tags: [${tags.map(t => `"${escapeYamlValue(t)}"`).join(', ')}]`);
       } else if (jsonLd.keywords?.length) {
-        const tags = jsonLd.keywords.slice(0, 10).map(t => t.replace(/"/g, '\\"'));
+        const tags = jsonLd.keywords.slice(0, 10).map(t => escapeYamlValue(t));
         if (tags.length) lines.push(`tags: [${tags.map(t => `"${t}"`).join(', ')}]`);
       }
     }
@@ -1689,26 +1720,26 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     if (S.get('frontmatterCanonical')) {
       const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href') ||
                         getMetaContent('meta[property="og:url"]') || '';
-      if (canonical) lines.push(`canonical: "${canonical.replace(/"/g, '\\"')}"`);
+      if (canonical) lines.push(`canonical: "${escapeYamlValue(canonical)}"`);
     }
 
     if (S.get('frontmatterPublished')) {
       const published = getMetaContent('meta[property="article:published_time"]') ||
                         getMetaContent('meta[name="article:published_time"]') ||
                         jsonLd.published || '';
-      if (published) lines.push(`published: "${published.replace(/"/g, '\\"')}"`);
+      if (published) lines.push(`published: "${escapeYamlValue(published)}"`);
     }
 
     if (S.get('frontmatterUpdated')) {
       const updated = getMetaContent('meta[property="og:updated_time"]') ||
                       getMetaContent('meta[name="article:modified_time"]') ||
                       jsonLd.updated || '';
-      if (updated) lines.push(`updated: "${updated.replace(/"/g, '\\"')}"`);
+      if (updated) lines.push(`updated: "${escapeYamlValue(updated)}"`);
     }
 
     if (S.get('frontmatterSite')) {
       const site = getMetaContent('meta[property="og:site_name"]') || jsonLd.site || '';
-      if (site) lines.push(`site: "${site.replace(/"/g, '\\"')}"`);
+      if (site) lines.push(`site: "${escapeYamlValue(site)}"`);
     }
 
     lines.push(`source: "${location.hostname}"`);
@@ -1739,7 +1770,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     _focusable() {
       return Array.from(this.container.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),a[href]')).filter(el => {
         if (el.getAttribute('tabindex') === '0') return true;
-        try { const cs = getComputedStyle(el); return cs.display !== 'none' && cs.visibility !== 'hidden'; } catch { return el.offsetParent !== null; }
+        try {
+          const cs = getComputedStyle(el);
+          if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+          return el.getClientRects().length > 0;
+        } catch {
+          return el.getClientRects?.().length > 0;
+        }
       });
     }
     _onKey(e) {
@@ -1889,14 +1926,16 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
       this.label.textContent = labelText;
       l.display = 'block';
-
-      const labelRect = this.label.getBoundingClientRect();
-      let labelTop = rect.top - labelRect.height - 4;
-      let labelLeft = rect.left;
-      if (labelTop < 0) labelTop = rect.bottom + 4;
-      if (labelLeft + labelRect.width > window.innerWidth) labelLeft = window.innerWidth - labelRect.width - 4;
-      l.top = `${Math.max(0, labelTop)}px`;
-      l.left = `${Math.max(0, labelLeft)}px`;
+      requestAnimationFrame(() => {
+        if (!this.label || !this.highlight || !this.active) return;
+        const labelRect = this.label.getBoundingClientRect();
+        let labelTop = rect.top - labelRect.height - 4;
+        let labelLeft = rect.left;
+        if (labelTop < 0) labelTop = rect.bottom + 4;
+        if (labelLeft + labelRect.width > window.innerWidth) labelLeft = window.innerWidth - labelRect.width - 4;
+        l.top = `${Math.max(0, labelTop)}px`;
+        l.left = `${Math.max(0, labelLeft)}px`;
+      });
     }
 
     _onMouseDown(e) {
@@ -2056,8 +2095,10 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       this._moreMenu = null;
       this._chrome = null;
       this._chromeAutoHideTimer = null;
+      this._chromeAutoHideHandlers = null;
       this._editorInputTimer = null;
       this._editorInputDelay = 150;
+      this._syncScrollTimer = null;
     }
 
     async show(markdown, options = {}) {
@@ -2155,10 +2196,23 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       }
 
       if (this._focusTrap) { this._focusTrap.deactivate(); this._focusTrap = null; }
-      this.modal.classList.remove('open');
+      if (this._editorInputTimer) { clearTimeout(this._editorInputTimer); this._editorInputTimer = null; }
+      if (this._chromeAutoHideTimer) { clearTimeout(this._chromeAutoHideTimer); this._chromeAutoHideTimer = null; }
+      if (this._syncScrollTimer) { clearTimeout(this._syncScrollTimer); this._syncScrollTimer = null; }
+      if (this._chromeAutoHideHandlers) {
+        const { modalEl, show, hide } = this._chromeAutoHideHandlers;
+        modalEl?.removeEventListener('mousemove', show);
+        modalEl?.removeEventListener('mouseleave', hide);
+        this._chromeAutoHideHandlers = null;
+      }
+      const modalToRemove = this.modal;
+      modalToRemove.classList.remove('open');
       this._originalContent = undefined;
       this.ui.unlockScroll();
-      setTimeout(() => { this.modal?.remove(); this.modal = null; }, 200);
+      setTimeout(() => {
+        modalToRemove?.remove();
+        if (this.modal === modalToRemove) this.modal = null;
+      }, 200);
     }
 
     _createModal() {
@@ -2398,6 +2452,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     _setupChromeAutoHide() {
       const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
       if (!modalEl || !this._chrome) return;
+      if (this._chromeAutoHideHandlers) {
+        const { modalEl: prevModal, show, hide } = this._chromeAutoHideHandlers;
+        prevModal?.removeEventListener('mousemove', show);
+        prevModal?.removeEventListener('mouseleave', hide);
+        this._chromeAutoHideHandlers = null;
+      }
       const enable = S.get('previewChromeAutoHide');
       modalEl.classList.toggle('chrome-autohide', enable);
       if (!enable) {
@@ -2417,6 +2477,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       };
       modalEl.addEventListener('mousemove', show);
       modalEl.addEventListener('mouseleave', hide);
+      this._chromeAutoHideHandlers = { modalEl, show, hide };
       hide();
     }
 
@@ -2609,7 +2670,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
               target.scrollTop = ratio * targetMax;
             }
             // 使用 setTimeout 而非立即解除，避免對方的 scroll 事件回彈
-            setTimeout(() => { this._isSyncing = false; }, 50);
+            if (this._syncScrollTimer) clearTimeout(this._syncScrollTimer);
+            const releaseDelay = 120;
+            this._syncScrollTimer = setTimeout(() => {
+              this._isSyncing = false;
+              this._syncScrollTimer = null;
+            }, releaseDelay);
           });
         };
 
@@ -2675,6 +2741,16 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         return;
       }
       applyInput();
+    }
+
+    _flushPendingEditorInput() {
+      if (this._editorInputTimer) {
+        clearTimeout(this._editorInputTimer);
+        this._editorInputTimer = null;
+      }
+      if (this._editorRef) {
+        this.content = this._editorRef.value;
+      }
     }
 
     _initEditorHistory(editor) {
@@ -2843,7 +2919,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         const lines = selected.split('\n');
         const prefixedLines = lines.map(line => {
           // 如果行已經有相同前綴，則跳過
-          if (line.trimStart().startsWith(prefix.trim())) {
+          if (line.trimStart().startsWith(prefix)) {
             return line;
           }
           return prefix + line;
@@ -2858,7 +2934,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         const currentLine = editor.value.substring(lineStart, actualLineEnd);
 
         // 檢查是否已有前綴
-        if (currentLine.trimStart().startsWith(prefix.trim())) {
+        if (currentLine.trimStart().startsWith(prefix)) {
           // 已有前綴，不重複添加
           return;
         }
@@ -2979,6 +3055,11 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       try {
         const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
         doc.querySelectorAll('script,iframe,object,embed,style,link,meta').forEach(el => el.remove());
+        doc.querySelectorAll('*').forEach(el => {
+          Array.from(el.attributes).forEach(attr => {
+            if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
+          });
+        });
         return doc.body.innerHTML;
       } catch {
         return String(html || '');
@@ -3096,7 +3177,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       // 圖片
       html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) => {
         const safeUrl = sanitizeUrl(url);
-        const safeAlt = escapeHtmlAttr(alt);
+        const safeAlt = alt;
         if (!safeUrl) return alt ? escapeHtml(alt) : '';
         return `<img alt="${safeAlt}" src="${escapeHtmlAttr(safeUrl)}" style="max-width:100%;" />`;
       });
@@ -3104,7 +3185,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       // 連結
       html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
         const safeUrl = sanitizeUrl(url);
-        const safeText = escapeHtml(text);
+        const safeText = text;
         if (!safeUrl) return safeText;
         return `<a href="${escapeHtmlAttr(safeUrl)}" target="_blank" style="color:var(--mdltx-primary);">${safeText}</a>`;
       });
@@ -3179,9 +3260,38 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       const headerRow = rows[0];
       const separatorRow = rows[1];
       const bodyRows = rows.slice(2);
+      const splitRow = (row) => {
+        const trimmed = row.trim();
+        const content = trimmed.startsWith('|') ? trimmed.slice(1) : trimmed;
+        const inner = content.endsWith('|') ? content.slice(0, -1) : content;
+        const cells = [];
+        let cur = '';
+        let escaped = false;
+        for (let i = 0; i < inner.length; i++) {
+          const ch = inner[i];
+          if (escaped) {
+            cur += ch;
+            escaped = false;
+            continue;
+          }
+          if (ch === '\\') {
+            cur += ch;
+            escaped = true;
+            continue;
+          }
+          if (ch === '|') {
+            cells.push(cur.replace(/\\\|/g, '|').trim());
+            cur = '';
+            continue;
+          }
+          cur += ch;
+        }
+        cells.push(cur.replace(/\\\|/g, '|').trim());
+        return cells;
+      };
 
       // 檢查分隔行
-      const sepCells = separatorRow.slice(1, -1).split('|').map(c => c.trim());
+      const sepCells = splitRow(separatorRow).map(c => c.trim());
       if (!sepCells.every(c => /^:?-+:?$/.test(c))) {
         return rows.join('\n');
       }
@@ -3194,7 +3304,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       });
 
       // 建構表格
-      const headerCells = headerRow.slice(1, -1).split('|').map(c => c.trim());
+      const headerCells = splitRow(headerRow).map(c => c.trim());
       let html = '<table style="border-collapse:collapse;width:100%;margin:1em 0;"><thead><tr>';
       headerCells.forEach((cell, i) => {
         html += `<th style="border:1px solid var(--mdltx-border);padding:8px;text-align:${aligns[i] || 'left'};background:var(--mdltx-bg-secondary);">${cell}</th>`;
@@ -3202,7 +3312,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       html += '</tr></thead><tbody>';
 
       for (const row of bodyRows) {
-        const cells = row.slice(1, -1).split('|').map(c => c.trim());
+        const cells = splitRow(row).map(c => c.trim());
         html += '<tr>';
         cells.forEach((cell, i) => {
           html += `<td style="border:1px solid var(--mdltx-border);padding:8px;text-align:${aligns[i] || 'left'};">${cell}</td>`;
@@ -3258,6 +3368,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     }
 
     async _handleCopy() {
+      this._flushPendingEditorInput();
       try {
         await setClipboardText(this.content);
         this.ui.showToast('success', t('previewCopySuccess'), `${this.content.length.toLocaleString()} ${t('previewCharCount')}`);
@@ -3266,6 +3377,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     }
 
     async _handleDownload() {
+      this._flushPendingEditorInput();
       try {
         let content = this.content;
 
@@ -4327,8 +4439,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         if (recording) return;
         if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
         else if (e.key === 'Enter') {
-          const t = e.target, isInput = t.tagName === 'INPUT' && t.type !== 'checkbox', isBtn = t.tagName === 'BUTTON', isSel = t.tagName === 'SELECT';
-          if (!isInput && !isBtn && !isSel) { e.preventDefault(); e.stopPropagation(); saveSettings(); }
+          const t = e.target, isInput = t.tagName === 'INPUT' && t.type !== 'checkbox', isBtn = t.tagName === 'BUTTON', isSel = t.tagName === 'SELECT', isTextarea = t.tagName === 'TEXTAREA';
+          if (!isInput && !isBtn && !isSel && !isTextarea) { e.preventDefault(); e.stopPropagation(); saveSettings(); }
         }
       });
 
@@ -4755,17 +4867,17 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           previewContent = frontmatter + result.markdown;
         }
 
-        this.setButtonState('default');
-        this.isProcessing = false;
         await this.previewModal.show(previewContent, {
           forDownload: true,
           includedFrontmatter: S.get('downloadFrontmatter'),
           mode: actualMode
         });
+        this.setButtonState('default');
       } catch (e) {
         console.error('[mdltx] Preview for download error:', e);
         this.setButtonState('error');
         this.showToast('error', t('toastError'), e.message);
+      } finally {
         this.isProcessing = false;
       }
     }
@@ -4832,13 +4944,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         const actualMode = mode || (hasSelection() ? 'selection' : decideModeNoSelection());
 
         const result = await generateMarkdown(actualMode);
-        this.setButtonState('default');
-        this.isProcessing = false;
         await this.previewModal.show(result.markdown, { mode: actualMode });
+        this.setButtonState('default');
       } catch (e) {
         console.error('[mdltx] Preview error:', e);
         this.setButtonState('error');
         this.showToast('error', t('toastError'), e.message);
+      } finally {
         this.isProcessing = false;
       }
     }
@@ -5486,9 +5598,10 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       ['\\(', '\\)'],
     ];
     for (const [open, close] of pairs) {
-      if (value.startsWith(open) && value.endsWith(close) && value.length >= open.length + close.length) {
-        value = value.slice(open.length, value.length - close.length).trim();
-      }
+      if (!value.startsWith(open) || !value.endsWith(close) || value.length < open.length + close.length) continue;
+      const inner = value.slice(open.length, value.length - close.length);
+      if (open === close && inner.includes(open)) continue;
+      value = inner.trim();
     }
     return value;
   }
@@ -5501,14 +5614,15 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         return wrapMath(existingTex, isBlock);
       }
       const getChildren = node => Array.from(node?.childNodes || []).filter(c => c.nodeType === 1);
-      const collect = node => {
+      const collect = (node, depth = 0) => {
+        if (depth > 200) return '';
         if (!node) return '';
         if (node.nodeType === 3) return (node.nodeValue || '').trim();
         if (node.nodeType !== 1) return '';
         const tag = node.tagName?.toLowerCase() || '', ch = getChildren(node), txt = () => (node.textContent || '').trim();
         const handler = MATHML_HANDLERS[tag];
-        if (handler) return handler(node, collect, txt, ch);
-        return ch.length ? ch.map(collect).join('') : txt();
+        if (handler) return handler(node, (n) => collect(n, depth + 1), txt, ch);
+        return ch.length ? ch.map(n => collect(n, depth + 1)).join('') : txt();
       };
       const content = collect(mathEl).trim(); if (!content) return '';
       return wrapMath(content, mathEl.getAttribute('display') === 'block');
@@ -5601,7 +5715,10 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
     const mdPatterns = [/^#{1,6}\s+.+$/m, /^\s*[-*+]\s+.+$/m, /^\s*\d+\.\s+.+$/m, /\[.+?\]\(.+?\)/, /\*\*.+?\*\*|__.+?__/, /^```[\s\S]*?```$/m, /^>\s+.+$/m, /^\s*[-*_]{3,}\s*$/m];
     let mdScore = 0; for (const p of mdPatterns) if (p.test(text)) mdScore++;
-    if (mdScore >= 3 || (/^#{1,6}\s+.+\n/.test(text) && mdScore >= 1)) return 'markdown';
+    const lineMarkers = [/^#{1,6}\s+.+$/m, /^\s*[-*+]\s+.+$/m, /^\s*\d+\.\s+.+$/m, /^```/m, /^>\s+.+$/m];
+    let markerLines = 0; for (const p of lineMarkers) if (p.test(text)) markerLines++;
+    const hasMultipleLines = text.includes('\n');
+    if (hasMultipleLines && ((mdScore >= 3 && markerLines >= 2) || (/^#{1,6}\s+.+\n/.test(text) && mdScore >= 1))) return 'markdown';
 
     if (/^\s*[\[{]/.test(text) && /[\]}]\s*$/.test(text)) {
       if (/^\s*\{[\s\S]*"[^"]+"\s*:/.test(text) || /^\s*\[[\s\S]*\{/.test(text)) { try { JSON.parse(text); return 'json'; } catch { if (/^\s*\{/.test(text) && /"[^"]+"\s*:/.test(text)) return 'json'; } }
@@ -5882,7 +5999,24 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     return null;
   }
 
-  function processRuby(rubyEl) { let result = ''; for (const child of rubyEl.childNodes) { if (child.nodeType === 3) result += child.nodeValue || ''; else if (child.nodeType === 1 && !/^(RT|RP)$/.test(child.tagName)) result += child.tagName === 'RUBY' ? processRuby(child) : (child.textContent || ''); } return result; }
+  function processRuby(rubyEl) {
+    let result = '';
+    for (const child of rubyEl.childNodes) {
+      if (child.nodeType === 3) {
+        result += child.nodeValue || '';
+        continue;
+      }
+      if (child.nodeType !== 1) continue;
+      if (child.tagName === 'RT') {
+        const rtText = (child.textContent || '').trim();
+        if (rtText) result += `(${rtText})`;
+        continue;
+      }
+      if (child.tagName === 'RP') continue;
+      result += child.tagName === 'RUBY' ? processRuby(child) : (child.textContent || '');
+    }
+    return result;
+  }
   function processSvg(svgEl) { const texts = []; try { const title = svgEl.querySelector('title'); if (title?.textContent?.trim()) texts.push(title.textContent.trim()); const desc = svgEl.querySelector('desc'); if (desc?.textContent?.trim()) texts.push(desc.textContent.trim()); svgEl.querySelectorAll('text').forEach(t => { if (t.textContent?.trim()) texts.push(t.textContent.trim()); }); } catch {} return texts.join(' '); }
 
   function smartConcat(out, part) {
@@ -5909,13 +6043,17 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
   }
 
   function escapeMarkdownText(s, ctx) { s = String(s ?? ''); if (ctx?.inTable) s = s.replace(/\|/g, '&#124;'); if (ctx?.escapeText) s = s.replace(/([\\*_`\[\]~])/g, '\\$1').replace(/</g, '&lt;').replace(/>/g, '&gt;'); return s; }
-  function escapeBracketText(s) { return String(s ?? '').replace(/\\/g, '\\\\').replace(/\[/g, '\\[').replace(/\]/g, '\\]'); }
+  function escapeBracketText(s, inTable = false) {
+    let out = String(s ?? '').replace(/\\/g, '\\\\').replace(/\[/g, '\\[').replace(/\]/g, '\\]');
+    if (inTable) out = out.replace(/\|/g, '\\|');
+    return out;
+  }
   function escapeLinkLabel(s, ctx) { s = String(s ?? '').replace(/\\/g, '\\\\').replace(/\[/g, '\\[').replace(/\]/g, '\\]'); if (ctx?.escapeText) s = s.replace(/\*/g, '\\*').replace(/_/g, '\\_').replace(/~/g, '\\~'); return s; }
   function escapeLinkDest(url, inTable = false) { url = String(url || '').trim(); if (!url) return ''; if (inTable) url = url.replace(/\|/g, '%7C'); if (/[()\s"<>]/.test(url)) return `<${encodeURI(url).replace(/</g, '%3C').replace(/>/g, '%3E').replace(/\|/g, '%7C')}>`; return url.replace(/\\/g, '\\\\').replace(/\)/g, '\\)'); }
-  function mdLink(text, href, inTable = false) { const lt = escapeBracketText(text || ''), lh = escapeLinkDest(href || '', inTable); return lh ? `[${lt}](${lh})` : lt; }
+  function mdLink(text, href, inTable = false) { const lt = escapeBracketText(text || '', inTable), lh = escapeLinkDest(href || '', inTable); return lh ? `[${lt}](${lh})` : lt; }
 
   function wrapInlineCode(text) {
-    text = String(text ?? ''); if (!text) return '``';
+    text = String(text ?? ''); if (!text) return '';
     let maxLen = 0; for (const t of (text.match(/`+/g) || [])) maxLen = Math.max(maxLen, t.length);
     const wrapper = '`'.repeat(Math.max(1, maxLen + 1)), needsPad = text[0] === '`' || text.slice(-1) === '`' || text[0] === ' ' || text.slice(-1) === ' ';
     return needsPad ? `${wrapper} ${text} ${wrapper}` : `${wrapper}${text}${wrapper}`;
@@ -6034,7 +6172,15 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           }
         }
         result = parts.join(' ');
-      } else result = mdInline(cell, ctx);
+      } else {
+        if (cell.querySelector('table')) {
+          const cellClone = cell.cloneNode(true);
+          cellClone.querySelectorAll('table').forEach(n => n.remove());
+          result = mdInline(cellClone, ctx);
+        } else {
+          result = mdInline(cell, ctx);
+        }
+      }
       result = String(result || '').replace(/(?:<br>\s*){3,}/g, '<br><br>').replace(/<br\s*\/?>/gi, ' ').replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim();
       for (const [k, v] of Object.entries(placeholders)) result = result.split(k).join(v);
       return result.trim();
@@ -6044,7 +6190,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
   function serializeTableAsHtml(tbl, ctx) {
     try { const clone = tbl.cloneNode(true), nestedMap = new Map(); let nid = 0; const nonce = generateNonce();
       clone.querySelectorAll('table table').forEach(nt => { const key = makePlaceholder('NTBL', nonce, nid++); nestedMap.set(key, serializeTableAsHtml(nt, ctx) || ''); const sp = document.createElement('span'); sp.textContent = key; nt.replaceWith(sp); });
-      clone.querySelectorAll('td, th').forEach(cell => { const mdContent = cellToMd(cell, ctx); cell.textContent = ''; cell.innerHTML = mdContent; });
+      clone.querySelectorAll('td, th').forEach(cell => { const mdContent = cellToMd(cell, ctx); cell.textContent = ''; safeSetInnerHTML(cell, mdContent); });
       const allowedAttrs = new Set(['rowspan', 'colspan', 'scope']);
       clone.querySelectorAll('*').forEach(el => { Array.from(el.attributes).forEach(attr => { if (!allowedAttrs.has(attr.name)) el.removeAttribute(attr.name); }); });
       let html = clone.outerHTML; for (const [k, v] of nestedMap.entries()) if (v) html = html.split(k).join(v);
@@ -6076,9 +6222,11 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     try { const isWikiMathDl = dl.classList?.contains('mw-ext-math-display'), hasDT = !!dl.querySelector?.(':scope > dt'), ddList = Array.from(dl.querySelectorAll?.(':scope > dd') || []), isDdOnlyDl = ddList.length > 0 && !hasDT;
       if (isWikiMathDl || isDdOnlyDl) { const blocks = []; for (const ch of Array.from(dl.children)) if (ch.tagName === 'DT' || ch.tagName === 'DD') { const m = trimNewlinesOnly(md(ch, ctx)).trim(); if (m) blocks.push(m); } const out = blocks.join('\n\n').trim(); return out ? `\n\n${out}\n\n` : ''; }
       const items = []; let curTerm = null, defs = []; const marker = getListMarker(), strong = getStrongMarker();
+      const lang = detectLanguage();
+      const colon = /^zh/i.test(lang) ? '：' : ':';
       const flush = () => { if (!curTerm) { const defTextOnly = defs.map(d => d.trim()).filter(Boolean).join('<br>'); if (defTextOnly) items.push(`${marker} ${defTextOnly}`); curTerm = null; defs = []; return; }
         const term = curTerm.trim(), defText = defs.map(d => d.trim()).filter(Boolean).join('<br>');
-        items.push(term && defText ? `${marker} ${strong}${term}${strong}：${defText}` : term ? `${marker} ${strong}${term}${strong}` : '');
+        items.push(term && defText ? `${marker} ${strong}${term}${strong}${colon}${defText}` : term ? `${marker} ${strong}${term}${strong}` : '');
         curTerm = null; defs = [];
       };
       for (const ch of Array.from(dl.children)) { if (ch.tagName === 'DT') { flush(); curTerm = mdInline(ch, ctx); } else if (ch.tagName === 'DD') defs.push(mdInline(ch, ctx)); }
@@ -6132,7 +6280,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       }
       if (T === 'CODE') { const txt = node.textContent || ''; return txt.trim() ? wrapInlineCode(txt) : ''; }
       if (T === 'A') { const textContent = processChildrenInline(node, { ...ctx, escapeText: false }).trim(), text = textContent || (node.getAttribute('href') || ''), href = hrefForA(node, ctx.baseUri); return href ? mdLink(text, href, ctx.inTable) : escapeLinkLabel(text, ctx); }
-      if (T === 'IMG') { const wtex = wikipediaImgToTex(node); if (wtex) return wtex; const alt = escapeBracketText((node.getAttribute('alt') || '').trim()), u = absUrl(pickImgSrc(node), ctx.baseUri); return u ? `![${alt}](${escapeLinkDest(u, ctx.inTable)})` : (alt || ''); }
+      if (T === 'IMG') { const wtex = wikipediaImgToTex(node); if (wtex) return wtex; const alt = escapeBracketText((node.getAttribute('alt') || '').trim(), ctx.inTable), u = absUrl(pickImgSrc(node), ctx.baseUri); return u ? `![${alt}](${escapeLinkDest(u, ctx.inTable)})` : (alt || ''); }
       if (T === 'SUB') return `<sub>${processChildrenInline(node, ctx).trim()}</sub>`;
       if (T === 'SUP') return `<sup>${processChildrenInline(node, ctx).trim()}</sup>`;
       if (T === 'KBD') return `<kbd>${processChildrenInline(node, ctx).trim()}</kbd>`;
@@ -6182,7 +6330,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (T === 'BR') return '<br>\n';
       if (T === 'HR') return `\n\n${getHorizontalRule()}\n\n`;
       if (T === 'A') { const textContent = processChildren(node, { ...ctx, escapeText: false }).trim(), text = textContent || (node.getAttribute('href') || ''), href = hrefForA(node, ctx.baseUri); return href ? mdLink(text, href, ctx.inTable) : escapeLinkLabel(text, ctx); }
-      if (T === 'IMG') { const wtex = wikipediaImgToTex(node); if (wtex) return wtex; const alt = escapeBracketText((node.getAttribute('alt') || '').trim()), u = absUrl(pickImgSrc(node), ctx.baseUri); return u ? `![${alt}](${escapeLinkDest(u, ctx.inTable)})` : (alt || ''); }
+      if (T === 'IMG') { const wtex = wikipediaImgToTex(node); if (wtex) return wtex; const alt = escapeBracketText((node.getAttribute('alt') || '').trim(), ctx.inTable), u = absUrl(pickImgSrc(node), ctx.baseUri); return u ? `![${alt}](${escapeLinkDest(u, ctx.inTable)})` : (alt || ''); }
       if (/^(STRONG|B|EM|I|DEL|S)$/.test(T)) return processInlineFormat(node, T, ctx);
       if (T === 'Q') {
         const inner = processChildren(node, ctx).trim();
@@ -6197,7 +6345,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (T === 'U') return `<u>${processChildren(node, ctx)}</u>`;
       if (T === 'MARK') return `<mark>${processChildren(node, ctx)}</mark>`;
       if (node.matches?.('.katex,.katex-display,mjx-container,.MathJax,span.MathJax,script[type^="math/tex"]')) { if (node.closest?.('pre,code')) return node.textContent || ''; let tex = extractTex(node); if (!tex) return ''; const block = isDisplayMath(node, tex); if (block && S.get('stripCommonIndentInBlockMath')) tex = stripCommonIndent(tex); return wrapMath(tex, block); }
-      if (T === 'BLOCKQUOTE') { let inner = processChildren(node, ctx).replace(/\n{3,}/g, '\n\n').trim().replace(/^\s{4}([-*+] |\d+\. )/gm, '$1'); return `\n\n${inner.split('\n').map(l => l.trim() === '' ? '>' : `> ${l}`).join('\n')}\n\n`; }
+      if (T === 'BLOCKQUOTE') { let inner = processChildren(node, ctx).replace(/\n{3,}/g, '\n\n').trim(); return `\n\n${inner.split('\n').map(l => l.trim() === '' ? '>' : `> ${l}`).join('\n')}\n\n`; }
       // ═══════════════════════════════════════════════════════════
       // 🔧 修復：處理 UL/OL 元素（包含非 LI 子元素的情況）
       // Arena 等現代平台使用 OL/UL 作為 flex 容器，子元素是 DIV
@@ -6252,7 +6400,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         return out.trim() ? `\n\n${out}\n\n` : '';
       }
       if (T === 'P') { const inner = processChildren(node, ctx).trim(); return inner ? `\n\n${inner}\n\n` : ''; }
-      if (/^(DIV|SECTION|ARTICLE|MAIN|NAV|HEADER|FOOTER|ASIDE)$/.test(T)) return `\n\n${processChildren(node, ctx)}\n\n`;
+      if (/^(DIV|SECTION|ARTICLE|MAIN|NAV|HEADER|FOOTER|ASIDE|ADDRESS|HGROUP|FORM|FIELDSET|DIALOG)$/.test(T)) {
+        return `\n\n${processChildren(node, ctx)}\n\n`;
+      }
       return processChildren(node, ctx);
     } catch (e) { console.warn('[mdltx] md error:', e); return ''; }
   }
@@ -6324,6 +6474,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         if (parent && /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|MJX-ASSISTIVE-MML)$/i.test(parent.tagName)) continue;
         // 跳過我們自己的 UI
         if (parent && (parent.id === 'mdltx-ui-host' || parent.closest?.('[data-mdltx-ui="1"]'))) continue;
+        if (parent) {
+          try {
+            const cs = getComputedStyle(parent);
+            if (cs.display === 'none' || cs.visibility === 'hidden' || cs.contentVisibility === 'hidden') continue;
+          } catch {}
+        }
         const text = node.nodeValue || '';
         if (text.trim()) len += text.length;
       }
@@ -6467,8 +6623,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
       // 對 AI 聊天平台使用更寬鬆的判斷
       if (isAIChatPlatform()) {
-        // 只要有足夠的內容就不算太小
-        return a < Math.min(S.get('articleMinChars'), 300);
+        // 固定使用較寬鬆的門檻，避免覆蓋使用者設定
+        return a < 200;
       }
 
       return a < S.get('articleMinChars') || a / b < S.get('articleMinRatio');
