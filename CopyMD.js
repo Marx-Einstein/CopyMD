@@ -1068,6 +1068,7 @@
 .mdltx-toast-close:hover{background:var(--mdltx-bg-secondary);color:var(--mdltx-text)}
 .mdltx-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:var(--mdltx-overlay);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all 0.2s ease;-webkit-backdrop-filter:blur(var(--mdltx-overlay-blur));backdrop-filter:blur(var(--mdltx-overlay-blur))}
 .mdltx-modal-overlay.open{opacity:1;visibility:visible}
+.mdltx-modal-overlay.preview-modal.is-fullscreen{padding:0}
 .mdltx-modal{width:100%;max-width:860px;max-height:calc(100vh - 40px);background:var(--mdltx-bg);border-radius:var(--mdltx-radius-lg);box-shadow:0 24px 52px var(--mdltx-shadow-lg);display:flex;flex-direction:column;transform:scale(0.95);transition:transform 0.2s ease;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-modal-overlay.open .mdltx-modal{transform:scale(1)}
 .mdltx-modal-header{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;border-bottom:1px solid var(--mdltx-border-subtle);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))}
@@ -1155,8 +1156,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 .mdltx-root[data-theme="dark"] .mdltx-preview-header{background:linear-gradient(180deg,rgba(31,41,55,0.7),rgba(31,41,55,0))}
 .mdltx-preview-title{font-size:14px;font-weight:600;color:var(--mdltx-text);display:flex;align-items:center;gap:6px;min-width:0}
 .mdltx-preview-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px;justify-content:flex-end}
-.mdltx-preview-footer-left{display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:nowrap}
-.mdltx-preview-stats{display:flex;gap:16px;font-size:12px;color:var(--mdltx-text-secondary);flex-wrap:nowrap;white-space:nowrap}
+.mdltx-preview-header-fallback{display:none;align-items:center;gap:6px;justify-content:flex-end;padding:8px 12px;border-bottom:1px solid var(--mdltx-border);flex-shrink:0}
+.mdltx-preview-footer-left{display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:nowrap;overflow:hidden}
+.mdltx-preview-stats{display:flex;gap:16px;font-size:12px;color:var(--mdltx-text-secondary);flex-wrap:nowrap;white-space:nowrap;min-width:0;overflow:hidden}
 .mdltx-preview-tabs{display:flex;background:var(--mdltx-bg-secondary);border-radius:8px;padding:3px;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-preview-tab{padding:6px 14px;border:none;background:none;color:var(--mdltx-text-secondary);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all 0.15s ease;font-family:inherit;letter-spacing:0.2px}
 .mdltx-preview-tab:hover{color:var(--mdltx-text)}
@@ -1164,12 +1166,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 .mdltx-preview-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .mdltx-preview-hint{font-size:11px;color:var(--mdltx-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mdltx-preview-hint.hidden{display:none}
-.mdltx-preview-content{flex:1;overflow:auto;padding:0}
-.mdltx-preview-editor{width:100%;height:100%;border:none;resize:none;padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6;color:var(--mdltx-text);background:var(--mdltx-bg);outline:none;transition:box-shadow 0.15s ease}
+.mdltx-preview-content{flex:1;overflow:auto;padding:0;display:flex;flex-direction:column;min-height:0}
+.mdltx-preview-editor{width:100%;flex:1;min-height:0;border:none;resize:none;padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6;color:var(--mdltx-text);background:var(--mdltx-bg);outline:none;transition:box-shadow 0.15s ease}
 .mdltx-preview-editor:focus{box-shadow:inset 0 0 0 2px rgba(37,99,235,0.15)}
 .mdltx-preview-rendered{padding:12px 14px;font-size:14px;line-height:1.7;color:var(--mdltx-text)}
 .mdltx-preview-rendered pre{background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);border-radius:8px;padding:12px 16px;overflow-x:auto;margin:12px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,0.2)}
-.mdltx-preview-rendered code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}
+.mdltx-preview-rendered code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;background:var(--mdltx-bg-secondary);padding:0.2em 0.4em;border-radius:4px;border:1px solid var(--mdltx-border-subtle)}
+.mdltx-preview-rendered pre code{background:none;padding:0;border:none;border-radius:0}
 .mdltx-preview-rendered p{margin:8px 0}
 .mdltx-preview-rendered h1,.mdltx-preview-rendered h2,.mdltx-preview-rendered h3{margin:16px 0 8px;font-weight:600}
 .mdltx-preview-rendered ul,.mdltx-preview-rendered ol{margin:8px 0;padding-left:24px}
@@ -2099,9 +2102,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       this._editorInputTimer = null;
       this._editorInputDelay = 150;
       this._syncScrollTimer = null;
+      this._suppressNextInputHistory = false;
     }
 
     async show(markdown, options = {}) {
+      if (this.modal) {
+        this.close(true);
+      }
       this._originalContent = markdown;
       this.content = markdown;
       this.options = options;
@@ -2111,12 +2118,15 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       this._history = [];
       this._historyIndex = -1;
       this._isApplyingHistory = false;
-      this.ui.lockScroll();
-      this._createModal();
+      let scrollLocked = false;
+      try {
+        this.ui.lockScroll();
+        scrollLocked = true;
+        this._createModal();
 
-      // 更新標題顯示
-      const titleEl = this.modal?.querySelector('#mdltx-preview-title');
-      if (titleEl) {
+        // 更新標題顯示
+        const titleEl = this.modal?.querySelector('#mdltx-preview-title');
+        if (titleEl) {
         // 如果包含 Frontmatter，顯示標籤
         if (options?.includedFrontmatter) {
           const badge = createElement('span', {
@@ -2176,19 +2186,38 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
             titleEl.appendChild(modeBadge);
           }
         }
-      }
+        }
 
-      this._bindEvents();
-      this._updateView();
-      this._updateStats();
-      await new Promise(r => requestAnimationFrame(r));
-      this.modal.classList.add('open');
-      this._focusTrap = new FocusTrap(this.modal.querySelector('.mdltx-preview-modal'));
-      this._focusTrap.activate();
+        this._bindEvents();
+        this._updateView();
+        this._updateStats();
+        await new Promise(r => requestAnimationFrame(r));
+        if (!this.modal) throw new Error('Preview modal creation failed');
+        this.modal.classList.add('open');
+        this._focusTrap = new FocusTrap(this.modal.querySelector('.mdltx-preview-modal'));
+        this._focusTrap.activate();
+      } catch (e) {
+        if (this._focusTrap) { this._focusTrap.deactivate(); this._focusTrap = null; }
+        if (this._editorInputTimer) { clearTimeout(this._editorInputTimer); this._editorInputTimer = null; }
+        if (this._chromeAutoHideTimer) { clearTimeout(this._chromeAutoHideTimer); this._chromeAutoHideTimer = null; }
+        if (this._syncScrollTimer) { clearTimeout(this._syncScrollTimer); this._syncScrollTimer = null; }
+        if (this._chromeAutoHideHandlers) {
+          const { modalEl, show, hide } = this._chromeAutoHideHandlers;
+          modalEl?.removeEventListener('mousemove', show);
+          modalEl?.removeEventListener('mouseleave', hide);
+          this._chromeAutoHideHandlers = null;
+        }
+        this.modal?.remove();
+        this.modal = null;
+        this._originalContent = undefined;
+        if (scrollLocked) this.ui.unlockScroll();
+        throw e;
+      }
     }
 
     close(force = false) {
       if (!this.modal) return;
+      this._flushPendingEditorInput();
 
       // 檢查是否有未儲存的編輯
       if (!force && this._originalContent !== undefined && this.content !== this._originalContent) {
@@ -2291,8 +2320,19 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         this._createMoreButton(),
       ].filter(Boolean));
 
+      const fallbackActions = createElement('div', { className: 'mdltx-preview-header-fallback' }, [
+        createElement('div', { className: 'mdltx-preview-view-toggle' }, [
+          createElement('button', { className: 'mdltx-preview-view-btn', type: 'button', dataset: { mode: 'preview' }, textContent: t('previewModePreview') }),
+          createElement('button', { className: 'mdltx-preview-view-btn', type: 'button', dataset: { mode: 'edit' }, textContent: t('previewModeEdit') }),
+          createElement('button', { className: 'mdltx-preview-view-btn', type: 'button', dataset: { mode: 'split' }, textContent: t('previewSplitView') }),
+        ]),
+        createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-fullscreen-btn-fallback', title: t('previewFullscreen') }, [createIcon('maximize', 18)]),
+        createElement('button', { className: 'mdltx-modal-close mdltx-modal-close-fallback', type: 'button', 'aria-label': t('close') }, [createIcon('x', 18)]),
+      ]);
+
       // 內容區
       const body = createElement('div', { className: 'mdltx-preview-body' }, [
+        fallbackActions,
         createElement('div', { className: 'mdltx-preview-content', id: 'mdltx-preview-content' }),
       ]);
 
@@ -2312,8 +2352,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         ]),
       ]);
 
-      const chrome = createElement('div', { className: 'mdltx-preview-chrome' }, [header, toolbar, footer]);
-      modal.append(chrome, body);
+      const chrome = createElement('div', { className: 'mdltx-preview-chrome' }, [header, toolbar]);
+      modal.append(chrome, body, footer);
       overlay.appendChild(modal);
       root.appendChild(overlay);
       this.modal = overlay;
@@ -2424,13 +2464,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           modalEl.classList.toggle('chrome-footer-hidden', !showFooter);
           if (footerLeft.parentElement !== footer) footer.insertBefore(footerLeft, footer.firstChild);
           if (footerButtons.parentElement !== footer) footer.appendChild(footerButtons);
-          if (toolbar && this._chrome && toolbar.parentElement !== this._chrome) this._chrome.insertBefore(toolbar, footer);
+          if (toolbar && this._chrome && toolbar.parentElement !== this._chrome) this._chrome.appendChild(toolbar);
         }
       } else {
         modalEl.classList.remove('chrome-footer-hidden');
         if (footerLeft.parentElement !== footer) footer.insertBefore(footerLeft, footer.firstChild);
         if (footerButtons.parentElement !== footer) footer.appendChild(footerButtons);
-        if (toolbar && this._chrome && toolbar.parentElement !== this._chrome) this._chrome.insertBefore(toolbar, footer);
+        if (toolbar && this._chrome && toolbar.parentElement !== this._chrome) this._chrome.appendChild(toolbar);
       }
     }
 
@@ -2438,6 +2478,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
       if (!modalEl || !this.modal) return;
       const header = this.modal.querySelector('.mdltx-preview-header');
+      const fallbackActions = this.modal.querySelector('.mdltx-preview-header-fallback');
       const toolbar = this.modal.querySelector('#mdltx-preview-toolbar');
       const footer = this.modal.querySelector('.mdltx-preview-footer');
       let showHeader = S.get('previewShowHeader');
@@ -2445,6 +2486,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       let showFooter = S.get('previewShowFooter');
       if (!showHeader && !showToolbar && !showFooter) showHeader = true;
       header?.classList.toggle('mdltx-hidden', !showHeader);
+      if (fallbackActions) fallbackActions.style.display = showHeader ? 'none' : 'flex';
       toolbar?.classList.toggle('mdltx-hidden', !showToolbar);
       footer?.classList.toggle('mdltx-hidden', !showFooter);
     }
@@ -2483,7 +2525,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
     _bindEvents() {
       if (!this.modal) return;
-      this.modal.querySelector('.mdltx-modal-close')?.addEventListener('click', () => this.close());
+      this.modal.querySelectorAll('.mdltx-modal-close').forEach(btn => btn.addEventListener('click', () => this.close()));
       this.modal.addEventListener('click', e => {
         if (this._moreMenu) this._moreMenu.classList.remove('open');
         if (e.target === this.modal) this.close();
@@ -2512,7 +2554,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       });
 
       // 全螢幕
-      this.modal.querySelector('#preview-fullscreen-btn')?.addEventListener('click', () => this._toggleFullscreen());
+      this.modal.querySelectorAll('#preview-fullscreen-btn, #preview-fullscreen-btn-fallback').forEach(btn => btn.addEventListener('click', () => this._toggleFullscreen()));
 
       // 複製/下載
       this.modal.querySelector('#preview-copy-btn')?.addEventListener('click', () => this._handleCopy());
@@ -2534,22 +2576,29 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       // 工具列顯示/隱藏
       const toolbar = this.modal?.querySelector('#mdltx-preview-toolbar');
       if (toolbar) {
-        toolbar.style.display = (this.mode === 'edit' || this.mode === 'split') ? 'flex' : 'none';
+        const shouldShowToolbar = this.mode === 'edit' || this.mode === 'split';
+        toolbar.classList.toggle('mdltx-hidden', !shouldShowToolbar);
+        toolbar.style.display = shouldShowToolbar ? 'flex' : 'none';
       }
     }
 
     _toggleFullscreen() {
       this.isFullscreen = !this.isFullscreen;
       const modalEl = this.modal?.querySelector('.mdltx-preview-modal');
-      const btn = this.modal?.querySelector('#preview-fullscreen-btn');
+      const btns = this.modal?.querySelectorAll('#preview-fullscreen-btn, #preview-fullscreen-btn-fallback');
       if (modalEl) {
         modalEl.classList.toggle('fullscreen', this.isFullscreen);
       }
-      if (btn) {
+      this.modal?.classList.toggle('is-fullscreen', this.isFullscreen);
+      const container = this.modal?.querySelector('#mdltx-preview-content');
+      if (container) {
+        container.style.maxHeight = this.isFullscreen ? '' : `${S.get('previewMaxHeight')}vh`;
+      }
+      btns?.forEach(btn => {
         while (btn.firstChild) btn.removeChild(btn.firstChild);
         btn.appendChild(createIcon(this.isFullscreen ? 'minimize' : 'maximize', 18));
         btn.title = this.isFullscreen ? t('previewExitFullscreen') : t('previewFullscreen');
-      }
+      });
     }
 
     _applyWrapState(textarea) {
@@ -2594,6 +2643,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     }
 
     _updateView() {
+      this._flushPendingEditorInput();
       const container = this.modal?.querySelector('#mdltx-preview-content');
       if (!container) return;
       while (container.firstChild) container.removeChild(container.firstChild);
@@ -2602,14 +2652,14 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       this._updateViewState();
       this._updatePreviewHint();
 
-      const maxH = `${S.get('previewMaxHeight')}vh`;
+      const maxH = this.isFullscreen ? '' : `${S.get('previewMaxHeight')}vh`;
+      const hasMaxH = !!maxH;
       const fontSize = `${S.get('previewFontSize')}px`;
 
       if (this.mode === 'edit') {
         const textarea = createElement('textarea', { className: 'mdltx-preview-editor', id: 'mdltx-preview-editor', spellcheck: 'false' });
         textarea.value = this.content;
         textarea.style.fontSize = fontSize;
-        textarea.style.minHeight = maxH;
         this._applyWrapState(textarea);
         textarea.addEventListener('input', () => this._handleEditorInput(textarea));
         container.appendChild(textarea);
@@ -2648,10 +2698,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           createElement('div', { className: 'mdltx-preview-pane-header', textContent: t('previewModePreview') }),
           createElement('div', { className: 'mdltx-preview-rendered', id: 'mdltx-preview-rendered' }),
         ]);
-        safeSetInnerHTML(previewPane.querySelector('.mdltx-preview-rendered'), this._renderMarkdown(this.content));
+        const splitRendered = previewPane.querySelector('.mdltx-preview-rendered');
+        splitRendered.style.fontSize = fontSize;
+        safeSetInnerHTML(splitRendered, this._renderMarkdown(this.content));
         this._updatePreviewHint();
 
-        container.style.maxHeight = maxH;
+        container.style.maxHeight = hasMaxH ? maxH : '';
         container.append(editPane, previewPane);
 
         // ═══ 滾動同步 ═══
@@ -2686,11 +2738,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       } else {
         // 純預覽
         const rendered = createElement('div', { className: 'mdltx-preview-rendered', id: 'mdltx-preview-rendered' });
+        rendered.style.fontSize = fontSize;
         safeSetInnerHTML(rendered, this._renderMarkdown(this.content));
         this._bindMathCopyHandlers(rendered);
         this._updatePreviewHint();
 
-        rendered.style.maxHeight = maxH;
+        container.style.maxHeight = hasMaxH ? maxH : '';
         container.appendChild(rendered);
         this._editorRef = null;
       }
@@ -2710,7 +2763,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (!hint) return;
       const mode = S.get('previewRenderer');
       const fallback = this._previewRendererFallback;
-      if (this.mode === 'edit') {
+      const showHint = S.get('previewShowRendererHint');
+      if (this.mode === 'edit' || !showHint) {
         hint.textContent = '';
         hint.classList.add('hidden');
         return;
@@ -2727,10 +2781,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     _handleEditorInput(editor) {
       if (!editor) return;
       const applyInput = () => {
+        const shouldRecordHistory = !this._suppressNextInputHistory;
+        this._suppressNextInputHistory = false;
         this.content = editor.value;
         this._updateStats();
         if (this.mode === 'split') this._updatePreviewPane();
-        this._recordHistory(editor);
+        if (shouldRecordHistory) this._recordHistory(editor);
       };
       if (this.mode === 'split') {
         if (this._editorInputTimer) clearTimeout(this._editorInputTimer);
@@ -2968,11 +3024,13 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     }
 
     _replaceEditorRange(editor, start, end, text, newStart, newEnd) {
+      this._suppressNextInputHistory = true;
       editor.setRangeText(text, start, end, 'preserve');
       this.content = editor.value;
       this._updateStats();
       if (this.mode === 'split') this._updatePreviewPane();
       requestAnimationFrame(() => {
+        this._suppressNextInputHistory = false;
         editor.focus();
         editor.setSelectionRange(newStart, newEnd);
         this._scrollToCursor(editor, newStart);
@@ -3191,7 +3249,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       });
 
       // 引用區塊
-      html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+      html = html.replace(/^&gt;\s+(.+)$/gm, '<blockquote>$1</blockquote>');
       html = html.replace(/<\/blockquote>\n<blockquote>/g, '<br>');
 
       // 表格
