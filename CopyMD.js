@@ -1169,7 +1169,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 .mdltx-preview-content{flex:1;overflow:auto;padding:0;display:flex;flex-direction:column;min-height:0}
 .mdltx-preview-editor{width:100%;flex:1;min-height:0;border:none;resize:none;padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6;color:var(--mdltx-text);background:var(--mdltx-bg);outline:none;transition:box-shadow 0.15s ease}
 .mdltx-preview-editor:focus{box-shadow:inset 0 0 0 2px rgba(37,99,235,0.15)}
-.mdltx-preview-rendered{padding:12px 14px;font-size:14px;line-height:1.7;color:var(--mdltx-text)}
+.mdltx-preview-rendered{padding:12px 14px;font-size:14px;line-height:1.7;color:var(--mdltx-text);overflow-wrap:break-word}
 .mdltx-preview-rendered pre{background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);border-radius:8px;padding:12px 16px;overflow-x:auto;margin:12px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,0.2)}
 .mdltx-preview-rendered code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;background:var(--mdltx-bg-secondary);padding:0.2em 0.4em;border-radius:4px;border:1px solid var(--mdltx-border-subtle)}
 .mdltx-preview-rendered pre code{background:none;padding:0;border:none;border-radius:0}
@@ -1214,6 +1214,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 .mdltx-preview-modal.split-view .mdltx-preview-pane-header{padding:8px 12px;background:var(--mdltx-bg-secondary);font-size:12px;font-weight:600;color:var(--mdltx-text-secondary);border-bottom:1px solid var(--mdltx-border)}
 .mdltx-preview-modal.split-view .mdltx-preview-editor{border:none;flex:1;resize:none}
 .mdltx-preview-modal.split-view .mdltx-preview-rendered{flex:1;overflow:auto}
+@media(max-width:768px){.mdltx-preview-modal.split-view .mdltx-preview-content{flex-direction:column}.mdltx-preview-modal.split-view .mdltx-preview-pane{border-right:none;border-bottom:1px solid var(--mdltx-border)}.mdltx-preview-modal.split-view .mdltx-preview-pane:last-child{border-bottom:none}}
 .mdltx-preview-toolbar{display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--mdltx-border-subtle);background:var(--mdltx-bg-secondary);flex-wrap:wrap}
 .mdltx-preview-toolbar-group{display:flex;align-items:center;gap:4px;padding-right:10px;border-right:1px solid var(--mdltx-border-subtle);margin-right:10px}
 .mdltx-preview-toolbar-group:last-child{border-right:none;margin-right:0;padding-right:0}
@@ -1288,8 +1289,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
 /* ═══ 工具列按鈕 hover tooltip ═══ */
 .mdltx-toolbar-btn{position:relative}
-.mdltx-toolbar-btn[title]::after{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:3px 8px;border-radius:4px;background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);color:var(--mdltx-text);font-size:11px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.15s ease 0.3s;z-index:1}
-.mdltx-toolbar-btn[title]:hover::after{opacity:1}
+.mdltx-toolbar-btn[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:3px 8px;border-radius:4px;background:var(--mdltx-bg-secondary);border:1px solid var(--mdltx-border);color:var(--mdltx-text);font-size:11px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.15s ease 0.3s;z-index:1}
+.mdltx-toolbar-btn[data-tip]:hover::after{opacity:1}
 `;
 
   // ─────────────────────────────────────────────────────────────
@@ -1392,21 +1393,33 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     }
   }
 
-  function buildAssetFilename(url, index) {
+  function buildAssetFilename(url, index, usedNames = new Set()) {
+    const ensureUnique = (candidate) => {
+      let output = candidate;
+      let seq = 2;
+      while (usedNames.has(output)) {
+        const match = output.match(/^(.*?)(\.[a-z0-9]{1,10})$/i);
+        output = match ? `${match[1]}_${seq}${match[2]}` : `${output}_${seq}`;
+        seq += 1;
+      }
+      usedNames.add(output);
+      return output;
+    };
     try {
       const u = new URL(url);
       const last = u.pathname.split('/').filter(Boolean).pop() || `asset_${index}`;
       const clean = sanitizeFilename(last) || `asset_${index}`;
-      if (/\.[a-z0-9]{1,6}$/i.test(clean)) return clean;
-      return `${clean}.bin`;
+      if (/\.[a-z0-9]{1,6}$/i.test(clean)) return ensureUnique(clean);
+      return ensureUnique(`${clean}.bin`);
     } catch {
-      return `asset_${index}.bin`;
+      return ensureUnique(`asset_${index}.bin`);
     }
   }
 
   function rewriteMarkdownAssets(markdown, replacements) {
     let out = markdown;
-    for (const [original, replacement] of replacements) {
+    const ordered = Array.from(replacements || []).slice().sort((a, b) => String(b?.[0] || '').length - String(a?.[0] || '').length);
+    for (const [original, replacement] of ordered) {
       if (!original || !replacement) continue;
       const escaped = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       out = out.replace(new RegExp(escaped, 'g'), replacement);
@@ -1428,16 +1441,22 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     const rawUrls = extractMarkdownImageUrls(markdown);
     if (!rawUrls.length) return { markdown, assets: [] };
     const folder = buildAssetsFolder(tokens);
+    const usedNames = new Set();
+    const urlToTarget = new Map();
     const replacements = [];
     const assets = [];
     let index = 1;
     for (const raw of rawUrls) {
       const normalized = normalizeAssetUrl(raw, document.baseURI);
       if (!normalized) continue;
-      const fileName = buildAssetFilename(normalized, index++);
-      const target = folder ? `${folder}/${fileName}` : fileName;
+      let target = urlToTarget.get(normalized);
+      if (!target) {
+        const fileName = buildAssetFilename(normalized, index++, usedNames);
+        target = folder ? `${folder}/${fileName}` : fileName;
+        urlToTarget.set(normalized, target);
+        assets.push({ url: normalized, filename: target });
+      }
       replacements.push([raw, target]);
-      assets.push({ url: normalized, filename: target });
     }
     const updated = rewriteMarkdownAssets(markdown, replacements);
     return { markdown: updated, assets };
@@ -1493,6 +1512,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     if (!list.length) return 0;
     const canOpenInTab = typeof GM_openInTab === 'function';
     const delay = canOpenInTab ? 400 : 0;
+    let opened = 0;
     const openTab = url => {
       try {
         if (canOpenInTab) GM_openInTab(url, { active: false, insert: true, setParent: true });
@@ -1502,15 +1522,16 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     list.forEach((u, idx) => {
       try {
         const parsed = new URL(u, location.href);
+        if (!/^https?:$/i.test(parsed.protocol)) return;
         parsed.searchParams.set('mdltx_autodownload', '1');
+        opened += 1;
         if (delay > 0) setTimeout(() => openTab(parsed.toString()), idx * delay);
         else openTab(parsed.toString());
       } catch {
-        if (delay > 0) setTimeout(() => openTab(u), idx * delay);
-        else openTab(u);
+        // Ignore invalid URL input.
       }
     });
-    return list.length;
+    return opened;
   }
 
   /**
@@ -2207,6 +2228,18 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           modalEl?.removeEventListener('mouseleave', hide);
           this._chromeAutoHideHandlers = null;
         }
+        this._editorRef = null;
+        this._wrapBtn = null;
+        this._syncScrollBtn = null;
+        this._chrome = null;
+        this._moreMenu = null;
+        this._hiddenToolbarButtons = new Set();
+        this._toolbarOverflowActions = [];
+        this._history = [];
+        this._historyIndex = -1;
+        this._isApplyingHistory = false;
+        this._isSyncing = false;
+        this._suppressNextInputHistory = false;
         this.modal?.remove();
         this.modal = null;
         this._originalContent = undefined;
@@ -2234,6 +2267,18 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         modalEl?.removeEventListener('mouseleave', hide);
         this._chromeAutoHideHandlers = null;
       }
+      this._editorRef = null;
+      this._wrapBtn = null;
+      this._syncScrollBtn = null;
+      this._chrome = null;
+      this._moreMenu = null;
+      this._hiddenToolbarButtons = new Set();
+      this._toolbarOverflowActions = [];
+      this._history = [];
+      this._historyIndex = -1;
+      this._isApplyingHistory = false;
+      this._isSyncing = false;
+      this._suppressNextInputHistory = false;
       const modalToRemove = this.modal;
       modalToRemove.classList.remove('open');
       this._originalContent = undefined;
@@ -2273,10 +2318,10 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
             ]),
           ]),
           // 快速操作
-          createElement('button', { className: 'mdltx-toolbar-btn mdltx-preview-header-action', type: 'button', id: 'preview-copy-btn-header', title: t('previewCopyBtn') }, [createIcon('copy', 16)]),
-          createElement('button', { className: 'mdltx-toolbar-btn mdltx-preview-header-action', type: 'button', id: 'preview-download-btn-header', title: t('previewDownloadBtn') }, [createIcon('download', 16)]),
+          createElement('button', { className: 'mdltx-toolbar-btn mdltx-preview-header-action', type: 'button', id: 'preview-copy-btn-header', dataset: { tip: t('previewCopyBtn') }, 'aria-label': t('previewCopyBtn') }, [createIcon('copy', 16)]),
+          createElement('button', { className: 'mdltx-toolbar-btn mdltx-preview-header-action', type: 'button', id: 'preview-download-btn-header', dataset: { tip: t('previewDownloadBtn') }, 'aria-label': t('previewDownloadBtn') }, [createIcon('download', 16)]),
           // 全螢幕按鈕
-          createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-fullscreen-btn', title: t('previewFullscreen') }, [createIcon('maximize', 18)]),
+          createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-fullscreen-btn', dataset: { tip: t('previewFullscreen') }, 'aria-label': t('previewFullscreen') }, [createIcon('maximize', 18)]),
           // 關閉按鈕
           createElement('button', { className: 'mdltx-modal-close', type: 'button', 'aria-label': t('close') }, [createIcon('x', 18)]),
         ]),
@@ -2326,7 +2371,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
           createElement('button', { className: 'mdltx-preview-view-btn', type: 'button', dataset: { mode: 'edit' }, textContent: t('previewModeEdit') }),
           createElement('button', { className: 'mdltx-preview-view-btn', type: 'button', dataset: { mode: 'split' }, textContent: t('previewSplitView') }),
         ]),
-        createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-fullscreen-btn-fallback', title: t('previewFullscreen') }, [createIcon('maximize', 18)]),
+        createElement('button', { className: 'mdltx-toolbar-btn', type: 'button', id: 'preview-fullscreen-btn-fallback', dataset: { tip: t('previewFullscreen') }, 'aria-label': t('previewFullscreen') }, [createIcon('maximize', 18)]),
         createElement('button', { className: 'mdltx-modal-close mdltx-modal-close-fallback', type: 'button', 'aria-label': t('close') }, [createIcon('x', 18)]),
       ]);
 
@@ -2373,11 +2418,12 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         this._registerToolbarAction(id, title, icon, onClick);
         return null;
       }
+      const tip = shortcut ? `${title} (${shortcut})` : title;
       const attrs = {
         className: `mdltx-toolbar-btn mdltx-editor-btn${pressed ? ' active' : ''}`,
         type: 'button',
-        title: shortcut ? `${title} (${shortcut})` : title,
-        dataset: { buttonId: id }
+        dataset: { buttonId: id, tip },
+        'aria-label': tip
       };
       if (isToggle) attrs['aria-pressed'] = String(pressed);
       const btn = createElement('button', attrs, [
@@ -2401,7 +2447,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
     _createMoreButton() {
       if (!S.get('previewShowMoreButton') || this._toolbarOverflowActions.length === 0) return null;
-      const moreBtn = createElement('button', { className: 'mdltx-toolbar-btn mdltx-editor-btn', type: 'button', title: t('previewMore') }, [
+      const moreTip = t('previewMore');
+      const moreBtn = createElement('button', { className: 'mdltx-toolbar-btn mdltx-editor-btn', type: 'button', dataset: { tip: moreTip }, 'aria-label': moreTip }, [
         createIcon('more', 16),
         createElement('span', { className: 'mdltx-editor-btn-label', textContent: t('previewMore') })
       ]);
@@ -2576,9 +2623,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       // 工具列顯示/隱藏
       const toolbar = this.modal?.querySelector('#mdltx-preview-toolbar');
       if (toolbar) {
-        const shouldShowToolbar = this.mode === 'edit' || this.mode === 'split';
+        const shouldShowToolbar = (this.mode === 'edit' || this.mode === 'split') && S.get('previewShowToolbar');
         toolbar.classList.toggle('mdltx-hidden', !shouldShowToolbar);
-        toolbar.style.display = shouldShowToolbar ? 'flex' : 'none';
       }
     }
 
@@ -2597,7 +2643,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       btns?.forEach(btn => {
         while (btn.firstChild) btn.removeChild(btn.firstChild);
         btn.appendChild(createIcon(this.isFullscreen ? 'minimize' : 'maximize', 18));
-        btn.title = this.isFullscreen ? t('previewExitFullscreen') : t('previewFullscreen');
+        const tip = this.isFullscreen ? t('previewExitFullscreen') : t('previewFullscreen');
+        btn.dataset.tip = tip;
+        btn.setAttribute('aria-label', tip);
       });
     }
 
@@ -2621,7 +2669,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (labelEl) labelEl.textContent = label;
       this._wrapBtn.classList.toggle('active', this.isWrapEnabled);
       this._wrapBtn.setAttribute('aria-pressed', String(this.isWrapEnabled));
-      this._wrapBtn.title = label;
+      this._wrapBtn.dataset.tip = label;
+      this._wrapBtn.setAttribute('aria-label', label);
     }
 
     _toggleSyncScroll() {
@@ -2637,13 +2686,17 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (labelEl) labelEl.textContent = label;
       this._syncScrollBtn.classList.toggle('active', this.isSyncScrollEnabled);
       this._syncScrollBtn.setAttribute('aria-pressed', String(this.isSyncScrollEnabled));
-      this._syncScrollBtn.title = label;
+      this._syncScrollBtn.dataset.tip = label;
+      this._syncScrollBtn.setAttribute('aria-label', label);
       const disabled = this.mode !== 'split';
       this._syncScrollBtn.disabled = disabled;
     }
 
     _updateView() {
       this._flushPendingEditorInput();
+      this._editorRef = null;
+      if (this._syncScrollTimer) { clearTimeout(this._syncScrollTimer); this._syncScrollTimer = null; }
+      this._isSyncing = false;
       const container = this.modal?.querySelector('#mdltx-preview-content');
       if (!container) return;
       while (container.firstChild) container.removeChild(container.firstChild);
@@ -2692,7 +2745,10 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         textarea.addEventListener('keyup', updateCursor2);
         textarea.addEventListener('click', updateCursor2);
         textarea.addEventListener('input', updateCursor2);
-        requestAnimationFrame(updateCursor2);
+        requestAnimationFrame(() => {
+          updateCursor2();
+          textarea.focus();
+        });
 
         const previewPane = createElement('div', { className: 'mdltx-preview-pane' }, [
           createElement('div', { className: 'mdltx-preview-pane-header', textContent: t('previewModePreview') }),
@@ -2701,6 +2757,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         const splitRendered = previewPane.querySelector('.mdltx-preview-rendered');
         splitRendered.style.fontSize = fontSize;
         safeSetInnerHTML(splitRendered, this._renderMarkdown(this.content));
+        this._bindMathCopyHandlers(splitRendered);
         this._updatePreviewHint();
 
         container.style.maxHeight = hasMaxH ? maxH : '';
@@ -2806,6 +2863,7 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       }
       if (this._editorRef) {
         this.content = this._editorRef.value;
+        this._recordHistory(this._editorRef);
       }
     }
 
@@ -2814,7 +2872,14 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       if (this._historyIndex === -1) {
         this._recordHistory(editor, true);
       } else {
-        this._restoreEditorState(editor);
+        const entry = this._history[this._historyIndex];
+        if (entry && entry.value === editor.value) {
+          requestAnimationFrame(() => {
+            try { editor.setSelectionRange(entry.selectionStart, entry.selectionEnd); } catch {}
+          });
+        } else {
+          this._recordHistory(editor);
+        }
       }
     }
 
@@ -2900,7 +2965,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
     _handleUndo() {
       const editor = this._editorRef;
-      if (!editor || this._historyIndex <= 0) return;
+      if (!editor) return;
+      this._flushPendingEditorInput();
+      if (this._historyIndex <= 0) return;
       editor.focus();
       this._historyIndex -= 1;
       this._applyHistoryEntry(editor, this._history[this._historyIndex]);
@@ -2908,7 +2975,9 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
     _handleRedo() {
       const editor = this._editorRef;
-      if (!editor || this._historyIndex >= this._history.length - 1) return;
+      if (!editor) return;
+      this._flushPendingEditorInput();
+      if (this._historyIndex >= this._history.length - 1) return;
       editor.focus();
       this._historyIndex += 1;
       this._applyHistoryEntry(editor, this._history[this._historyIndex]);
@@ -3024,12 +3093,20 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
     }
 
     _replaceEditorRange(editor, start, end, text, newStart, newEnd) {
+      if (this._editorInputTimer) {
+        clearTimeout(this._editorInputTimer);
+        this._editorInputTimer = null;
+      }
       this._suppressNextInputHistory = true;
       editor.setRangeText(text, start, end, 'preserve');
       this.content = editor.value;
       this._updateStats();
       if (this.mode === 'split') this._updatePreviewPane();
       requestAnimationFrame(() => {
+        if (this._editorInputTimer) {
+          clearTimeout(this._editorInputTimer);
+          this._editorInputTimer = null;
+        }
         this._suppressNextInputHistory = false;
         editor.focus();
         editor.setSelectionRange(newStart, newEnd);
@@ -3113,9 +3190,21 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       try {
         const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
         doc.querySelectorAll('script,iframe,object,embed,style,link,meta').forEach(el => el.remove());
+        const uriAttrs = new Set(['href', 'src', 'xlink:href', 'formaction', 'poster']);
         doc.querySelectorAll('*').forEach(el => {
           Array.from(el.attributes).forEach(attr => {
-            if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
+            const name = String(attr.name || '').toLowerCase();
+            const value = String(attr.value || '').trim();
+            if (/^on/i.test(name)) { el.removeAttribute(attr.name); return; }
+            if (uriAttrs.has(name) && value) {
+              if (/^(javascript|data|vbscript|file):/i.test(value)) { el.removeAttribute(attr.name); return; }
+              try {
+                const parsed = new URL(value, location.href);
+                if (!['http:', 'https:', 'mailto:', 'tel:'].includes(parsed.protocol)) el.removeAttribute(attr.name);
+              } catch {
+                if (!(value.startsWith('#') || value.startsWith('/'))) el.removeAttribute(attr.name);
+              }
+            }
           });
         });
         return doc.body.innerHTML;
@@ -3132,17 +3221,23 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
         .replace(/>/g,'&gt;')
         .replace(/"/g,'&quot;')
         .replace(/'/g,'&#39;');
+      const unescapeHtml = s => String(s)
+        .replace(/&#39;/g,"'")
+        .replace(/&quot;/g,'"')
+        .replace(/&gt;/g,'>')
+        .replace(/&lt;/g,'<')
+        .replace(/&amp;/g,'&');
       const sanitizeUrl = (url) => {
         const raw = String(url || '').trim();
         if (!raw) return '';
         if (raw.startsWith('#')) return raw;
-        if (/^(javascript|data):/i.test(raw)) return '';
+        if (/^(javascript|data|vbscript|file):/i.test(raw)) return '';
         try {
           const parsed = new URL(raw, location.href);
-          if (/^(javascript|data):/i.test(parsed.protocol)) return '';
+          if (!['http:', 'https:', 'mailto:', 'tel:'].includes(parsed.protocol)) return '';
           return parsed.href;
         } catch {
-          return raw;
+          return raw.startsWith('/') ? raw : '';
         }
       };
       const escapeRegex = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -3166,8 +3261,8 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
       };
 
       // 程式碼區塊（先處理）
-      html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
-        protectBlock(`<pre><code class="language-${escapeHtml(lang)}">${escapeHtml(code.trim())}</code></pre>`));
+      html = html.replace(/```[ \t]*([^\n`]*)\n([\s\S]*?)```/g, (_, lang, code) =>
+        protectBlock(`<pre><code class="language-${escapeHtml((lang || '').trim())}">${escapeHtml(code.trim())}</code></pre>`));
 
       // 行內程式碼（需逸出 HTML 以防止注入）
       html = html.replace(/(`+)([^`]+)\1/g, (_, ticks, code) =>
@@ -3234,15 +3329,15 @@ input.mdltx-checkbox{width:18px;height:18px;accent-color:var(--mdltx-primary);cu
 
       // 圖片
       html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) => {
-        const safeUrl = sanitizeUrl(url);
+        const safeUrl = sanitizeUrl(unescapeHtml(url));
         const safeAlt = alt;
-        if (!safeUrl) return alt ? escapeHtml(alt) : '';
+        if (!safeUrl) return alt || '';
         return `<img alt="${safeAlt}" src="${escapeHtmlAttr(safeUrl)}" style="max-width:100%;" />`;
       });
 
       // 連結
       html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
-        const safeUrl = sanitizeUrl(url);
+        const safeUrl = sanitizeUrl(unescapeHtml(url));
         const safeText = text;
         if (!safeUrl) return safeText;
         return `<a href="${escapeHtmlAttr(safeUrl)}" target="_blank" style="color:var(--mdltx-primary);">${safeText}</a>`;
